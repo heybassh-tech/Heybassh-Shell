@@ -19,6 +19,8 @@ import logo from "../../Images/heybasshlogo.png"
 import { Contacts } from "./dashboard/components/Contacts"
 import { Companies } from "./dashboard/components/Companies"
 import { Deals } from "./dashboard/components/Deals"
+import { Marketing } from "./dashboard/components/Marketing"
+import { Sales } from "./dashboard/components/Sales"
 import { Palette, createInstanceFromPalette } from "./builder/palette"
 import { BuilderCanvas, createInitialState, getComponentById } from "./builder/BuilderCanvas"
 import { ComponentEditor } from "./builder/component-editor"
@@ -1881,6 +1883,10 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
                 IT workspace coming soon. Connect device inventory, approval flows, and monitoring alerts here.
               </div>
             </div>
+          ) : view === "customers_marketing" ? (
+            <Marketing />
+          ) : view === "customers_sales" ? (
+            <Sales />
           ) : view === "admin_password_manager" ? (
             <div className="card rounded-[32px] bg-[#0e1629] p-6">
               {/* Filters */}
