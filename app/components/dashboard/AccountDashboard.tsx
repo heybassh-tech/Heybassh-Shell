@@ -63,6 +63,8 @@ import { Deals } from "./components/Deals";
 import { Products } from "./components/Products";
 import { Tasks } from "./components/Tasks";
 import { HRPeople } from "./components/HRPeople";
+import { Marketing } from "./components/Marketing";
+import { Sales } from "./components/Sales";
 import { Pill } from "./components/Pill";
 
 // Placeholder components for other tabs
@@ -327,172 +329,10 @@ export default function AccountDashboard({
             }}
           />
         );
-      case 'customers_marketing': {
-        const marketingModules = [
-          {
-            id: "forms_live_chat",
-            title: "Forms & Live Chat",
-            description: "Capture new leads and manage live conversations from your website and apps in one place.",
-          },
-          {
-            id: "call_to_action",
-            title: "Call-To-Action",
-            description: "Design, test, and track call-to-action blocks that turn visitors into pipeline.",
-          },
-          {
-            id: "social",
-            title: "Social",
-            description: "Plan, publish, and measure social posts across your primary channels.",
-          },
-          {
-            id: "ads",
-            title: "Ads",
-            description: "Run and review paid campaigns with clear checklists and performance snapshots.",
-          },
-          {
-            id: "events",
-            title: "Events",
-            description: "Organise webinars, meetups, and launches with simple tracking for attendees and follow‑ups.",
-          },
-          {
-            id: "campaigns",
-            title: "Campaigns",
-            description: "Group email, ads, and content into campaigns to see what actually moves revenue.",
-          },
-          {
-            id: "lead_scoring",
-            title: "Lead Scoring",
-            description: "Score leads automatically based on fit and engagement so sales knows who to call first.",
-          },
-          {
-            id: "seo_analytics",
-            title: "SEO & Analytics",
-            description: "Monitor search performance and key web metrics to spot what’s working and what’s not.",
-          },
-          {
-            id: "reviews",
-            title: "Reviews",
-            description: "Collect, respond to, and showcase customer reviews from a single workspace.",
-          },
-          {
-            id: "referral_system",
-            title: "Referral System",
-            description: "Track referrals, rewards, and partner-sourced deals to grow revenue efficiently.",
-          },
-        ];
-
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-white">Marketing</h2>
-              <p className="mt-1 text-sm text-blue-200">
-                Jump into the marketing modules your team uses to turn traffic into qualified pipeline.
-              </p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {marketingModules.map((module) => (
-                <div
-                  key={module.id}
-                  className="card relative flex h-full flex-col justify-between rounded-[28px] border border-[#141f3b] bg-[#060c20] p-5 shadow-[0_18px_40px_-28px_rgba(39,172,255,0.7)]"
-                >
-                  <button
-                    type="button"
-                    className="absolute right-3 top-3 text-blue-300/60 hover:text-blue-300"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-                    </svg>
-                  </button>
-                  <div>
-                    <h3 className="text-base font-semibold text-white">{module.title}</h3>
-                    <p className="mt-2 text-sm text-blue-200">{module.description}</p>
-                  </div>
-                  <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#5dd4ff] hover:text-white">
-                    Open
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
-      case 'customers_sales': {
-        const salesModules = [
-          {
-            id: "appointment_scheduling",
-            title: "Appointment Scheduling",
-            description: "Let prospects pick time slots that work for them while keeping reps’ calendars under control.",
-          },
-          {
-            id: "ai_sales_assistants",
-            title: "AI Sales Assistants",
-            description: "Use AI copilots to prep calls, summarize meetings, and surface next‑best actions for every deal.",
-          },
-          {
-            id: "video_selling",
-            title: "Video Selling",
-            description: "Record and send personal video explainers that help deals move forward asynchronously.",
-          },
-          {
-            id: "sales_automation",
-            title: "Sales Automation",
-            description: "Build simple sequences and workflows so follow‑ups, tasks, and handoffs never slip through.",
-          },
-          {
-            id: "sales_analytics",
-            title: "Sales Analytics",
-            description: "Track pipeline health, win rates, and rep performance with dashboards built for sales leaders.",
-          },
-          {
-            id: "documents",
-            title: "Documents",
-            description: "Send, track, and version proposals and contracts so the latest copy is always the one in play.",
-          },
-        ];
-
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-white">Sales</h2>
-              <p className="mt-1 text-sm text-blue-200">
-                Give your sales team focused tools to schedule, automate, and close more revenue.
-              </p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {salesModules.map((module) => (
-                <div
-                  key={module.id}
-                  className="card relative flex h-full flex-col justify-between rounded-[28px] border border-[#141f3b] bg-[#060c20] p-5 shadow-[0_18px_40px_-28px_rgba(39,172,255,0.7)]"
-                >
-                  <button
-                    type="button"
-                    className="absolute right-3 top-3 text-blue-300/60 hover:text-blue-300"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
-                    </svg>
-                  </button>
-                  <div>
-                    <h3 className="text-base font-semibold text-white">{module.title}</h3>
-                    <p className="mt-2 text-sm text-blue-200">{module.description}</p>
-                  </div>
-                  <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#5dd4ff] hover:text-white">
-                    Open
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      }
+      case 'customers_marketing':
+        return <Marketing />;
+      case 'customers_sales':
+        return <Sales />;
       case 'products_listing':
         return <Products products={products} onAddProduct={handleAddProduct} />;
       case 'tasks':

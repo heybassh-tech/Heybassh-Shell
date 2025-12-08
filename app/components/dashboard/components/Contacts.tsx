@@ -405,12 +405,18 @@ const toggleFilterPanel = (panel: FilterPanel) => {
       <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
         <h2 className="text-2xl font-bold text-white">Contacts</h2>
         <div className="flex items-center gap-2">
-          <PrimaryButton
-            onClick={() => setIsModalOpen(true)}
-            icon={<PlusIcon className="h-4 w-4" />}
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-[20px] border border-[#1a2446] bg-[#0e1629] p-2 text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
           >
-            Add Contact
-          </PrimaryButton>
+            <EllipsisVerticalIcon className="h-5 w-5" />
+          </button>
+        <PrimaryButton
+          onClick={() => setIsModalOpen(true)}
+          icon={<PlusIcon className="h-4 w-4" />}
+        >
+          Add Contact
+        </PrimaryButton>
         </div>
       </div>
 
@@ -623,7 +629,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                   ref={selectAllCheckboxRef}
                   checked={allSelected}
                   onChange={handleSelectAll}
-                  className="h-4 w-4 border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff] min1370:ml-[-20px]"
+                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff]"
                 />
               </th>
               <th scope="col" className="px-6 py-3 text-left">
@@ -945,10 +951,10 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                 </span>
               ) : (
                 "Save Changes"
-              )}
-            </PrimaryButton>
-          </div>
-        </form>
+                  )}
+                </PrimaryButton>
+              </div>
+            </form>
       </PrimaryModal>
     </div>
   );
