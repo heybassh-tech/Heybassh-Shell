@@ -626,7 +626,7 @@ export function Deals({
                   handleResetFilters();
                   setActiveFilterPanel(null);
                 }}
-                className="ml-auto inline-flex items-center gap-1 rounded-[20px] border border-transparent px-3 py-1.5 text-xs text-[#7ed0ff] transition hover:text-white"
+                className="m inline-flex items-center gap-1 rounded-[20px] border border-transparent px-3 py-1.5 text-xs text-[#7ed0ff] transition hover:text-white"
               >
                 Clear filters
               </button>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Task, priorityOptions, statusOptions } from "../types";
+import { PrimaryModal } from "../../PrimaryModal";
 
 interface TasksProps {
   tasks: Task[];
@@ -8,7 +9,7 @@ interface TasksProps {
 }
 
 export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
-  const [isAdding, setIsAdding] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "board">("list");
   const [filters, setFilters] = useState({
     search: "",
@@ -48,7 +49,7 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
       description: "",
       tags: [],
     });
-    setIsAdding(false);
+    setIsModalOpen(false);
   };
 
   const getPriorityColor = (priority: Task["priority"]) => {
@@ -166,17 +167,32 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
           </div>
           
           <button
-            onClick={() => setIsAdding(!isAdding)}
+            onClick={() => setIsModalOpen(true)}
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           >
-            {isAdding ? 'Cancel' : 'Add Task'}
+            Add Task
           </button>
         </div>
       </div>
-
-      {isAdding && (
-        <form onSubmit={handleAddTask} className="mb-6 rounded-lg bg-[#1a2035] p-6 shadow">
-          <h3 className="mb-4 text-lg font-semibold text-white">Add New Task</h3>
+      <PrimaryModal
+        open={isModalOpen}
+        title="Add Task"
+        description="Create a new task and assign it to a team member."
+        onClose={() => {
+          setIsModalOpen(false);
+          setNewTask({
+            title: "",
+            assignee: "",
+            dueDate: "",
+            priority: "Normal",
+            status: "Todo",
+            description: "",
+            tags: [],
+          });
+        }}
+        widthClassName="max-w-2xl"
+      >
+        <form onSubmit={handleAddTask} className="space-y-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label htmlFor="title" className="block text-sm font-medium text-gray-300">
@@ -273,7 +289,18 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
           <div className="mt-4 flex justify-end space-x-3">
             <button
               type="button"
-              onClick={() => setIsAdding(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                setNewTask({
+                  title: "",
+                  assignee: "",
+                  dueDate: "",
+                  priority: "Normal",
+                  status: "Todo",
+                  description: "",
+                  tags: [],
+                });
+              }}
               className="rounded-md border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
             >
               Cancel
@@ -286,7 +313,7 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
             </button>
           </div>
         </form>
-      )}
+      </PrimaryModal>
 
       {viewMode === "list" ? (
         <div className="overflow-hidden rounded-lg border border-gray-700 shadow">

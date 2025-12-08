@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Employee, LeaveRequest } from "../types";
+import { PrimaryModal } from "../../PrimaryModal";
 
 interface HRPeopleProps {
   employees: Employee[];
@@ -131,80 +132,78 @@ export function HRPeople({
 
       {activeTab === "employees" ? (
         <>
-          {isAddingEmployee && (
-            <div className="mb-6 rounded-lg bg-[#1a2035] p-6 shadow">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Add New Employee</h3>
+          <PrimaryModal
+            open={isAddingEmployee}
+            title="Add Employee"
+            description="Create a new employee profile."
+            onClose={() => {
+              setIsAddingEmployee(false);
+              setNewEmployee({ name: "", email: "", role: "" });
+            }}
+            widthClassName="max-w-2xl"
+          >
+            <form onSubmit={handleAddEmployee} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="emp-name" className="block text-sm font-medium text-gray-300">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    id="emp-name"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={newEmployee.name}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="emp-email" className="block text-sm font-medium text-gray-300">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="emp-email"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={newEmployee.email}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="emp-role" className="block text-sm font-medium text-gray-300">
+                    Role
+                  </label>
+                  <input
+                    type="text"
+                    id="emp-role"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={newEmployee.role}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 pt-4">
                 <button
-                  onClick={() => setIsAddingEmployee(false)}
-                  className="text-gray-400 hover:text-white"
+                  type="button"
+                  onClick={() => {
+                    setIsAddingEmployee(false);
+                    setNewEmployee({ name: "", email: "", role: "" });
+                  }}
+                  className="rounded-md border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
                 >
-                  <span className="sr-only">Close</span>
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                >
+                  Add Employee
                 </button>
               </div>
-              <form onSubmit={handleAddEmployee} className="mt-4 space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="emp-name" className="block text-sm font-medium text-gray-300">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="emp-name"
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={newEmployee.name}
-                      onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="emp-email" className="block text-sm font-medium text-gray-300">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="emp-email"
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={newEmployee.email}
-                      onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="emp-role" className="block text-sm font-medium text-gray-300">
-                      Role
-                    </label>
-                    <input
-                      type="text"
-                      id="emp-role"
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={newEmployee.role}
-                      onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsAddingEmployee(false)}
-                    className="rounded-md border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    Add Employee
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
+            </form>
+          </PrimaryModal>
 
           <div className="mb-4">
             <div className="relative">
@@ -284,104 +283,112 @@ export function HRPeople({
         </>
       ) : (
         <>
-          {isRequestingLeave && (
-            <div className="mb-6 rounded-lg bg-[#1a2035] p-6 shadow">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Request Leave</h3>
+          <PrimaryModal
+            open={isRequestingLeave}
+            title="Request Leave"
+            description="Submit a new leave request for an employee."
+            onClose={() => {
+              setIsRequestingLeave(false);
+              setNewLeaveRequest({
+                employeeId: "",
+                type: "Annual",
+                startDate: "",
+                endDate: "",
+              });
+            }}
+            widthClassName="max-w-2xl"
+          >
+            <form onSubmit={handleRequestLeave} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="leave-employee" className="block text-sm font-medium text-gray-300">
+                    Employee
+                  </label>
+                  <select
+                    id="leave-employee"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={newLeaveRequest.employeeId}
+                    onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, employeeId: e.target.value })}
+                  >
+                    <option value="">Select Employee</option>
+                    {employees.map((employee) => (
+                      <option key={employee.id} value={employee.id}>
+                        {employee.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="leave-type" className="block text-sm font-medium text-gray-300">
+                    Leave Type
+                  </label>
+                  <select
+                    id="leave-type"
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={newLeaveRequest.type}
+                    onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, type: e.target.value })}
+                  >
+                    <option value="Annual">Annual Leave</option>
+                    <option value="Sick">Sick Leave</option>
+                    <option value="Personal">Personal Leave</option>
+                    <option value="Unpaid">Unpaid Leave</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="start-date" className="block text-sm font-medium text-gray-300">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    id="start-date"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={newLeaveRequest.startDate}
+                    onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, startDate: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="end-date" className="block text-sm font-medium text-gray-300">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    id="end-date"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={newLeaveRequest.endDate}
+                    onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, endDate: e.target.value })}
+                    min={newLeaveRequest.startDate}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 pt-4">
                 <button
-                  onClick={() => setIsRequestingLeave(false)}
-                  className="text-gray-400 hover:text-white"
+                  type="button"
+                  onClick={() => {
+                    setIsRequestingLeave(false);
+                    setNewLeaveRequest({
+                      employeeId: "",
+                      type: "Annual",
+                      startDate: "",
+                      endDate: "",
+                    });
+                  }}
+                  className="rounded-md border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
                 >
-                  <span className="sr-only">Close</span>
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                >
+                  Submit Request
                 </button>
               </div>
-              <form onSubmit={handleRequestLeave} className="mt-4 space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="leave-employee" className="block text-sm font-medium text-gray-300">
-                      Employee
-                    </label>
-                    <select
-                      id="leave-employee"
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={newLeaveRequest.employeeId}
-                      onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, employeeId: e.target.value })}
-                    >
-                      <option value="">Select Employee</option>
-                      {employees.map((employee) => (
-                        <option key={employee.id} value={employee.id}>
-                          {employee.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="leave-type" className="block text-sm font-medium text-gray-300">
-                      Leave Type
-                    </label>
-                    <select
-                      id="leave-type"
-                      className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={newLeaveRequest.type}
-                      onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, type: e.target.value })}
-                    >
-                      <option value="Annual">Annual Leave</option>
-                      <option value="Sick">Sick Leave</option>
-                      <option value="Personal">Personal Leave</option>
-                      <option value="Unpaid">Unpaid Leave</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="start-date" className="block text-sm font-medium text-gray-300">
-                      Start Date
-                    </label>
-                    <input
-                      type="date"
-                      id="start-date"
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={newLeaveRequest.startDate}
-                      onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, startDate: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="end-date" className="block text-sm font-medium text-gray-300">
-                      End Date
-                    </label>
-                    <input
-                      type="date"
-                      id="end-date"
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={newLeaveRequest.endDate}
-                      onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, endDate: e.target.value })}
-                      min={newLeaveRequest.startDate}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsRequestingLeave(false)}
-                    className="rounded-md border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    Submit Request
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
+            </form>
+          </PrimaryModal>
 
           <div className="mb-4 flex flex-col justify-between space-y-3 sm:flex-row sm:items-center sm:space-y-0">
             <div className="relative flex-1 max-w-md">

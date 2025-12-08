@@ -605,7 +605,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                   handleResetFilters();
                   setActiveFilterPanel(null);
                 }}
-                className="ml-auto inline-flex items-center gap-1 rounded-[20px] border border-transparent px-3 py-1.5 text-xs font-medium text-[#7ed0ff] transition-colors hover:text-white"
+                className="inline-flex items-center gap-1 rounded-[20px] border border-transparent px-3 py-1.5 text-xs font-medium text-[#7ed0ff] transition-colors hover:text-white"
               >
                 Clear Filters
               </button>

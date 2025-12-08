@@ -1930,9 +1930,6 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
                       </p>
                     </div>
                   </div>
-                  <button className="hidden rounded-[24px] border border-[#1a2446] bg-[#0b1225] px-4 py-1.5 text-xs font-medium text-[#5dd4ff] hover:bg-[#121c3d] md:inline-flex">
-                    Print
-                  </button>
                 </div>
 
                 {/* Right column info + usage */}

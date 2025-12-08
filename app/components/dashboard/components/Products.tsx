@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Product } from "../types";
+import { PrimaryModal } from "../../PrimaryModal";
 
 interface ProductsProps {
   products: Product[];
@@ -7,7 +8,7 @@ interface ProductsProps {
 }
 
 export function Products({ products, onAddProduct }: ProductsProps) {
-  const [isAdding, setIsAdding] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({ 
@@ -38,7 +39,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
       price: 0,
       stock: 0
     });
-    setIsAdding(false);
+    setIsModalOpen(false);
   };
 
   return (
@@ -74,17 +75,30 @@ export function Products({ products, onAddProduct }: ProductsProps) {
           </select>
           
           <button
-            onClick={() => setIsAdding(!isAdding)}
+            onClick={() => setIsModalOpen(true)}
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           >
-            {isAdding ? 'Cancel' : 'Add Product'}
+            Add Product
           </button>
         </div>
       </div>
-
-      {isAdding && (
-        <form onSubmit={handleAddProduct} className="mb-6 rounded-lg bg-[#1a2035] p-6 shadow">
-          <h3 className="mb-4 text-lg font-semibold text-white">Add New Product</h3>
+      <PrimaryModal
+        open={isModalOpen}
+        title="Add Product"
+        description="Create a new product in your listing."
+        onClose={() => {
+          setIsModalOpen(false);
+          setNewProduct({ 
+            sku: "",
+            name: "", 
+            category: "General", 
+            price: 0,
+            stock: 0
+          });
+        }}
+        widthClassName="max-w-2xl"
+      >
+        <form onSubmit={handleAddProduct} className="space-y-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div>
               <label htmlFor="sku" className="block text-sm font-medium text-gray-300">
@@ -96,7 +110,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
                 required
                 className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 value={newProduct.sku}
-                onChange={(e) => setNewProduct({...newProduct, sku: e.target.value})}
+                onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })}
               />
             </div>
             <div>
@@ -109,7 +123,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
                 required
                 className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 value={newProduct.name}
-                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
               />
             </div>
             <div>
@@ -120,7 +134,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
                 id="category"
                 className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 value={newProduct.category}
-                onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
               >
                 {categories.filter(c => c !== "All").map(category => (
                   <option key={category} value={category} className="bg-gray-800">
@@ -141,7 +155,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
                 required
                 className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 value={newProduct.price}
-                onChange={(e) => setNewProduct({...newProduct, price: parseFloat(e.target.value) || 0})}
+                onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) || 0 })}
               />
             </div>
             <div>
@@ -155,14 +169,23 @@ export function Products({ products, onAddProduct }: ProductsProps) {
                 required
                 className="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 value={newProduct.stock}
-                onChange={(e) => setNewProduct({...newProduct, stock: parseInt(e.target.value) || 0})}
+                onChange={(e) => setNewProduct({ ...newProduct, stock: parseInt(e.target.value) || 0 })}
               />
             </div>
           </div>
           <div className="mt-4 flex justify-end space-x-3">
             <button
               type="button"
-              onClick={() => setIsAdding(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                setNewProduct({ 
+                  sku: "",
+                  name: "", 
+                  category: "General", 
+                  price: 0,
+                  stock: 0
+                });
+              }}
               className="rounded-md border border-gray-600 bg-transparent px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
             >
               Cancel
@@ -175,7 +198,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
             </button>
           </div>
         </form>
-      )}
+      </PrimaryModal>
 
       <div className="overflow-hidden rounded-lg border border-gray-700 shadow">
         <table className="min-w-full divide-y divide-gray-700">
