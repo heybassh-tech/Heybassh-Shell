@@ -19,6 +19,8 @@ import logo from "../../Images/heybasshlogo.png"
 import { Contacts } from "./dashboard/components/Contacts"
 import { Companies } from "./dashboard/components/Companies"
 import { Deals } from "./dashboard/components/Deals"
+import { Products } from "./dashboard/components/Products"
+import { Tasks } from "./dashboard/components/Tasks"
 import { Marketing } from "./dashboard/components/Marketing"
 import { Sales } from "./dashboard/components/Sales"
 import { Palette, createInstanceFromPalette } from "./builder/palette"
@@ -744,6 +746,16 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
     setNewTask({ title: "", assignee: "", dueDate: "", priority: "Normal", description: "", tags: "" })
   }
 
+  // Wrapper functions for modal-based components
+  function handleAddProductFromModal(product: Omit<Product, 'id'>) {
+    setProducts([...products, product])
+  }
+
+  function handleAddTaskFromModal(task: Omit<Task, 'id'>) {
+    const nextId = `T-${String(tasks.length + 1).padStart(3, "0")}`
+    setTasks([...tasks, { ...task, id: nextId }])
+  }
+
   function handleResetTaskForm() {
     setNewTask({ title: "", assignee: "", dueDate: "", priority: "Normal", description: "", tags: "" })
   }
@@ -1346,322 +1358,12 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
               />
             </div>
           ) : view === "products_listing" ? (
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-              <div className="card rounded-[32px] bg-[#070d20] p-6">
-                <div className="mb-6">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <h2 className="text-2xl font-semibold text-white">Product Listing</h2>
-                      <p className="mt-1 text-sm text-blue-200">Catalog of sellable items</p>
-                    </div>
-                    <Pill>Catalog</Pill>
-                  </div>
-                  <div className="mt-4 flex flex-wrap items-center gap-3">
-                    <div className="flex-1 rounded-[32px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                      <input
-                        type="text"
-                        value={productSearch}
-                        onChange={(event) => setProductSearch(event.target.value)}
-                        placeholder="Search name, SKU"
-                        className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                      />
-                    </div>
-                    <select
-                      value={productCategory}
-                      onChange={(event) => setProductCategory(event.target.value)}
-                      className="rounded-[24px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100"
-                    >
-                      {["All", "Merch", "Bundle", "Service", "General"].map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  <button
-                    onClick={() => {
-                        setProductSearch("")
-                        setProductCategory("All")
-                    }}
-                      className="rounded-[24px] border border-[#1a2446] px-4 py-2 text-sm text-blue-100 hover:bg-[#121c3d]"
-                  >
-                      Clear
-                  </button>
-                </div>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full rounded-[6px] border border-[#121a36] bg-[#09112a]">
-                    <thead>
-                      <tr className="border-b border-[#1a2446] text-left text-xs font-semibold uppercase tracking-wide text-blue-300">
-                        <th className="px-4 py-3">SKU</th>
-                        <th className="px-4 py-3">Name</th>
-                        <th className="px-4 py-3">Category</th>
-                        <th className="px-4 py-3">Price</th>
-                        <th className="px-4 py-3">Stock</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredProducts.map((product) => (
-                        <tr key={product.sku} className="border-b border-[#1a2446]/40 last:border-b-0">
-                          <td className="px-4 py-3 text-sm text-blue-300">{product.sku}</td>
-                          <td className="px-4 py-3 text-sm font-semibold text-white">{product.name}</td>
-                          <td className="px-4 py-3 text-sm text-blue-200">{product.category}</td>
-                          <td className="px-4 py-3 text-sm text-blue-200">${product.price}</td>
-                          <td className="px-4 py-3 text-sm text-blue-200">{product.stock}</td>
-                        </tr>
-                      ))}
-                      {!filteredProducts.length && (
-                        <tr>
-                          <td colSpan={5} className="px-4 py-6 text-center text-sm text-blue-300">
-                            No products available for this filter.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-            </div>
-          </div>
-              <div className="card rounded-[32px] bg-[#070d20] p-6">
-                <h2 className="text-2xl font-semibold text-white">Add Product</h2>
-                <form className="mt-6 space-y-4" onSubmit={handleAddProduct}>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="text"
-                      value={newProduct.sku}
-                      onChange={(event) => setNewProduct((prev) => ({ ...prev, sku: event.target.value }))}
-                      placeholder="SKU"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-                </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="text"
-                      value={newProduct.name}
-                      onChange={(event) => setNewProduct((prev) => ({ ...prev, name: event.target.value }))}
-                      placeholder="Name"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-              </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="text"
-                      value={newProduct.category}
-                      onChange={(event) => setNewProduct((prev) => ({ ...prev, category: event.target.value }))}
-                      placeholder="Category"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-            </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="number"
-                      value={newProduct.price}
-                      onChange={(event) => setNewProduct((prev) => ({ ...prev, price: event.target.value }))}
-                      placeholder="Price"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-              </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="number"
-                      value={newProduct.stock}
-                      onChange={(event) => setNewProduct((prev) => ({ ...prev, stock: event.target.value }))}
-                      placeholder="Stock"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full rounded-[28px] bg-gradient-to-r from-[#31b0ff] to-[#66d6ff] py-2 text-sm font-semibold text-[#041226] transition hover:brightness-110 disabled:opacity-50"
-                    disabled={!newProduct.sku || !newProduct.name}
-                  >
-                    Save
-                  </button>
-                </form>
-                <p className="mt-4 text-xs text-blue-300">Demo only. Data is stored locally in your browser.</p>
-              </div>
+            <div className="space-y-6">
+              <Products products={products} onAddProduct={handleAddProductFromModal} />
             </div>
           ) : view === "tasks" ? (
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-              <div className="card rounded-[32px] bg-[#070d20] p-6">
-                <h2 className="text-2xl font-semibold text-white">New Task</h2>
-                <form className="mt-6 space-y-4" onSubmit={handleAddTask}>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="text"
-                      value={newTask.title}
-                      onChange={(event) => setNewTask((prev) => ({ ...prev, title: event.target.value }))}
-                      placeholder="Title"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-                  </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="text"
-                      value={newTask.assignee}
-                      onChange={(event) => setNewTask((prev) => ({ ...prev, assignee: event.target.value }))}
-                      placeholder="Assignee"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-                  </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="date"
-                      value={newTask.dueDate}
-                      onChange={(event) => setNewTask((prev) => ({ ...prev, dueDate: event.target.value }))}
-                      placeholder="yyyy/mm/dd"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-                  </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <select
-                      value={newTask.priority}
-                      onChange={(event) => setNewTask((prev) => ({ ...prev, priority: event.target.value as Task["priority"] }))}
-                      className="w-full bg-transparent text-sm text-blue-100 focus:outline-none"
-                    >
-                      {priorityOptions.map((priority) => (
-                        <option key={priority} value={priority} className="bg-[#0e1629]">
-                          {priority}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <textarea
-                      value={newTask.description}
-                      onChange={(event) => setNewTask((prev) => ({ ...prev, description: event.target.value }))}
-                      placeholder="Description"
-                      className="h-32 w-full resize-none bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-                  </div>
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="text"
-                      value={newTask.tags}
-                      onChange={(event) => setNewTask((prev) => ({ ...prev, tags: event.target.value }))}
-                      placeholder="Tags (comma separated)"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="submit"
-                      className="flex-1 rounded-[28px] bg-gradient-to-r from-[#31b0ff] to-[#66d6ff] py-2 text-sm font-semibold text-[#041226] transition hover:brightness-110 disabled:opacity-50"
-                      disabled={!newTask.title.trim()}
-                    >
-                      Add Task
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleResetTaskForm}
-                      className="rounded-[28px] border border-[#1a2446] px-6 py-2 text-sm text-blue-100 hover:bg-[#121c3d]"
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </form>
-                <div className="mt-6 rounded-[28px] border border-[#1a2446] bg-[#09112a]">
-                  <div className="overflow-x-auto rounded-[28px]">
-                    <table className="w-full">
-                  <thead>
-                        <tr className="border-b border-[#1a2446] text-left text-xs font-semibold uppercase tracking-wide text-blue-300">
-                          <th className="px-4 py-3">ID</th>
-                          <th className="px-4 py-3">Title</th>
-                          <th className="px-4 py-3">Assignee</th>
-                          <th className="px-4 py-3">Due</th>
-                          <th className="px-4 py-3">Priority</th>
-                          <th className="px-4 py-3">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                        {filteredTasks.map((task) => (
-                          <tr key={task.id} className="border-b border-[#1a2446]/40 last:border-b-0">
-                            <td className="px-4 py-3 text-sm text-blue-300">{task.id}</td>
-                            <td className="px-4 py-3 text-sm font-semibold text-white">{task.title}</td>
-                            <td className="px-4 py-3 text-sm text-blue-200">{task.assignee}</td>
-                            <td className="px-4 py-3 text-sm text-blue-200">{task.dueDate || "—"}</td>
-                            <td className="px-4 py-3 text-sm text-blue-200">{task.priority}</td>
-                            <td className="px-4 py-3 text-sm text-blue-200">{task.status}</td>
-                    </tr>
-                        ))}
-                        {!filteredTasks.length && (
-                          <tr>
-                            <td colSpan={6} className="px-4 py-6 text-center text-sm text-blue-300">
-                              No tasks found.
-                            </td>
-                    </tr>
-                        )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-              </div>
-              <div className="card rounded-[32px] bg-[#070d20] p-6">
-                <h2 className="text-2xl font-semibold text-white">Filters</h2>
-                <div className="mt-6 space-y-4">
-                  <div className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                    <input
-                      type="text"
-                      value={taskFilters.search}
-                      onChange={(event) => setTaskFilters((prev) => ({ ...prev, search: event.target.value }))}
-                      placeholder="Search"
-                      className="w-full bg-transparent text-sm text-blue-100 placeholder-blue-300/70 focus:outline-none"
-                    />
-            </div>
-                  {(["status", "priority", "assignee"] as const).map((filterKey) => (
-                    <div key={filterKey} className="rounded-[28px] border border-[#1a2446] bg-[#0e1629] px-4 py-2">
-                      <select
-                        value={taskFilters[filterKey]}
-                        onChange={(event) => setTaskFilters((prev) => ({ ...prev, [filterKey]: event.target.value }))}
-                        className="w-full bg-transparent text-sm text-blue-100 focus:outline-none"
-                      >
-                        <option className="bg-[#0e1629]" value="All">
-                          All
-                        </option>
-                        {filterKey === "priority" &&
-                          priorityOptions.map((priority) => (
-                            <option key={priority} className="bg-[#0e1629]" value={priority}>
-                              {priority}
-                            </option>
-                          ))}
-                        {filterKey === "status" &&
-                          statusOptions.map((status) => (
-                            <option key={status} className="bg-[#0e1629]" value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        {filterKey === "assignee" &&
-                          Array.from(new Set(tasks.map((task) => task.assignee))).map((assignee) => (
-                            <option key={assignee} className="bg-[#0e1629]" value={assignee}>
-                              {assignee}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                  ))}
-                  <div className="flex items-center gap-3 rounded-[28px] border border-[#1a2446] bg-[#0e1629] p-1">
-                    <button
-                      onClick={() => setTaskViewMode("list")}
-                      className={`flex-1 rounded-[24px] px-4 py-2 text-sm font-semibold transition ${
-                        taskViewMode === "list" ? "bg-[#31b0ff] text-[#041226]" : "text-blue-100"
-                      }`}
-                    >
-                      List
-                    </button>
-                    <button
-                      onClick={() => setTaskViewMode("board")}
-                      className={`flex-1 rounded-[24px] px-4 py-2 text-sm font-semibold transition ${
-                        taskViewMode === "board" ? "bg-[#31b0ff] text-[#041226]" : "text-blue-100"
-                      }`}
-                    >
-                      Board
-                    </button>
-                  </div>
-                  {taskViewMode === "board" && (
-                    <div className="rounded-[28px] border border-dashed border-[#1a2446] bg-[#0e1629] p-6 text-center text-sm text-blue-200">
-                      Board preview coming soon. Tasks stay in list view for now.
-                    </div>
-                  )}
-                </div>
-              </div>
+            <div className="space-y-6">
+              <Tasks tasks={tasks} onAddTask={handleAddTaskFromModal} employees={employees} />
             </div>
           ) : view === "hr" ? (
             <div className="grid gap-5">
