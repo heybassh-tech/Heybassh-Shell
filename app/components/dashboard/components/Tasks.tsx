@@ -85,18 +85,29 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
     <div className="space-y-6">
       <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
         <h2 className="text-2xl font-bold text-white">Tasks</h2>
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              className="w-full bg-transparent py-2.5 text-blue-200 placeholder-blue-300/60 focus:outline-none"
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            />
-          </div>
-          
+        <div className="flex items-center gap-2">
+          <PrimaryButton
+            onClick={() => setIsModalOpen(true)}
+            icon={<PlusIcon className="h-4 w-4" />}
+          >
+            Add Task
+          </PrimaryButton>
+        </div>
+      </div>
+
+      <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+          <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            className="w-full bg-transparent py-2.5 text-blue-200 placeholder-blue-300/60 focus:outline-none"
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          />
+        </div>
+
+        <div className="flex w-full flex-wrap items-center gap-2.5 lg:flex-1 lg:justify-end">
           <select
             value={filters.priority}
             onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
@@ -160,13 +171,6 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
               Board
             </button>
           </div>
-          
-          <PrimaryButton
-            onClick={() => setIsModalOpen(true)}
-            icon={<PlusIcon className="h-4 w-4" />}
-          >
-            Add Task
-          </PrimaryButton>
         </div>
       </div>
       <PrimaryModal
