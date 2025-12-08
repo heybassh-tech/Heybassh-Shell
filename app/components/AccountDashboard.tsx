@@ -897,7 +897,7 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
           <button
             onClick={() => setSidebarCollapsed((prev) => !prev)}
             aria-pressed={sidebarCollapsed}
-            className={`flex h-10 w-10 items-center justify-center rounded-md border border-[#1a2446] transition-all ${
+            className={`flex h-10 w-10 items-center justify-center rounded-lg border border-[#1a2446] transition-all ${
               sidebarCollapsed ? "bg-[#101733] text-[#7ed0ff]" : "bg-[rgba(20,26,52,0.85)] text-white/80"
             }`}
             title="Toggle navigation"

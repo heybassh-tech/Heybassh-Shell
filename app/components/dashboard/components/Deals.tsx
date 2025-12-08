@@ -460,20 +460,20 @@ export function Deals({
             </div>
           </div>
         ) : (
-          <div className="flex w-full flex-col gap-3 xl:flex-row xl:items-center">
-            <div className="relative flex w-full items-center rounded-[28px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] xl:max-w-xl 2xl:max-w-2xl">
+          <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative flex w-full items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
               <input
                 type="text"
                 placeholder="Search deals"
-                className="w-full bg-transparent py-3 text-blue-200 placeholder-blue-300/60 focus:outline-none"
+                className="w-full bg-transparent py-2.5 text-blue-200 placeholder-blue-300/60 focus:outline-none"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
               />
             </div>
 
             <div
-              className="flex w-full flex-wrap items-center gap-2.5 xl:justify-end"
+              className="flex w-full flex-wrap items-center gap-2.5 lg:flex-1 lg:justify-end"
               ref={inlineFiltersRef}
             >
               {renderFilterButton(
@@ -635,7 +635,7 @@ export function Deals({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-[0px] border border-[#1a2446] bg-[#0c142a]">
+      <div className="overflow-hidden rounded-[5px] border border-[#1a2446] bg-[#0c142a]">
         <table className="min-w-full divide-y divide-[#1a2446]">
           <thead className="bg-[#0e1629]">
             <tr>

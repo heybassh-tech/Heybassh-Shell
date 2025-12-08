@@ -405,12 +405,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
       <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
         <h2 className="text-2xl font-bold text-white">Contacts</h2>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-[20px] border border-[#1a2446] bg-[#0e1629] p-2 text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
-          >
-            <EllipsisVerticalIcon className="h-5 w-5" />
-          </button>
+          
         <PrimaryButton
           onClick={() => setIsModalOpen(true)}
           icon={<PlusIcon className="h-4 w-4" />}
@@ -478,20 +473,20 @@ const toggleFilterPanel = (panel: FilterPanel) => {
             </div>
           </div>
         ) : (
-          <div className="flex w-full flex-col gap-3 xl:flex-row xl:items-center">
-            <div className="relative flex w-full items-center rounded-[28px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] xl:max-w-xl 2xl:max-w-2xl">
+          <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative flex w-full items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
               <input
                 type="text"
                 placeholder="Search contacts"
-                className="w-full bg-transparent py-3 text-blue-200 placeholder-blue-300/60 focus:outline-none"
+                className="w-full bg-transparent py-2.5 text-blue-200 placeholder-blue-300/60 focus:outline-none"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
               />
             </div>
 
             <div
-              className="flex w-full flex-wrap items-center gap-2.5 xl:justify-end"
+              className="flex w-full flex-wrap items-center gap-2.5 lg:flex-1 lg:justify-end"
               ref={inlineFiltersRef}
             >
               {renderFilterButton(
@@ -619,7 +614,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-[0px] border border-[#1a2446] bg-[#0c142a]">
+      <div className="overflow-hidden rounded-[5px] border border-[#1a2446] bg-[#0c142a]">
         <table className="min-w-full divide-y divide-[#1a2446]">
           <thead className="bg-[#0e1629]">
             <tr>
