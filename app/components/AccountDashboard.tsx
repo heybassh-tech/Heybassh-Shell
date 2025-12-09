@@ -15,7 +15,8 @@ import { Tasks } from "./dashboard/components/Tasks"
 import { Marketing } from "./dashboard/components/Marketing"
 import { Sales } from "./dashboard/components/Sales"
 import { OverviewTab } from "./dashboard/components/OverviewTab"
-import { HRPeopleTab } from "./dashboard/components/HRPeopleTab"
+import { LeaveRequest } from "./dashboard/components/LeaveRequest"
+import { Users } from "./dashboard/components/Users"
 import { AdminOverviewTab } from "./dashboard/components/AdminOverviewTab"
 import { AdminITTab } from "./dashboard/components/AdminITTab"
 import { AdminPasswordManagerTab } from "./dashboard/components/AdminPasswordManagerTab"
@@ -177,8 +178,10 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
                   <div className="space-y-6">
                     <Tasks tasks={tasks} onAddTask={handleAddTaskFromModal} employees={employees} />
                   </div>
-                ) : view === "hr" ? (
-                  <HRPeopleTab />
+                ) : view === "hr_leave_request" ? (
+                  <LeaveRequest />
+                ) : view === "hr_users" ? (
+                  <Users />
                 ) : view === "admin_overview" ? (
                   <AdminOverviewTab />
                 ) : view === "admin_it" ? (

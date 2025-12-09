@@ -229,7 +229,15 @@ export const navigation: NavItem[] = [
   { id: "tasks", label: "Tasks", icon: <TasksIcon /> },
   { id: "reports", label: "Reports & Data", icon: <ReportsIcon /> },
   { id: "automate", label: "Automate", icon: <AutomateIcon /> },
-  { id: "hr", label: "HR / People", icon: <PeopleIcon /> },
+  {
+    id: "hr",
+    label: "HR / People",
+    icon: <PeopleIcon />,
+    children: [
+      { id: "hr_leave_request", label: "Leave Request" },
+      { id: "hr_users", label: "Users" },
+    ],
+  },
   {
     id: "admin",
     label: "IT / Admin",

@@ -50,7 +50,7 @@ export function OverviewTab({ accountId, navigate }: OverviewTabProps) {
       id: "overview_hr",
       title: "HR / People Module",
       description: "Directory, leave, onboarding.",
-      action: () => navigate("hr"),
+      action: () => navigate("hr_leave_request"),
     },
     {
       id: "overview_admin",

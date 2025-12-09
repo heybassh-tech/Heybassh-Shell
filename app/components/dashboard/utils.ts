@@ -20,6 +20,8 @@ export function viewToPath(view: string): string | null {
   if (view === "admin_overview") return "dashboard/admin";
   if (view === "admin_it") return "dashboard/admin/it";
   if (view === "admin_password_manager") return "dashboard/admin/password-manager";
+  if (view === "hr_leave_request") return "hr/leave-request";
+  if (view === "hr_users") return "hr/users";
   // For all other views, return null to just update state without routing
   return null;
 }
