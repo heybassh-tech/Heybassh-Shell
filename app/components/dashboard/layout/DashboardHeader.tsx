@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, ChangeEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { FunnelIcon } from "@heroicons/react/24/outline"
-import logo from "../../../Images/heybasshlogo.png"
 import { SearchIcon, AcademyIcon, MediaIcon, BellIcon } from "../icons"
 import type { Contact } from "../types"
 import { nameMatchesTokens } from "../utils"
@@ -134,7 +133,7 @@ export function DashboardHeader({
     <header className="sticky top-0 z-10 flex items-center justify-between bg-[rgba(9,15,31,.95)] px-4 py-2 backdrop-blur">
       <div className="flex items-center gap-3">
         <Link href={`/${accountId}/dashboard`} className="flex items-center">
-          <Image src={logo} alt="Heybassh" height={28} className="h-7 w-auto" />
+          <Image src="/heybasshlogo.png" alt="Heybassh" height={28} width={84} className="h-7 w-auto" />
         </Link>
         <div className="relative" ref={filterRef} data-dropdown>
           <div className="flex items-center gap-2 border border-[#1a2446] rounded-[24px] px-4 py-1.2 bg-[#0e1629]">
