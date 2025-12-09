@@ -43,7 +43,7 @@ export function MainSidebar({ view, navigate, sidebarCollapsed }: MainSidebarPro
   return (
     <aside
       className={`border-b border-[#1a2446] p-3 md:border-b-0 md:border-r bg-[#0e1629] md:sticky md:top-0 md:h-screen md:overflow-hidden transition-all duration-300 ${
-        sidebarCollapsed ? "pointer-events-none" : "pointer-events-auto"
+        sidebarCollapsed ? "pointer-events-none opacity-0" : "pointer-events-auto opacity-100"
       } ${isPanelOpen ? "blur-sm" : ""}`}
       aria-hidden={sidebarCollapsed}
     >
