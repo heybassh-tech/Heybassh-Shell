@@ -45,6 +45,79 @@ html {
 
 body { @apply min-h-screen bg-[#020617] text-[#eef3ff]; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 
+/* Ant Design DatePicker dark theme styling */
+.ant-picker {
+  background-color: #0e1629 !important;
+  border-color: #1a2446 !important;
+  color: #eef3ff !important;
+}
+
+.ant-picker:hover {
+  border-color: #2b9bff !important;
+}
+
+.ant-picker-focused {
+  border-color: #2b9bff !important;
+  box-shadow: 0 0 0 2px rgba(43, 155, 255, 0.1) !important;
+}
+
+.ant-picker-input > input {
+  background-color: #0e1629 !important;
+  color: #eef3ff !important;
+}
+
+.ant-picker-input > input::placeholder {
+  color: rgba(238, 243, 255, 0.4) !important;
+}
+
+.ant-picker-panel-container {
+  background-color: #0e1629 !important;
+  border-color: #1a2446 !important;
+}
+
+.ant-picker-header {
+  background-color: #0e1629 !important;
+  border-color: #1a2446 !important;
+  color: #eef3ff !important;
+}
+
+.ant-picker-header-view button {
+  color: #eef3ff !important;
+}
+
+.ant-picker-header-view button:hover {
+  color: #2b9bff !important;
+}
+
+.ant-picker-content th {
+  color: rgba(238, 243, 255, 0.7) !important;
+}
+
+.ant-picker-cell {
+  color: rgba(238, 243, 255, 0.8) !important;
+}
+
+.ant-picker-cell:hover:not(.ant-picker-cell-disabled):not(.ant-picker-cell-selected) {
+  background-color: #121c3d !important;
+}
+
+.ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: #2b9bff !important;
+  color: #fff !important;
+}
+
+.ant-picker-cell-today .ant-picker-cell-inner {
+  border-color: #2b9bff !important;
+}
+
+.ant-picker-cell-disabled {
+  color: rgba(238, 243, 255, 0.2) !important;
+}
+
+.ant-picker-footer {
+  border-color: #1a2446 !important;
+}
+
 /* Reduce modal border radius by half */
 .ant-modal-content {
   border-radius: 10px !important;

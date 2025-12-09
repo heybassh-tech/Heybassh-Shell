@@ -1,25 +1,26 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  name              String?
-  passwordHash      String
-  companyName       String?
-  resetToken        String?
-  resetTokenExpiry  DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  role              String   @default("user")
-  account_id        String?
-  account           Account? @relation(fields: [account_id], references: [account_id])
-  emailVerified     DateTime?
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String?
+  passwordHash     String
+  companyName      String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  role             String    @default("user")
+  account_id       String?
+  account          Account?  @relation(fields: [account_id], references: [account_id])
+  emailVerified    DateTime?
 }
 
 model PasswordResetToken {
@@ -41,18 +42,19 @@ model EmailVerificationToken {
 /// Company account model
 model Account {
   /// Internal numeric sequence to ensure uniqueness and easy increment
-  accountSeq     Int      @id @default(autoincrement())
+  accountSeq     Int            @id @default(autoincrement())
   /// Public 7-digit zero-padded account identifier
-  account_id     String?  @unique
+  account_id     String?        @unique
   company_name   String
   company_domain String
   owner_email    String
-  created_at     DateTime @default(now())
+  created_at     DateTime       @default(now())
   /// Back relation to users under this account
   users          User[]
   contacts       Contact[]
   companies      Company[]
   deals          Deal[]
+  tasks          Task[]
   passwordVault  PasswordVault?
 }
 
@@ -107,27 +109,43 @@ model Deal {
   @@index([accountSeq])
 }
 
-/// Encrypted password vault per account. Stores only encrypted data, never raw passwords.
-model PasswordVault {
-  id           String   @id @default(cuid())
-  accountSeq   Int      @unique
-  account      Account  @relation(fields: [accountSeq], references: [accountSeq])
-
-  /// Base64-encoded AES-GCM cipher text
-  cipher       String
-  /// Base64-encoded IV used for AES-GCM
-  iv           String
-  /// Base64-encoded PBKDF2 salt
-  salt         String
-
-  /// Timestamp (ms since epoch) from the client when this vault was last updated
-  lastUpdated  BigInt
-  /// Number of entries in the vault at last update
-  entryCount   Int
-
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model Task {
+  id          String   @id @default(cuid())
+  accountSeq  Int
+  account     Account  @relation(fields: [accountSeq], references: [accountSeq])
+  title       String
+  assignee    String?
+  dueDate     String?
+  priority    String   @default("Normal")
+  status      String   @default("Todo")
+  description String?
+  tags        String   @default("[]") // JSON array as string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([accountSeq])
 }
 
+/// Encrypted password vault per account. Stores only encrypted data, never raw passwords.
+model PasswordVault {
+  id         String  @id @default(cuid())
+  accountSeq Int     @unique
+  account    Account @relation(fields: [accountSeq], references: [accountSeq])
+
+  /// Base64-encoded AES-GCM cipher text
+  cipher String
+  /// Base64-encoded IV used for AES-GCM
+  iv     String
+  /// Base64-encoded PBKDF2 salt
+  salt   String
+
+  /// Timestamp (ms since epoch) from the client when this vault was last updated
+  lastUpdated BigInt
+  /// Number of entries in the vault at last update
+  entryCount  Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountSeq])
+}

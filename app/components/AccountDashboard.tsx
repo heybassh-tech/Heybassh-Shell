@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import type { Contact, Product, Task, Employee } from "./dashboard/types"
+import type { Contact, Product, Employee } from "./dashboard/types"
 import { defaultContacts, defaultProducts, defaultEmployees } from "./dashboard/types"
 import { findNavLabel, viewToPath } from "./dashboard/utils"
 import { navigation } from "./dashboard/icons"
@@ -38,7 +38,6 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
   const [contactsError, setContactsError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<Product[]>(defaultProducts)
-  const [tasks, setTasks] = useState<Task[]>([])
   const [employees] = useState<Employee[]>(defaultEmployees)
   const [users, setUsers] = useState<Array<{ id: string; name: string; email: string }>>([])
   const [usersLoading, setUsersLoading] = useState(true)
@@ -158,10 +157,6 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
     setProducts([...products, product])
   }
 
-  function handleAddTaskFromModal(task: Omit<Task, "id">) {
-    const nextId = `T-${String(tasks.length + 1).padStart(3, "0")}`
-    setTasks([...tasks, { ...task, id: nextId }])
-  }
 
   const desktopGrid = "md:grid-cols-[64px_minmax(0,1fr)]"
   const contentGrid = sidebarCollapsed ? "md:grid-cols-[0px_minmax(0,1fr)]" : "md:grid-cols-[260px_minmax(0,1fr)]"
@@ -210,7 +205,7 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
                   </div>
                 ) : view === "tasks" ? (
                   <div className="space-y-6">
-                    <Tasks tasks={tasks} onAddTask={handleAddTaskFromModal} employees={users} />
+                    <Tasks accountId={accountId} employees={users} />
                   </div>
                 ) : view === "hr_leave_request" ? (
                   <LeaveRequest />
