@@ -29,7 +29,7 @@ const SortIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-function UsersContent({ accountId }: { accountId: string }) {
+function UsersContent({ accountId, companyName }: { accountId: string; companyName: string }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -224,7 +224,7 @@ function UsersContent({ accountId }: { accountId: string }) {
           <div className="flex items-center justify-between border-b border-[#1a2446] px-6 py-4">
             <div>
               <h3 className="text-lg font-semibold text-white">Add User</h3>
-              <p className="text-sm text-blue-300/70">Invite a new user to the platform</p>
+              <p className="text-sm text-blue-300/70">Invite a new user to join {companyName}</p>
             </div>
             <button
               onClick={closeAddPanel}
@@ -248,7 +248,6 @@ function UsersContent({ accountId }: { accountId: string }) {
                   placeholder="user@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full"
                 />
               </div>
 
@@ -275,8 +274,8 @@ function UsersContent({ accountId }: { accountId: string }) {
                   onChange={(e) => setSendInvite(e.target.checked)}
                   className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff]"
                 />
-                <label htmlFor="send-invite" className="text-sm text-blue-200 cursor-pointer">
-                  Send the invite to user
+                <label htmlFor="send-invite" className="text-sm text-white cursor-pointer font-medium">
+                  Send invitation email to this user
                 </label>
               </div>
             </div>
@@ -311,10 +310,10 @@ function UsersContent({ accountId }: { accountId: string }) {
   )
 }
 
-export function Users({ accountId }: { accountId: string }) {
+export function Users({ accountId, companyName }: { accountId: string; companyName: string }) {
   return (
     <Suspense fallback={<div className="text-white">Loading...</div>}>
-      <UsersContent accountId={accountId} />
+      <UsersContent accountId={accountId} companyName={companyName} />
     </Suspense>
   )
 }
