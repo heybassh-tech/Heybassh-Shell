@@ -36,14 +36,19 @@ function RegisterContent() {
       return
     }
 
-    setEmail(emailParam)
-    setAccountId(accountIdParam)
-    setToken(tokenParam)
+    // Store validated values
+    const validatedEmail = emailParam
+    const validatedAccountId = accountIdParam
+    const validatedToken = tokenParam
+
+    setEmail(validatedEmail)
+    setAccountId(validatedAccountId)
+    setToken(validatedToken)
 
     // Validate invitation token and fetch company name
     async function validateInvitation() {
       try {
-        const response = await fetch(`/api/validate-invitation?email=${encodeURIComponent(emailParam)}&account_id=${accountIdParam}&token=${encodeURIComponent(tokenParam)}`)
+        const response = await fetch(`/api/validate-invitation?email=${encodeURIComponent(validatedEmail)}&account_id=${validatedAccountId}&token=${encodeURIComponent(validatedToken)}`)
         const data = await response.json()
         
         if (!response.ok || !data.valid) {
