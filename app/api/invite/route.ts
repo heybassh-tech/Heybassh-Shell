@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   try {
     // Check authentication
     const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
-    if (!authSecret) {
+    if (!authSecret || typeof authSecret !== 'string') {
       return NextResponse.json(
         { error: "SERVER_ERROR", message: "Authentication configuration error." },
         { status: 500 }
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     
     const token = await getToken({ 
       req, 
-      secret: authSecret 
+      secret: authSecret as string
     })
     
     if (!token || !token.email) {
