@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { NavItem } from "../types"
 import { navigation } from "../icons"
 
@@ -17,8 +17,19 @@ export function MainSidebar({ view, navigate, sidebarCollapsed }: MainSidebarPro
     front_office: false,
     admin: true,
   })
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
 
   const navSeparators = new Set(["billing", "automate"])
+
+  useEffect(() => {
+    const checkPanelState = () => {
+      setIsPanelOpen(document.body.classList.contains("user-panel-open"))
+    }
+    checkPanelState()
+    const observer = new MutationObserver(checkPanelState)
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  }, [])
 
   function toggleSectionState(curr: Record<string, boolean>, id: string) {
     return { ...curr, [id]: !curr[id] }
@@ -31,9 +42,9 @@ export function MainSidebar({ view, navigate, sidebarCollapsed }: MainSidebarPro
 
   return (
     <aside
-      className={`border-b border-[#1a2446] p-3 md:border-b-0 md:border-r bg-[#0e1629] md:sticky md:top-0 md:h-screen md:overflow-hidden ${
+      className={`border-b border-[#1a2446] p-3 md:border-b-0 md:border-r bg-[#0e1629] md:sticky md:top-0 md:h-screen md:overflow-hidden transition-all duration-300 ${
         sidebarCollapsed ? "pointer-events-none" : "pointer-events-auto"
-      }`}
+      } ${isPanelOpen ? "blur-sm" : ""}`}
       aria-hidden={sidebarCollapsed}
     >
       <div className="flex h-full flex-col">
