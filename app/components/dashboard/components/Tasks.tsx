@@ -1082,7 +1082,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                         </div>
                       )}
                       <div className="mt-2 flex justify-end">
-                        <div className="relative" ref={(el) => (menuRefs.current[`board-${task.id}`] = el)}>
+                        <div className="relative" ref={(el) => { menuRefs.current[`board-${task.id}`] = el; }}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
