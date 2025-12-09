@@ -230,7 +230,16 @@ export const navigation: NavItem[] = [
   { id: "reports", label: "Reports & Data", icon: <ReportsIcon /> },
   { id: "automate", label: "Automate", icon: <AutomateIcon /> },
   { id: "hr", label: "HR / People", icon: <PeopleIcon /> },
-  { id: "admin", label: "IT / Admin", icon: <ShieldIcon /> },
+  {
+    id: "admin",
+    label: "IT / Admin",
+    icon: <ShieldIcon />,
+    children: [
+      { id: "admin_overview", label: "Admin" },
+      { id: "admin_it", label: "IT" },
+      { id: "admin_password_manager", label: "Password Manager" },
+    ],
+  },
   { id: "finance", label: "Finance", icon: <BriefcaseIcon /> },
   { id: "executive", label: "Executive", icon: <BuildingIcon /> },
 ];
