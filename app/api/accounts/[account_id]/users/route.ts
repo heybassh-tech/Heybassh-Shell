@@ -11,6 +11,28 @@ const schema = z.object({
   role: z.enum(["user", "admin"]).optional()
 })
 
+export async function GET(_req: Request, { params }: { params: { account_id: string } }) {
+  try {
+    const users = await prisma.user.findMany({
+      where: { account_id: params.account_id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        account_id: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    })
+
+    return NextResponse.json(users)
+  } catch (error) {
+    console.error("[users][GET]", error)
+    return NextResponse.json({ error: "Failed to load users" }, { status: 500 })
+  }
+}
+
 export async function POST(req: Request, { params }: { params: { account_id: string } }) {
   try {
     const body = await req.json()

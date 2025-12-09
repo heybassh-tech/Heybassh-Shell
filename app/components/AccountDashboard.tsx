@@ -40,6 +40,8 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
   const [products, setProducts] = useState<Product[]>(defaultProducts)
   const [tasks, setTasks] = useState<Task[]>([])
   const [employees] = useState<Employee[]>(defaultEmployees)
+  const [users, setUsers] = useState<Array<{ id: string; name: string; email: string }>>([])
+  const [usersLoading, setUsersLoading] = useState(true)
 
   useEffect(() => {
     let ignore = false
@@ -80,6 +82,38 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
         if (!ignore && data?.company_name) setCompanyName(data.company_name)
       })
       .catch(() => {})
+    return () => {
+      ignore = true
+    }
+  }, [accountId])
+
+  useEffect(() => {
+    let ignore = false
+    async function loadUsers() {
+      setUsersLoading(true)
+      try {
+        const response = await fetch(`/api/accounts/${accountId}/users`)
+        const payload = await response.json().catch(() => [])
+        if (!response.ok) {
+          throw new Error((payload as { error?: string })?.error ?? "Failed to load users")
+        }
+        if (!ignore) {
+          const usersList = Array.isArray(payload) ? payload : []
+          setUsers(usersList.map((user: any) => ({
+            id: user.id,
+            name: user.name || user.email,
+            email: user.email,
+          })))
+        }
+      } catch (error) {
+        console.error("[AccountDashboard] Failed to fetch users", error)
+      } finally {
+        if (!ignore) {
+          setUsersLoading(false)
+        }
+      }
+    }
+    loadUsers()
     return () => {
       ignore = true
     }
@@ -176,7 +210,7 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
                   </div>
                 ) : view === "tasks" ? (
                   <div className="space-y-6">
-                    <Tasks tasks={tasks} onAddTask={handleAddTaskFromModal} employees={employees} />
+                    <Tasks tasks={tasks} onAddTask={handleAddTaskFromModal} employees={users} />
                   </div>
                 ) : view === "hr_leave_request" ? (
                   <LeaveRequest />

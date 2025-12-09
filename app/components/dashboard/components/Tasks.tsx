@@ -8,7 +8,7 @@ import { PrimaryInput } from "../../PrimaryInput";
 interface TasksProps {
   tasks: Task[];
   onAddTask: (task: Omit<Task, 'id'>) => void;
-  employees: { id: string; name: string }[];
+  employees: { id: string; name: string; email?: string }[];
 }
 
 export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
@@ -142,7 +142,7 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
             <option value="All" className="bg-[#0e1629]">All Assignees</option>
             {employees.map((employee) => (
               <option key={employee.id} value={employee.id} className="bg-[#0e1629]">
-                {employee.name}
+                {employee.name || employee.email}
               </option>
             ))}
           </select>
@@ -219,7 +219,7 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
                 <option value="" className="bg-[#0e1629]">Select Assignee</option>
                 {employees.map((employee) => (
                   <option key={employee.id} value={employee.id} className="bg-[#0e1629]">
-                    {employee.name}
+                    {employee.name || employee.email}
                   </option>
                 ))}
               </select>
@@ -346,7 +346,7 @@ export function Tasks({ tasks, onAddTask, employees }: TasksProps) {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="text-sm text-blue-200">
-                        {employees.find(e => e.id === task.assignee)?.name || task.assignee}
+                        {employees.find(e => e.id === task.assignee)?.name || employees.find(e => e.id === task.assignee)?.email || task.assignee}
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">

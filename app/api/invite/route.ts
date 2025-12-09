@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { getToken } from "next-auth/jwt"
 import { createInvitationToken, sendInvitationEmail } from "@/lib/invitation"
 
 export const runtime = "nodejs"
@@ -14,6 +15,32 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    // Check authentication
+    const token = await getToken({ 
+      req, 
+      secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET 
+    })
+    
+    if (!token || !token.email) {
+      return NextResponse.json(
+        { error: "UNAUTHORIZED", message: "You must be signed in to invite users." },
+        { status: 401 }
+      )
+    }
+
+    // Get the current user
+    const currentUser = await prisma.user.findUnique({ 
+      where: { email: token.email as string },
+      select: { id: true, email: true, role: true, account_id: true }
+    })
+
+    if (!currentUser) {
+      return NextResponse.json(
+        { error: "UNAUTHORIZED", message: "User not found." },
+        { status: 401 }
+      )
+    }
+
     const body = await req.json()
     const { account_id, email } = schema.parse(body)
 
@@ -25,6 +52,15 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "ACCOUNT_NOT_FOUND", message: "Account does not exist." },
         { status: 404 }
+      )
+    }
+
+    // Check if user is an admin AND belongs to this account
+    // Only admins can invite users, and only to their own company
+    if (currentUser.role !== "admin" || currentUser.account_id !== account_id) {
+      return NextResponse.json(
+        { error: "FORBIDDEN", message: "Only company admins can invite users to this company." },
+        { status: 403 }
       )
     }
 
