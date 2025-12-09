@@ -29,7 +29,7 @@ const SortIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-function UsersContent() {
+function UsersContent({ accountId }: { accountId: string }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -82,25 +82,40 @@ function UsersContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!email.trim() || !accountId) return
 
     setIsSubmitting(true)
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      
+      const response = await fetch("/api/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          account_id: accountId,
+          email: email.trim(),
+          role: userType === "Employee" ? "user" : "user",
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || "Failed to send invitation")
+      }
+
+      // Add user to local state (will be pending until they register)
       const newUser: User = {
         id: `U-${String(users.length + 1).padStart(4, "0")}`,
         email: email.trim(),
         userType,
-        status: sendInvite ? "Pending" : "Active",
+        status: "Pending",
         createdAt: new Date().toISOString(),
       }
       
       setUsers([...users, newUser])
       closeAddPanel()
     } catch (error) {
-      console.error("Failed to add user", error)
+      console.error("Failed to send invitation", error)
+      alert(error instanceof Error ? error.message : "Failed to send invitation. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -296,10 +311,10 @@ function UsersContent() {
   )
 }
 
-export function Users() {
+export function Users({ accountId }: { accountId: string }) {
   return (
     <Suspense fallback={<div className="text-white">Loading...</div>}>
-      <UsersContent />
+      <UsersContent accountId={accountId} />
     </Suspense>
   )
 }

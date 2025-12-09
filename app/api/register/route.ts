@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import bcrypt from "bcryptjs"
 import { createEmailVerificationToken, sendVerificationEmail, validateVerificationToken } from "@/lib/email-verification"
+import { validateInvitationToken } from "@/lib/invitation"
 
 // Disable Edge Runtime for this route
 // This is needed because bcryptjs uses Node.js APIs not available in Edge Runtime
@@ -36,8 +37,9 @@ const schema = z.object({
   name: z.string().optional(),
   role: z.enum(["user", "admin"]).optional(),
   account_id: z.string().length(7).optional(),
-  companyName: z.string().min(2, "Company name is required"),
+  companyName: z.string().min(2, "Company name is required").optional(),
   setupToken: z.string().optional(),
+  invitationToken: z.string().optional(),
 })
 
 function isBusinessEmail(email: string) {
@@ -88,10 +90,84 @@ export async function POST(req: Request) {
     }
 
     try {
-      const { email, password, name, role, account_id, companyName, setupToken } = schema.parse(body);
+      const { email, password, name, role, account_id, companyName, setupToken, invitationToken } = schema.parse(body);
       const normalizedEmail = email.trim().toLowerCase();
-      console.log('Validated input:', { email: normalizedEmail, name: name || 'not provided' });
+      console.log('Validated input:', { email: normalizedEmail, name: name || 'not provided', hasInvitation: !!invitationToken });
 
+      // Handle invitation-based registration
+      if (invitationToken) {
+        // Validate invitation token
+        const invitationRecord = await validateInvitationToken(invitationToken, normalizedEmail)
+        if (!invitationRecord) {
+          return NextResponse.json(
+            { error: "INVALID_INVITATION", message: "Invalid or expired invitation link." },
+            { status: 400 },
+          )
+        }
+
+        // Verify account_id matches
+        if (!account_id) {
+          return NextResponse.json(
+            { error: "ACCOUNT_ID_REQUIRED", message: "Account ID is required for invitation registration." },
+            { status: 400 },
+          )
+        }
+
+        // Verify account exists
+        const account = await prisma.account.findUnique({
+          where: { account_id },
+          select: { company_name: true },
+        })
+
+        if (!account) {
+          return NextResponse.json(
+            { error: "ACCOUNT_NOT_FOUND", message: "Account not found." },
+            { status: 404 },
+          )
+        }
+
+        // Check if user already exists
+        const exists = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+        if (exists) {
+          return NextResponse.json(
+            { error: "Email already registered" }, 
+            { status: 409 }
+          );
+        }
+
+        // Validate required fields
+        if (!name || !name.trim()) {
+          return NextResponse.json(
+            { error: "NAME_REQUIRED", message: "Full name is required." },
+            { status: 400 },
+          )
+        }
+
+        // Create user with invitation
+        const passwordHash = await bcrypt.hash(password, 10);
+        const user = await prisma.user.create({
+          data: {
+            email: normalizedEmail,
+            name: name.trim(),
+            passwordHash,
+            role: role ?? "user",
+            account_id,
+            companyName: account.company_name,
+            emailVerified: new Date(), // Email is pre-verified via invitation
+          },
+        })
+
+        // Delete the invitation token
+        await prisma.emailVerificationToken.deleteMany({ where: { token: invitationToken } })
+
+        return NextResponse.json({
+          id: user.id,
+          email: user.email,
+          message: 'Registration successful. You can sign in now.',
+        })
+      }
+
+      // Handle regular registration (workspace creation)
       if (!isBusinessEmail(normalizedEmail)) {
         return NextResponse.json(
           { error: "BUSINESS_EMAIL_REQUIRED", message: "Please use your business email address (free providers are not allowed)." },
@@ -112,7 +188,7 @@ export async function POST(req: Request) {
       console.log('Ensuring account...');
       let resolvedAccountId: string
       try {
-        resolvedAccountId = await ensureAccount(account_id, companyName, normalizedEmail)
+        resolvedAccountId = await ensureAccount(account_id, companyName || "", normalizedEmail)
       } catch (accountError) {
         if ((accountError as Error).message === "ACCOUNT_NOT_FOUND") {
           return NextResponse.json(
@@ -153,7 +229,7 @@ export async function POST(req: Request) {
           passwordHash,
           role: role ?? "user",
           account_id: resolvedAccountId,
-          companyName,
+          companyName: companyName || undefined,
           emailVerified: emailVerifiedAt ?? undefined,
         } 
       });
@@ -162,7 +238,7 @@ export async function POST(req: Request) {
 
       if (!emailVerifiedAt) {
         const verification = await createEmailVerificationToken(normalizedEmail)
-        await sendVerificationEmail(normalizedEmail, verification.token, companyName)
+        await sendVerificationEmail(normalizedEmail, verification.token, companyName || undefined)
         console.log('Verification email queued:', { userId: user.id })
       }
 

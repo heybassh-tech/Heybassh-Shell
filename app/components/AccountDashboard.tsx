@@ -181,7 +181,7 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
                 ) : view === "hr_leave_request" ? (
                   <LeaveRequest />
                 ) : view === "hr_users" ? (
-                  <Users />
+                  <Users accountId={accountId} />
                 ) : view === "admin_overview" ? (
                   <AdminOverviewTab />
                 ) : view === "admin_it" ? (

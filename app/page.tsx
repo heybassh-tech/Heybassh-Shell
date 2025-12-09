@@ -9,7 +9,6 @@ import logo from "../Images/heybasshlogo.png"
 import { PrimaryButton } from "./components/PrimaryButton"
 import { PrimaryInput } from "./components/PrimaryInput"
 
-type AuthMode = "login" | "register"
 type Feedback = { type: "success" | "error" | "info"; message: string }
 
 export default function Page() {
@@ -45,24 +44,13 @@ const blockedEmailDomains = new Set([
 
 function HomeInner() {
   const searchParams = useSearchParams()
-  const [mode, setMode] = useState<AuthMode>("login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [name, setName] = useState("")
-  const [companyName, setCompanyName] = useState("")
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [formErrors, setFormErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
   const [forgotStatus, setForgotStatus] = useState<"idle" | "sending" | "sent">("idle")
   const [showPassword, setShowPassword] = useState(false)
-  const [accountId, setAccountId] = useState<string | null>(null)
-
-  useEffect(() => {
-    const aid = searchParams.get("account_id")
-    if (aid) {
-      setAccountId(aid)
-    }
-  }, [searchParams])
 
   useEffect(() => {
     if (!feedback) return
@@ -76,107 +64,22 @@ function HomeInner() {
     setForgotStatus("idle")
   }
 
-  function handleModeChange(nextMode: AuthMode) {
-    resetUi()
-    setMode(nextMode)
-  }
-
-  function isBusinessEmail(emailValue: string) {
-    const domain = emailValue.split("@")[1]?.toLowerCase()
-    if (!domain) return false
-    return !blockedEmailDomains.has(domain)
-  }
-
-  function validateForm(currentMode: AuthMode) {
+  function validateForm() {
     const errors: FormErrors = {}
     const trimmedEmail = email.trim().toLowerCase()
     const trimmedPassword = password.trim()
-    const trimmedName = name.trim()
-    const trimmedCompany = companyName.trim()
 
     if (!trimmedEmail) errors.email = "Email is required."
     else if (!emailPattern.test(trimmedEmail)) errors.email = "Enter a valid email address."
-    else if (currentMode === "register" && !isBusinessEmail(trimmedEmail))
-      errors.email = "Please use your business email address (free email providers are not allowed)."
 
     if (!trimmedPassword) errors.password = "Password is required."
-    else if (currentMode === "register" && trimmedPassword.length < 6)
-      errors.password = "Use at least 6 characters."
-
-    if (currentMode === "register") {
-      if (!trimmedName) errors.name = "Full name is required."
-      else if (trimmedName.length < 2) errors.name = "Name should be at least 2 characters."
-      if (!trimmedCompany) errors.companyName = "Company name is required."
-    }
 
     setFormErrors(errors)
     return Object.keys(errors).length === 0
   }
 
-  async function onRegister() {
-    if (!validateForm("register")) return
-    setLoading(true)
-    setFeedback(null)
-    try {
-      // If no account_id yet, create a company account automatically from email domain
-      let acctId = accountId
-      const trimmedEmail = email.trim().toLowerCase()
-      const trimmedCompany = companyName.trim()
-      if (!acctId) {
-        try {
-          const accountsRes = await fetch("/api/accounts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              company_name: trimmedCompany,
-              company_domain: trimmedEmail.split("@")[1] || "company.com",
-              owner_email: trimmedEmail,
-            }),
-          })
-          if (accountsRes.ok) {
-            const acc = await accountsRes.json()
-            acctId = acc.account_id || null
-            setAccountId(acctId)
-          }
-        } catch {}
-      }
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email: email.trim(), 
-          password: password.trim(), 
-          name: name.trim(),
-          companyName: trimmedCompany,
-          account_id: acctId || undefined,
-        }),
-      })
-      const data = await response.json()
-      if (!response.ok) {
-        let errorMessage = data.error || "We couldn't complete your registration."
-        if (data.error === "BUSINESS_EMAIL_REQUIRED") {
-          errorMessage = "Please use your business email address (free providers are not allowed)."
-        }
-        setFeedback({ type: "error", message: errorMessage })
-        return
-      }
-      setFeedback({
-        type: "success",
-        message: "Account created. Please verify your email before signing in.",
-      })
-      setFormErrors({})
-      setMode("login")
-      setPassword("")
-      setCompanyName("")
-    } catch {
-      setFeedback({ type: "error", message: "Something went wrong. Please try again in a moment." })
-    } finally {
-      setLoading(false)
-    }
-  }
-
   async function onLogin() {
-    if (!validateForm("login")) return
+    if (!validateForm()) return
     setLoading(true)
     setFeedback(null)
     setForgotStatus("idle")
@@ -330,11 +233,7 @@ function HomeInner() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (loading) return
-    if (mode === "login") {
-      onLogin()
-    } else {
-      onRegister()
-    }
+    onLogin()
   }
 
   return (
@@ -405,30 +304,10 @@ function HomeInner() {
           </div>
 
           <div className="flex flex-col gap-8 rounded-2xl border border-white/10 bg-black/40 p-6 shadow-[0_20px_45px_-25px_rgba(16,167,255,0.45)] sm:p-8 min-h-[560px] md:min-h-[600px]">
-            <div className="flex items-center justify-between">
+            <div>
               <h2 className="text-xl font-semibold text-white md:text-2xl">
-                {mode === "login" ? "Welcome back" : "Create your free account"}
+                Welcome back
               </h2>
-              <div className="inline-flex items-center rounded-lg border border-white/10 bg-white/10 p-1 text-xs">
-                <button
-                  type="button"
-                  onClick={() => handleModeChange("login")}
-                  className={`radius-6 px-3 py-1 transition whitespace-nowrap ${
-                    mode === "login" ? "bg-white text-[#061332] shadow-sm" : "text-blue-100"
-                  }`}
-                >
-                  Sign in
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleModeChange("register")}
-                  className={`radius-6 px-3 py-1 transition whitespace-nowrap ${
-                    mode === "register" ? "bg-white text-[#061332] shadow-sm" : "text-blue-100"
-                  }`}
-                >
-                  Register
-                </button>
-              </div>
             </div>
 
             <form className="grid gap-5" onSubmit={handleSubmit}>
@@ -451,65 +330,28 @@ function HomeInner() {
                 {formErrors.email && <p className="text-xs font-medium text-rose-300">{formErrors.email}</p>}
               </div>
 
-              {mode === "register" && (
-                <div className="grid gap-2">
-                  <label className="block text-sm font-medium text-blue-200" htmlFor="name">
-                    Full name
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    className={`w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#2b9bff] focus:outline-none ${formErrors.name ? "ring-2 ring-rose-400/70" : ""}`}
-                    placeholder="Jane Developer"
-                    value={name}
-                    autoComplete="name"
-                    onChange={(event) => setName(event.target.value)}
-                    aria-invalid={Boolean(formErrors.name)}
-                  />
-                  {formErrors.name && <p className="text-xs font-medium text-rose-300">{formErrors.name}</p>}
-                </div>
-              )}
-              {mode === "register" && (
-                <div className="grid gap-2">
-                  <label className="block text-sm font-medium text-blue-200" htmlFor="company">
-                    Company name
-                  </label>
-                  <input
-                    id="company"
-                    type="text"
-                    className={`w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#2b9bff] focus:outline-none ${formErrors.companyName ? "ring-2 ring-rose-400/70" : ""}`}
-                    placeholder="Acme Inc."
-                    value={companyName}
-                    onChange={(event) => setCompanyName(event.target.value)}
-                    aria-invalid={Boolean(formErrors.companyName)}
-                  />
-                  {formErrors.companyName && <p className="text-xs font-medium text-rose-300">{formErrors.companyName}</p>}
-                </div>
-              )}
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                   <label className="block text-sm font-medium text-blue-200" htmlFor="password">
                     Password
                   </label>
-                  {mode === "login" && (
-                    <button
-                      type="button"
-                      className="radius-6 px-2 py-1 text-xs font-medium text-[#5dd4ff] transition hover:text-white"
-                      onClick={onForgotPassword}
-                      disabled={forgotStatus === "sending"}
-                    >
-                      {forgotStatus === "sent" ? "Reset link sent" : "Forgot password?"}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    className="radius-6 px-2 py-1 text-xs font-medium text-[#5dd4ff] transition hover:text-white"
+                    onClick={onForgotPassword}
+                    disabled={forgotStatus === "sending"}
+                  >
+                    {forgotStatus === "sent" ? "Reset link sent" : "Forgot password?"}
+                  </button>
                 </div>
                 <div className="relative w-full">
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     className={`w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 pr-12 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#2b9bff] focus:outline-none ${formErrors.password ? "ring-2 ring-rose-400/70" : ""}`}
-                    placeholder={mode === "login" ? "Your password" : "At least 6 characters"}
+                    placeholder="Your password"
                     value={password}
-                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    autoComplete="current-password"
                     onChange={(event) => setPassword(event.target.value)}
                     aria-invalid={Boolean(formErrors.password)}
                   />
@@ -534,23 +376,10 @@ function HomeInner() {
                 {formErrors.password && <p className="text-xs font-medium text-rose-300">{formErrors.password}</p>}
               </div>
 
-              {mode === "login" ? (
               <PrimaryButton type="submit" disabled={loading} aria-busy={loading} className="w-full" size="lg">
-                  {loading ? <span className="spinner" role="status" aria-label="Processing request" /> : <span>Sign in</span>}
-                </PrimaryButton>
-              ) : (
-                <PrimaryButton type="submit" disabled={loading} aria-busy={loading} className="w-full" size="lg">
-                  {loading ? <span className="spinner" role="status" aria-label="Processing request" /> : <span>Create account</span>}
-                </PrimaryButton>
-              )}
+                {loading ? <span className="spinner" role="status" aria-label="Processing request" /> : <span>Sign in</span>}
+              </PrimaryButton>
             </form>
-
-            <p className="text-xs text-blue-200/70 text-center">
-              Need a full company workspace?{" "}
-              <Link href="/create-account" className="text-[#5dd4ff] underline-offset-4 hover:underline">
-                Create your free account →
-              </Link>
-            </p>
 
             {/* <p className="text-xs text-blue-200/60">
               By continuing, you agree to the Heybassh Shell Terms and acknowledge the Privacy Policy. Need assistance?{" "}

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
-import bcrypt from "bcryptjs"
-import { createPasswordResetToken } from "@/lib/reset-tokens"
+import { createInvitationToken, sendInvitationEmail } from "@/lib/invitation"
 
 export const runtime = "nodejs"
 
@@ -16,7 +15,7 @@ const schema = z.object({
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { account_id, email, name, role } = schema.parse(body)
+    const { account_id, email } = schema.parse(body)
 
     const normalizedEmail = email.trim().toLowerCase()
 
@@ -38,32 +37,30 @@ export async function POST(req: Request) {
       )
     }
 
-    // Create user with a random temporary password
-    const tempPassword = Math.random().toString(36).slice(-10)
-    const passwordHash = await bcrypt.hash(tempPassword, 10)
-
-    const user = await prisma.user.create({
-      data: {
-        email: normalizedEmail,
-        name,
-        passwordHash,
-        role: role ?? "user",
-        account_id,
-      },
-      select: { id: true, email: true, name: true, role: true, account_id: true },
-    })
-
-    // Create a password reset token for the invited user so they can set their own password
-    const resetToken = await createPasswordResetToken(normalizedEmail)
-    const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken.token}`
-
-    // For testing: return the reset URL in response instead of sending real email
-    return NextResponse.json({
-      success: true,
-      user,
-      resetUrl,
-      message: "User invited successfully. Share the resetUrl with the user to set their password.",
-    })
+    // Create invitation token
+    const invitationToken = await createInvitationToken(normalizedEmail, account_id)
+    
+    // Send invitation email
+    try {
+      const inviteUrl = await sendInvitationEmail(normalizedEmail, invitationToken.token, account_id, account.company_name)
+      
+      return NextResponse.json({
+        success: true,
+        message: "Invitation sent successfully.",
+        inviteUrl, // For testing - remove in production
+      })
+    } catch (emailError) {
+      console.error("Failed to send invitation email:", emailError)
+      // Still return success with the URL for testing
+      const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+      const inviteUrl = `${baseUrl}/register?email=${encodeURIComponent(normalizedEmail)}&account_id=${account_id}&token=${invitationToken.token}`
+      return NextResponse.json({
+        success: true,
+        message: "Invitation created but email sending failed. Use the inviteUrl to share with the user.",
+        inviteUrl,
+        smtpConfigured: false,
+      })
+    }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
