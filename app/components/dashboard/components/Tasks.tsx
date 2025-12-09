@@ -999,7 +999,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                       </div>
                     </td>
                     <td className="relative whitespace-nowrap px-6 py-4">
-                      <div className="relative" ref={(el) => (menuRefs.current[task.id] = el)}>
+                      <div className="relative" ref={(el) => { menuRefs.current[task.id] = el; }}>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
