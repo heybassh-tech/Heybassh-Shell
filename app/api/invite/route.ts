@@ -16,9 +16,17 @@ const schema = z.object({
 export async function POST(req: Request) {
   try {
     // Check authentication
+    const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+    if (!authSecret) {
+      return NextResponse.json(
+        { error: "SERVER_ERROR", message: "Authentication configuration error." },
+        { status: 500 }
+      )
+    }
+    
     const token = await getToken({ 
       req, 
-      secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET 
+      secret: authSecret 
     })
     
     if (!token || !token.email) {
