@@ -39,8 +39,43 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
   const [userType, setUserType] = useState<UserType>("Employee")
   const [sendInvite, setSendInvite] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true)
 
   const isAddPanelOpen = searchParams.get("add") === "true"
+
+  // Fetch users on mount and when accountId changes
+  useEffect(() => {
+    let ignore = false
+    async function fetchUsers() {
+      setIsLoadingUsers(true)
+      try {
+        const response = await fetch(`/api/accounts/${accountId}/users`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch users")
+        }
+        const data = await response.json()
+        if (!ignore) {
+          setUsers(data.map((user: any) => ({
+            id: user.id,
+            email: user.email,
+            userType: user.userType || (user.role === "admin" ? "Employee" : "Others"),
+            status: user.status || (user.emailVerified ? "Active" : "Pending"),
+            createdAt: user.createdAt,
+          })))
+        }
+      } catch (error) {
+        console.error("Failed to fetch users:", error)
+      } finally {
+        if (!ignore) {
+          setIsLoadingUsers(false)
+        }
+      }
+    }
+    fetchUsers()
+    return () => {
+      ignore = true
+    }
+  }, [accountId])
 
   useEffect(() => {
     if (isAddPanelOpen) {
@@ -92,7 +127,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
         body: JSON.stringify({
           account_id: accountId,
           email: email.trim(),
-          role: userType === "Employee" ? "user" : "user",
+          role: userType === "Employee" ? "admin" : "user", // Fix: Employee should be admin role
         }),
       })
 
@@ -102,16 +137,19 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
         throw new Error(data.message || data.error || "Failed to send invitation")
       }
 
-      // Add user to local state (will be pending until they register)
-      const newUser: User = {
-        id: `U-${String(users.length + 1).padStart(4, "0")}`,
-        email: email.trim(),
-        userType,
-        status: "Pending",
-        createdAt: new Date().toISOString(),
+      // Refetch users to get the updated list including the new pending invitation
+      const usersResponse = await fetch(`/api/accounts/${accountId}/users`)
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json()
+        setUsers(usersData.map((user: any) => ({
+          id: user.id,
+          email: user.email,
+          userType: user.userType || (user.role === "admin" ? "Employee" : "Others"),
+          status: user.status || (user.emailVerified ? "Active" : "Pending"),
+          createdAt: user.createdAt,
+        })))
       }
       
-      setUsers([...users, newUser])
       closeAddPanel()
     } catch (error) {
       console.error("Failed to send invitation", error)
@@ -125,6 +163,15 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
     Active: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
     Pending: "border-amber-500/40 bg-amber-500/10 text-amber-200",
     Inactive: "border-rose-500/40 bg-rose-500/10 text-rose-200",
+  }
+
+  if (isLoadingUsers) {
+    return (
+      <div className="flex items-center justify-center py-10 text-blue-200">
+        <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-blue-300 border-t-transparent mr-2" />
+        Loading users...
+      </div>
+    )
   }
 
   return (

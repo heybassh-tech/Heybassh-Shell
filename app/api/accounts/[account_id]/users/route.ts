@@ -13,7 +13,8 @@ const schema = z.object({
 
 export async function GET(_req: Request, { params }: { params: { account_id: string } }) {
   try {
-    const users = await prisma.user.findMany({
+    // Get all registered users for this account
+    const registeredUsers = await prisma.user.findMany({
       where: { account_id: params.account_id },
       select: {
         id: true,
@@ -21,12 +22,63 @@ export async function GET(_req: Request, { params }: { params: { account_id: str
         name: true,
         role: true,
         account_id: true,
+        emailVerified: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
     })
 
-    return NextResponse.json(users)
+    // Get all pending invitations (EmailVerificationTokens that haven't expired and don't have a user yet)
+    const allInvitations = await prisma.emailVerificationToken.findMany({
+      where: {
+        expires: { gt: new Date() }, // Not expired
+      },
+      select: {
+        email: true,
+        createdAt: true,
+      },
+    })
+
+    // Filter invitations to only those where:
+    // 1. The email doesn't exist as a registered user
+    // 2. We need to check if they're for this account - since EmailVerificationToken doesn't have account_id,
+    //    we'll include all pending invitations for emails that don't have users yet
+    //    (Note: This is a limitation - ideally we'd store account_id in EmailVerificationToken)
+    const registeredEmails = new Set(registeredUsers.map(u => u.email.toLowerCase()))
+    const pendingInvitations = allInvitations.filter(inv => !registeredEmails.has(inv.email.toLowerCase()))
+
+    // Combine registered users and pending invitations
+    const result = [
+      // Registered users
+      ...registeredUsers.map(user => ({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        account_id: user.account_id,
+        emailVerified: user.emailVerified,
+        createdAt: user.createdAt.toISOString(),
+        status: user.emailVerified ? "Active" : "Pending",
+        userType: user.role === "admin" ? "Employee" : "Others",
+      })),
+      // Pending invitations
+      ...pendingInvitations.map(inv => ({
+        id: `inv-${inv.email}`, // Temporary ID for pending invitations
+        email: inv.email,
+        name: null,
+        role: "user", // Default role, will be set when they register
+        account_id: params.account_id,
+        emailVerified: null,
+        createdAt: inv.createdAt.toISOString(),
+        status: "Pending",
+        userType: "Others", // Default, we don't know the type until they register
+      })),
+    ]
+
+    // Sort by createdAt descending
+    result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+    return NextResponse.json(result)
   } catch (error) {
     console.error("[users][GET]", error)
     return NextResponse.json({ error: "Failed to load users" }, { status: 500 })

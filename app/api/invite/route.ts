@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { account_id, email } = schema.parse(body)
+    const { account_id, email, role } = schema.parse(body)
 
     const normalizedEmail = email.trim().toLowerCase()
 
