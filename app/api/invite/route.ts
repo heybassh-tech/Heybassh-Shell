@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
-import { getToken } from "next-auth/jwt"
+import { auth } from "@/lib/auth"
 import { createInvitationToken, sendInvitationEmail } from "@/lib/invitation"
 
 export const runtime = "nodejs"
@@ -15,30 +15,19 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
-    // Check authentication
-    const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
-    if (!authSecret || typeof authSecret !== 'string') {
-      return NextResponse.json(
-        { error: "SERVER_ERROR", message: "Authentication configuration error." },
-        { status: 500 }
-      )
-    }
+    // Check authentication using NextAuth's auth() function
+    const session = await auth()
     
-    const token = await getToken({ 
-      req, 
-      secret: authSecret as string
-    })
-    
-    if (!token || !token.user || !(token.user as any).email) {
+    if (!session || !session.user || !session.user.email) {
       return NextResponse.json(
         { error: "UNAUTHORIZED", message: "You must be signed in to invite users." },
         { status: 401 }
       )
     }
 
-    const userEmail = (token.user as any).email as string
-    const userRole = (token.user as any).role as string
-    const userAccountId = (token.user as any).account_id as string
+    const userEmail = session.user.email
+    const userRole = (session.user as any).role as string | undefined
+    const userAccountId = (session.user as any).account_id as string | undefined
 
     // Get the current user
     const currentUser = await prisma.user.findUnique({ 

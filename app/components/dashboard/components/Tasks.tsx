@@ -418,7 +418,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 value={startDate}
                 onChange={(date) => setStartDate(date)}
                 format="YYYY-MM-DD"
-                className="w-full"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
                 placeholder="Select start date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -452,11 +452,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                     </button>
                   </div>
                 )}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#0e1629",
-                  borderColor: "#1a2446",
-                }}
               />
             </div>
             <div>
@@ -471,7 +466,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   setNewTask({ ...newTask, dueDate: date ? date.format("YYYY-MM-DD") : "" });
                 }}
                 format="YYYY-MM-DD"
-                className="w-full"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
                 placeholder="Select due date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -520,11 +515,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                     </button>
                   </div>
                 )}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#0e1629",
-                  borderColor: "#1a2446",
-                }}
               />
             </div>
             <div>
@@ -704,7 +694,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 value={editStartDate}
                 onChange={(date) => setEditStartDate(date)}
                 format="YYYY-MM-DD"
-                className="w-full"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
                 placeholder="Select start date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -738,11 +728,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                     </button>
                   </div>
                 )}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#0e1629",
-                  borderColor: "#1a2446",
-                }}
               />
             </div>
             <div>
@@ -757,7 +742,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   setEditTask({ ...editTask, dueDate: date ? date.format("YYYY-MM-DD") : "" });
                 }}
                 format="YYYY-MM-DD"
-                className="w-full"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
                 placeholder="Select due date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -806,11 +791,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                     </button>
                   </div>
                 )}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#0e1629",
-                  borderColor: "#1a2446",
-                }}
               />
             </div>
             <div>
