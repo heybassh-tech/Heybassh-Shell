@@ -29,16 +29,20 @@ export async function POST(req: Request) {
       secret: authSecret as string
     })
     
-    if (!token || !token.email) {
+    if (!token || !token.user || !(token.user as any).email) {
       return NextResponse.json(
         { error: "UNAUTHORIZED", message: "You must be signed in to invite users." },
         { status: 401 }
       )
     }
 
+    const userEmail = (token.user as any).email as string
+    const userRole = (token.user as any).role as string
+    const userAccountId = (token.user as any).account_id as string
+
     // Get the current user
     const currentUser = await prisma.user.findUnique({ 
-      where: { email: token.email as string },
+      where: { email: userEmail },
       select: { id: true, email: true, role: true, account_id: true }
     })
 

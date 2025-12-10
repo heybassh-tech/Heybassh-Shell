@@ -26,6 +26,9 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(f
     ? "!bg-[#18aead] !border-[#18aead] hover:!bg-[#18aead]/90 hover:!border-[#18aead] active:!bg-[#18aead]/80 active:!border-[#18aead] focus:!bg-[#18aead] focus:!border-[#18aead]"
     : "!bg-[#2b9bff] !border-[#2b9bff] hover:!bg-[#2b9bff]/90 hover:!border-[#2b9bff] active:!bg-[#2b9bff]/80 active:!border-[#2b9bff] focus:!bg-[#2b9bff] focus:!border-[#2b9bff]"
 
+  // Exclude variant from props that get passed to Ant Design Button
+  const { variant: _, ...buttonProps } = props as any
+
   return (
     <Button
       ref={ref}
@@ -35,7 +38,7 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(f
       size={mappedSize}
       className={`${className} ${colorClasses} !rounded-[9999999999999999999px] text-white`}
       icon={iconPosition === "left" ? icon : undefined}
-      {...props}
+      {...buttonProps}
     >
       {iconPosition === "right" ? (
         <span className="inline-flex items-center gap-2">
