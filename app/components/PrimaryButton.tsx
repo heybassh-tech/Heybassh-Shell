@@ -8,10 +8,11 @@ type PrimaryButtonProps = Omit<ButtonProps, "type" | "size"> & {
   iconPosition?: "left" | "right"
   type?: "button" | "submit" | "reset"
   size?: PrimarySize
+  variant?: "primary" | "brand" // primary = blue, brand = green
 }
 
 export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(function PrimaryButton(
-  { children, icon, iconPosition = "left", className = "", disabled, type = "button", size = "md", ...props },
+  { children, icon, iconPosition = "left", className = "", disabled, type = "button", size = "md", variant = "primary", ...props },
   ref,
 ) {
   const mappedSize: ButtonProps["size"] =
@@ -21,6 +22,10 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(f
       ? "small"
       : "middle"
 
+  const colorClasses = variant === "brand"
+    ? "!bg-[#18aead] !border-[#18aead] hover:!bg-[#18aead]/90 hover:!border-[#18aead] active:!bg-[#18aead]/80 active:!border-[#18aead] focus:!bg-[#18aead] focus:!border-[#18aead]"
+    : "!bg-[#2b9bff] !border-[#2b9bff] hover:!bg-[#2b9bff]/90 hover:!border-[#2b9bff] active:!bg-[#2b9bff]/80 active:!border-[#2b9bff] focus:!bg-[#2b9bff] focus:!border-[#2b9bff]"
+
   return (
     <Button
       ref={ref}
@@ -28,7 +33,7 @@ export const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(f
       htmlType={type}
       disabled={disabled}
       size={mappedSize}
-      className={`${className} !bg-[#2b9bff] !border-[#2b9bff] !rounded-[9999999999999999999px] text-white hover:!bg-[#2b9bff]/90 hover:!border-[#2b9bff] active:!bg-[#2b9bff]/80 active:!border-[#2b9bff] focus:!bg-[#2b9bff] focus:!border-[#2b9bff]`}
+      className={`${className} ${colorClasses} !rounded-[9999999999999999999px] text-white`}
       icon={iconPosition === "left" ? icon : undefined}
       {...props}
     >

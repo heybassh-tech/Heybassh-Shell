@@ -101,7 +101,7 @@ export function LeaveRequest() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
-        <h2 className="text-2xl font-bold text-white">Leave Requests</h2>
+        <h2 className="text-2xl font-bold text-[#18aead]">Leave Requests</h2>
         <div className="flex items-center gap-2">
           <div className="flex rounded-[20px] border border-[#1a2446] bg-[#0e1629] overflow-hidden">
             <button
@@ -160,7 +160,7 @@ export function LeaveRequest() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[5px] border border-[#1a2446] bg-[#0c142a]">
+          <div className="overflow-hidden rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
             <table className="min-w-full divide-y divide-[#1a2446]">
               <thead className="bg-[#0e1629]">
                 <tr>
@@ -316,7 +316,7 @@ export function LeaveRequest() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-[5px] border border-[#1a2446] bg-[#0c142a]">
+          <div className="overflow-hidden rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
             <table className="min-w-full divide-y divide-[#1a2446]">
               <thead className="bg-[#0e1629]">
                 <tr>

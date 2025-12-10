@@ -75,8 +75,9 @@ export function MainSidebar({ view, navigate, sidebarCollapsed }: MainSidebarPro
                 {hasChildren && (
                   <div
                     className={`overflow-hidden rounded-[7px] border border-[#111936] bg-[#0d142a] transition-all ${
-                      open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                      open ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                     }`}
+                    style={!open ? { padding: 0, margin: 0, borderWidth: 0 } : undefined}
                   >
                     <div className="flex flex-col gap-1 p-2">
                       {item.children?.map((child) => {

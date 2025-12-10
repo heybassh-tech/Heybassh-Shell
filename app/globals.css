@@ -159,6 +159,7 @@ body { @apply min-h-screen bg-[#020617] text-[#eef3ff]; font-family: system-ui, 
 }
 
 .primary-modal .ant-modal-title {
+  color: #18aead !important;
   color: #f4f6ff;
   font-size: 1.1rem;
   font-weight: 600;

@@ -268,11 +268,12 @@ export function Tasks({ accountId, employees }: TasksProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
-        <h2 className="text-2xl font-bold text-white">Tasks</h2>
+        <h2 className="text-2xl font-bold text-[#18aead]">Tasks</h2>
         <div className="flex items-center gap-2">
           <PrimaryButton
             onClick={() => setIsModalOpen(true)}
             icon={<PlusIcon className="h-4 w-4" />}
+            variant="brand"
           >
             Add Task
           </PrimaryButton>
@@ -928,7 +929,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       </PrimaryModal>
 
       {viewMode === "list" ? (
-        <div className="overflow-hidden rounded-[5px] border border-[#1a2446] bg-[#0c142a]">
+        <div className="overflow-hidden rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
           <table className="min-w-full divide-y divide-[#1a2446]">
             <thead className="bg-[#0e1629]">
               <tr>
@@ -1050,7 +1051,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {statusOptions.map((status) => (
-            <div key={status} className="rounded-[5px] border border-[#1a2446] bg-[#0c142a]">
+            <div key={status} className="rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
               <div className="border-b border-[#1a2446] bg-[#0e1629] px-4 py-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-blue-300">{status}</h3>
               </div>
@@ -1058,7 +1059,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 {filteredTasks
                   .filter((task) => task.status === status)
                   .map((task) => (
-                    <div key={task.id} className="rounded-[5px] border border-[#1a2446] bg-[#0e1629] p-3 transition-colors hover:bg-[#121c3d]">
+                    <div key={task.id} className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] p-3 transition-colors hover:bg-[#121c3d]">
                       <div className="flex items-start justify-between">
                         <h4 className="text-sm font-medium text-white">{task.title}</h4>
                         <span className={`inline-flex items-center rounded-full border px-2 text-xs font-semibold ${getPriorityColor(task.priority)}`}>

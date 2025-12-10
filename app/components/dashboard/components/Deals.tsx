@@ -392,7 +392,7 @@ export function Deals({
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
-        <h2 className="text-2xl font-bold text-white">Deals</h2>
+        <h2 className="text-2xl font-bold text-[#18aead]">Deals</h2>
         <PrimaryButton
           onClick={() => setIsModalOpen(true)}
           icon={isSubmitting ? <SpinnerIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}
@@ -635,7 +635,7 @@ export function Deals({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-[5px] border border-[#1a2446] bg-[#0c142a]">
+      <div className="overflow-hidden rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
         <table className="min-w-full divide-y divide-[#1a2446]">
           <thead className="bg-[#0e1629]">
             <tr>
