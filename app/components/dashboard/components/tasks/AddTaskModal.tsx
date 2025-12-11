@@ -338,8 +338,8 @@ export function AddTaskModal({
                 setPriorityPanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
-            >
+              className="flex items-center justify-center rounded-full p-2 text-blue-300 hover:text-white/50 transition-colors"
+              >
               <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
               <div className="flex-1">
                 {startDate && endDate ? (
@@ -376,45 +376,8 @@ export function AddTaskModal({
                     }}
                   />
 
-                  {/* Date Inputs */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-blue-200 mb-1">
-                        Start Date
-                      </label>
-                      <PrimaryInput
-                        type="date"
-                        value={startDate ? startDate.format("YYYY-MM-DD") : ""}
-                        onChange={(e) => {
-                          const parsed = dayjs(e.target.value, "YYYY-MM-DD", true);
-                          if (parsed.isValid()) {
-                            setStartDate(parsed);
-                            // Auto-focus end date input
-                            setTimeout(() => {
-                              const endDateInput = document.getElementById("end-date-input");
-                              endDateInput?.focus();
-                            }, 100);
-                          }
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-blue-200 mb-1">
-                        End Date
-                      </label>
-                      <PrimaryInput
-                        id="end-date-input"
-                        type="date"
-                        value={endDate ? endDate.format("YYYY-MM-DD") : ""}
-                        onChange={(e) => {
-                          const parsed = dayjs(e.target.value, "YYYY-MM-DD", true);
-                          if (parsed.isValid()) {
-                            setEndDate(parsed);
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
+                  Date Inputs
+                 
                 </div>
               </div>
             )}
