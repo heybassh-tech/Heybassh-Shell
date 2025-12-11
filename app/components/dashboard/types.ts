@@ -69,6 +69,7 @@ export type Task = {
   id: string;
   title: string;
   assignee: string;
+  startDate?: string;
   dueDate: string;
   priority: "Low" | "Normal" | "High";
   status: "Todo" | "In Progress" | "Done";

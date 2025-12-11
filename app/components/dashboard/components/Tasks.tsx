@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { MagnifyingGlassIcon, PlusIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { MagnifyingGlassIcon, PlusIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { DatePicker, Tag } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
@@ -12,7 +12,7 @@ import { PrimaryInput } from "../../PrimaryInput";
 
 interface TasksProps {
   accountId: string;
-  employees: { id: string; name: string; email?: string }[];
+  employees: { id: string; name: string; email?: string; role?: string; status?: string }[];
 }
 
 export function Tasks({ accountId, employees }: TasksProps) {
@@ -34,6 +34,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const [newTask, setNewTask] = useState<Omit<Task, 'id'>>({
     title: "",
     assignee: "",
+    startDate: "",
     dueDate: "",
     priority: "Normal",
     status: "Todo",
@@ -43,6 +44,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const [editTask, setEditTask] = useState<Omit<Task, 'id'>>({
     title: "",
     assignee: "",
+    startDate: "",
     dueDate: "",
     priority: "Normal",
     status: "Todo",
@@ -55,6 +57,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const [dueDate, setDueDate] = useState<Dayjs | null>(null);
   const [editStartDate, setEditStartDate] = useState<Dayjs | null>(null);
   const [editDueDate, setEditDueDate] = useState<Dayjs | null>(null);
+  const [tags, setTags] = useState<string[]>([]);
 
   useEffect(() => {
     let ignore = false;
@@ -96,6 +99,11 @@ export function Tasks({ accountId, employees }: TasksProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const activeAssignees = useMemo(
+    () => employees.filter((e) => (e.status ?? "Accepted") === "Accepted"),
+    [employees],
+  );
+
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch = task.title.toLowerCase().includes(filters.search.toLowerCase());
     const matchesPriority = filters.priority === "All" || task.priority === filters.priority;
@@ -105,11 +113,31 @@ export function Tasks({ accountId, employees }: TasksProps) {
     return matchesSearch && matchesPriority && matchesStatus && matchesAssignee;
   });
 
+  useEffect(() => {
+    let ignore = false;
+    async function loadTags() {
+      try {
+        const res = await fetch(`/api/accounts/${accountId}/tasks/tags`);
+        const data = await res.json().catch(() => []);
+        if (!ignore && Array.isArray(data)) {
+          setTags(data);
+        }
+      } catch (e) {
+        console.error("[Tasks] failed to load tags", e);
+      }
+    }
+    loadTags();
+    return () => {
+      ignore = true;
+    };
+  }, [accountId]);
+
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const taskToAdd = {
         ...newTask,
+        startDate: startDate ? startDate.format("YYYY-MM-DD") : newTask.startDate || "",
         dueDate: dueDate ? dueDate.format("YYYY-MM-DD") : newTask.dueDate || "",
       };
       
@@ -128,6 +156,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       setNewTask({
         title: "",
         assignee: "",
+        startDate: "",
         dueDate: "",
         priority: "Normal",
         status: "Todo",
@@ -149,6 +178,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
     setEditTask({
       title: task.title,
       assignee: task.assignee,
+      startDate: (task as any).startDate || "",
       dueDate: task.dueDate,
       priority: task.priority,
       status: task.status,
@@ -156,7 +186,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       tags: task.tags || [],
     });
     setEditTagInput("");
-    setEditStartDate(task.dueDate ? dayjs(task.dueDate) : null);
+    setEditStartDate((task as any).startDate ? dayjs((task as any).startDate) : null);
     setEditDueDate(task.dueDate ? dayjs(task.dueDate) : null);
     setIsEditModalOpen(true);
     setOpenMenuId(null);
@@ -169,6 +199,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
     try {
       const taskToUpdate = {
         ...editTask,
+        startDate: editStartDate ? editStartDate.format("YYYY-MM-DD") : editTask.startDate || "",
         dueDate: editDueDate ? editDueDate.format("YYYY-MM-DD") : editTask.dueDate || "",
       };
 
@@ -229,10 +260,14 @@ export function Tasks({ accountId, employees }: TasksProps) {
 
   const addTag = (tags: string[], input: string, setTags: (tags: string[]) => void, setInput: (input: string) => void) => {
     const trimmed = input.trim();
-    if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed]);
+    if (!trimmed) return;
+    if (tags.includes(trimmed)) {
       setInput("");
+      return;
     }
+    setTags([...tags, trimmed]);
+    setInput("");
+    // TODO: call API to persist tag (not implemented in this snippet)
   };
 
   const removeTag = (tags: string[], tagToRemove: string, setTags: (tags: string[]) => void) => {

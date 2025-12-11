@@ -6,6 +6,7 @@ export const runtime = "nodejs"
 type TaskPayload = {
   title: string
   assignee?: string
+  startDate?: string
   dueDate?: string
   priority?: string
   status?: string
@@ -67,6 +68,7 @@ export async function POST(req: Request, { params }: { params: { account_id: str
         accountSeq: account.accountSeq,
         title: body.title.trim(),
         assignee: body.assignee?.trim() || null,
+        startDate: body.startDate?.trim() || null,
         dueDate: body.dueDate?.trim() || null,
         priority: body.priority || "Normal",
         status: body.status || "Todo",
@@ -120,6 +122,7 @@ export async function PUT(req: Request, { params }: { params: { account_id: stri
       data: {
         title: body.title.trim(),
         assignee: body.assignee?.trim() || null,
+        startDate: body.startDate?.trim() || null,
         dueDate: body.dueDate?.trim() || null,
         priority: body.priority || existingTask.priority,
         status: body.status || existingTask.status,
