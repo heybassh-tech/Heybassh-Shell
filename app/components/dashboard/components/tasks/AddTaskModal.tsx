@@ -202,9 +202,9 @@ export function AddTaskModal({
                 setPriorityPanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
+              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
             >
-              <FiTag className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              <FiTag className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
               <div className="flex-1">
                 {task.tags.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -317,9 +317,9 @@ export function AddTaskModal({
                 setPriorityPanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
+              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
             >
-              <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
               <div className="flex-1">
                 {startDate && endDate ? (
                   <span className="text-sm text-blue-200">{formatDateRange()}</span>
@@ -410,9 +410,9 @@ export function AddTaskModal({
                 setDatePanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
+              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
             >
-              <FiFlag className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              <FiFlag className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
               <div className="flex-1">
                 {task.priority ? (
                   <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getPriorityColor(task.priority)}`}>
@@ -476,9 +476,9 @@ export function AddTaskModal({
                 setDatePanelOpen(false);
                 setPriorityPanelOpen(false);
               }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
+              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
             >
-              <FiCheckCircle className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              <FiCheckCircle className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
               <div className="flex-1">
                 {task.status ? (
                   <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(task.status)}`}>
