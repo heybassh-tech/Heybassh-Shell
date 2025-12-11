@@ -298,13 +298,13 @@ function HomeInner() {
           <div className="flex flex-col justify-between gap-10">
             <div>
               <h1 className="text-3xl font-semibold leading-snug text-white md:text-4xl">
-                Heybassh Shell Cloud
+                Heybassh Business Suite
               </h1>
               <p className="mt-4 text-lg leading-relaxed text-blue-100/90 md:text-xl">
-                Secure access to your developer workspace, from anywhere.
+                Secure, all-in-one business suite to run your teams, clients, and data.
               </p>
               <p className="mt-4 text-sm leading-relaxed text-blue-100/80 md:text-base">
-                Sign in to continue to your cloud shell environment or create a new account in just a few clicks. Enterprise-grade security, tailored for modern teams.
+                Sign in to continue to your Heybassh Business Suite workspace or create a new account in a few clicks. Enterprise-grade security, tailored for modern operations.
               </p>
             </div>
           </div>

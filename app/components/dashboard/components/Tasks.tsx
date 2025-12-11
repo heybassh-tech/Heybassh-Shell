@@ -1051,7 +1051,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       </PrimaryModal>
 
       {viewMode === "list" ? (
-        <div className="overflow-hidden rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
+        <div className="overflow-visible rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
           <table className="min-w-full divide-y divide-[#1a2446]">
             <thead className="bg-[#0e1629]">
               <tr>
@@ -1133,7 +1133,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                           <EllipsisVerticalIcon className="h-5 w-5" />
                         </button>
                         {openMenuId === task.id && (
-                          <div className="absolute right-0 top-full z-50 mt-1 w-40 overflow-hidden rounded-lg border border-[#1a2446] bg-[#0e1629] shadow-lg">
+                          <div className="absolute right-0 top-full z-50 mt-1 w-40 overflow-visible rounded-lg border border-[#1a2446] bg-[#0e1629] shadow-lg">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1216,7 +1216,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                             <EllipsisVerticalIcon className="h-4 w-4" />
                           </button>
                           {openMenuId === `board-${task.id}` && (
-                            <div className="absolute right-0 top-full z-50 mt-1 w-40 overflow-hidden rounded-lg border border-[#1a2446] bg-[#0e1629] shadow-lg">
+                            <div className="absolute right-0 top-full z-50 mt-1 w-40 overflow-visible rounded-lg border border-[#1a2446] bg-[#0e1629] shadow-lg">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
