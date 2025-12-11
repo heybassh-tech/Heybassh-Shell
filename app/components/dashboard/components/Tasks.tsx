@@ -74,6 +74,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const [editAssigneeOpen, setEditAssigneeOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [showAllAssignees, setShowAllAssignees] = useState(false);
+  const [showAllEditAssignees, setShowAllEditAssignees] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -464,7 +466,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
           setNewTask({
             title: "",
             assignee: "",
-        startDate: "",
             dueDate: "",
             priority: "Normal",
             status: "Todo",
@@ -488,24 +489,83 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
               />
             </div>
-            <div>
-              <label htmlFor="assignee" className="block text-sm font-medium text-blue-200">
-                Assign To
-              </label>
-              <select
-                id="assignee"
-                required
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={newTask.assignee}
-                onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })}
+            <div className="relative">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-200">
+                <FiUser className="h-4 w-4 text-blue-300" />
+                <span>Assign To</span>
+            </div>
+                    <button
+                      type="button"
+                onClick={() => {
+                  setAssigneeOpen((o) => !o);
+                  setShowAllAssignees(false);
+                }}
+                className="flex w-full items-center justify-between rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 transition-colors hover:border-[#18aead]"
               >
-                <option value="" className="bg-[#0e1629]">Select Assignee</option>
-                {employees.map((employee) => (
-                  <option key={employee.id} value={employee.id} className="bg-[#0e1629]">
-                    {employee.name || employee.email}
-                  </option>
-                ))}
-              </select>
+                <span className="truncate">
+                  {employees.find((e) => e.id === newTask.assignee)?.name ||
+                    employees.find((e) => e.id === newTask.assignee)?.email ||
+                    "Select assignee"}
+                </span>
+                <span className="text-blue-300/70">▼</span>
+                    </button>
+              {assigneeOpen && (
+                <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-3 shadow-lg">
+                  <div className="flex items-center justify-between gap-2">
+                    <PrimaryInput
+                      id="assignee-search"
+                      type="text"
+                      placeholder="Search people"
+                      value={assigneeSearch}
+                      onChange={(e) => setAssigneeSearch(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAssigneeOpen(false);
+                        setAssigneeSearch("");
+                        setShowAllAssignees(false);
+                      }}
+                      className="rounded p-1 text-blue-300/70 hover:bg-[#121c3d] hover:text-white"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="mt-3 max-h-56 space-y-1 overflow-y-auto pr-1">
+                    {(showAllAssignees ? filteredAssignees : filteredAssignees.slice(0, 6)).map((a) => (
+                    <button
+                        key={a.id}
+                      type="button"
+                        onClick={() => {
+                          setNewTask({ ...newTask, assignee: a.id });
+                          setAssigneeOpen(false);
+                          setAssigneeSearch("");
+                          setShowAllAssignees(false);
+                        }}
+                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                      >
+                        <span className="flex items-center gap-2">
+                          <FiUser className="h-4 w-4" />
+                          {a.name || a.email}
+                        </span>
+                        {newTask.assignee === a.id && <span className="text-xs text-[#18aead]">Selected</span>}
+                    </button>
+                    ))}
+                    {!showAllAssignees && filteredAssignees.length > 6 && (
+                    <button
+                      type="button"
+                        onClick={() => setShowAllAssignees(true)}
+                        className="w-full rounded-lg border border-dashed border-[#1a2446] px-3 py-2 text-center text-sm text-blue-200 transition-colors hover:border-[#18aead]"
+                    >
+                        Load more
+                    </button>
+                    )}
+                    {filteredAssignees.length === 0 && (
+                      <p className="px-1 py-2 text-xs text-blue-300/70">No people found</p>
+                    )}
+                  </div>
+                  </div>
+                )}
             </div>
             <div>
               <label htmlFor="dueDate" className="block text-sm font-medium text-blue-200 mb-2">
@@ -523,64 +583,110 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 placeholder="Select a date"
               />
               <div className="mt-2 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const today = dayjs();
-                    setDueDate(today);
-                    setNewTask({ ...newTask, dueDate: today.format("YYYY-MM-DD") });
-                  }}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const today = dayjs();
+                        setDueDate(today);
+                        setNewTask({ ...newTask, dueDate: today.format("YYYY-MM-DD") });
+                      }}
                   className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
-                >
+                    >
                   <FiCalendar className="h-4 w-4" />
                   Pick date
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
                     setDueDate(null);
                     setNewTask({ ...newTask, dueDate: "" });
-                  }}
+                      }}
                   className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
-                >
+                    >
                   <XMarkIcon className="h-4 w-4" />
                   No date
-                </button>
+                    </button>
               </div>
             </div>
-            <div>
-              <label htmlFor="priority" className="block text-sm font-medium text-blue-200">
-                Priority
-              </label>
-              <select
-                id="priority"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={newTask.priority}
-                onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as Task["priority"] })}
+            <div className="relative">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-200">
+                <FiFlag className="h-4 w-4 text-blue-300" />
+                <span>Priority</span>
+              </div>
+                    <button
+                      type="button"
+                onClick={() => setPriorityOpen((o) => !o)}
+                className="flex w-full items-center justify-between rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 transition-colors hover:border-[#18aead]"
               >
-                {priorityOptions.map((priority) => (
-                  <option key={priority} value={priority} className="bg-[#0e1629]">
-                    {priority}
-                  </option>
-                ))}
-              </select>
+                <span className="flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getPriorityColor(newTask.priority)}`}>
+                    {newTask.priority}
+                  </span>
+                </span>
+                <span className="text-blue-300/70">▼</span>
+                    </button>
+              {priorityOpen && (
+                <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+                  {priorityOptions.map((priority) => (
+                    <button
+                      key={priority}
+                      type="button"
+                      onClick={() => {
+                        setNewTask({ ...newTask, priority: priority as Task["priority"] });
+                        setPriorityOpen(false);
+                      }}
+                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <FiFlag className="h-4 w-4" />
+                        {priority}
+                      </span>
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getPriorityColor(priority as Task["priority"])}`}>
+                        {priority}
+                      </span>
+                    </button>
+                  ))}
+                  </div>
+                )}
             </div>
-            <div>
-              <label htmlFor="status" className="block text-sm font-medium text-blue-200">
-                Status
-              </label>
-              <select
-                id="status"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={newTask.status}
-                onChange={(e) => setNewTask({ ...newTask, status: e.target.value as Task["status"] })}
+            <div className="relative">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-200">
+                <Tag className="bg-transparent text-blue-200"> </Tag>
+                <span>Status</span>
+            </div>
+              <button
+                type="button"
+                onClick={() => setStatusOpen((o) => !o)}
+                className="flex w-full items-center justify-between rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 transition-colors hover:border-[#18aead]"
               >
+                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(newTask.status)}`}>
+                  {newTask.status}
+                </span>
+                <span className="text-blue-300/70">▼</span>
+              </button>
+              {statusOpen && (
+                <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
                 {statusOptions.map((status) => (
-                  <option key={status} value={status} className="bg-[#0e1629]">
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => {
+                        setNewTask({ ...newTask, status: status as Task["status"] });
+                        setStatusOpen(false);
+                      }}
+                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <FiFlag className="h-4 w-4" />
                     {status}
-                  </option>
-                ))}
-              </select>
+                      </span>
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getStatusColor(status as Task["status"])}`}>
+                        {status}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="description" className="block text-sm font-medium text-blue-200">
@@ -597,8 +703,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
             <div className="sm:col-span-2">
               <div className="mb-2 flex items-center justify-between">
                 <label htmlFor="tags" className="block text-sm font-medium text-blue-200">
-                  Tags
-                </label>
+                Tags
+              </label>
                 <button
                   type="button"
                   onClick={() => setTagOpen(true)}
@@ -611,14 +717,14 @@ export function Tasks({ accountId, employees }: TasksProps) {
               <div className="flex flex-wrap gap-2 mb-2">
                 {newTask.tags.length > 0 ? (
                   newTask.tags.map((tag, index) => (
-                    <Tag
-                      key={index}
-                      closable
-                      onClose={() => removeTag(newTask.tags, tag, (tags) => setNewTask({ ...newTask, tags }))}
-                      className="bg-[#121c3d] border-[#1a2446] text-blue-200"
-                    >
-                      {tag}
-                    </Tag>
+                  <Tag
+                    key={index}
+                    closable
+                    onClose={() => removeTag(newTask.tags, tag, (tags) => setNewTask({ ...newTask, tags }))}
+                    className="bg-[#121c3d] border-[#1a2446] text-blue-200"
+                  >
+                    {tag}
+                  </Tag>
                   ))
                 ) : (
                   <span className="text-xs text-blue-300/70">No tags</span>
@@ -641,9 +747,9 @@ export function Tasks({ accountId, employees }: TasksProps) {
                       </button>
                     </div>
                     <div className="mt-2">
-                      <PrimaryInput
-                        id="tags"
-                        type="text"
+                <PrimaryInput
+                  id="tags"
+                  type="text"
                         placeholder="Search tags"
                         value={tagSearch}
                         onChange={(e) => setTagSearch(e.target.value)}
@@ -654,7 +760,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                         filteredTags.map((tag) => (
                           <button
                             key={tag}
-                            type="button"
+                  type="button"
                             onClick={() => {
                               addTag(newTask.tags, tag, (tags) => setNewTask({ ...newTask, tags }), setTagInput);
                             }}
@@ -679,7 +785,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                       ) : (
                         <p className="text-xs text-blue-300/70">No tags yet.</p>
                       )}
-                    </div>
+              </div>
                   </div>
                 </div>
               )}
@@ -699,7 +805,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   description: "",
                   tags: [],
                 });
-                setStartDate(null);
                 setDueDate(null);
               }}
               className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
@@ -731,7 +836,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
             tags: [],
           });
           setEditTagInput("");
-          setEditStartDate(null);
           setEditDueDate(null);
         }}
         widthClassName="max-w-2xl"
@@ -750,125 +854,99 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 onChange={(e) => setEditTask({ ...editTask, title: e.target.value })}
               />
             </div>
-            <div>
-              <label htmlFor="edit-assignee" className="block text-sm font-medium text-blue-200">
-                Assign To
-              </label>
-              <select
-                id="edit-assignee"
-                required
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={editTask.assignee}
-                onChange={(e) => setEditTask({ ...editTask, assignee: e.target.value })}
-              >
-                <option value="" className="bg-[#0e1629]">Select Assignee</option>
-                {employees.map((employee) => (
-                  <option key={employee.id} value={employee.id} className="bg-[#0e1629]">
-                    {employee.name || employee.email}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="edit-dueDate" className="block text-sm font-medium text-blue-200 mb-2">
-                Date
-              </label>
-              <DatePicker
-                id="edit-dueDate"
-                value={editDueDate || (editTask.dueDate ? dayjs(editTask.dueDate) : null)}
-                onChange={(date) => {
-                  setEditDueDate(date);
-                  setEditTask({ ...editTask, dueDate: date ? date.format("YYYY-MM-DD") : "" });
-                }}
-                format="YYYY-MM-DD"
-                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
-                placeholder="Select a date"
-              />
-              <div className="mt-2 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const today = dayjs();
-                    setEditDueDate(today);
-                    setEditTask({ ...editTask, dueDate: today.format("YYYY-MM-DD") });
-                  }}
-                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
-                >
-                  <FiCalendar className="h-4 w-4" />
-                  Pick date
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditDueDate(null);
-                    setEditTask({ ...editTask, dueDate: "" });
-                  }}
-                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
-                >
-                  <XMarkIcon className="h-4 w-4" />
-                  No date
-                </button>
-              </div>
-            </div>
-            <div>
-              <label htmlFor="edit-priority" className="block text-sm font-medium text-blue-200">
-                Priority
-              </label>
-              <select
-                id="edit-priority"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={editTask.priority}
-                onChange={(e) => setEditTask({ ...editTask, priority: e.target.value as Task["priority"] })}
-              >
-                {priorityOptions.map((priority) => (
-                  <option key={priority} value={priority} className="bg-[#0e1629]">
-                    {priority}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="edit-status" className="block text-sm font-medium text-blue-200">
-                Status
-              </label>
-              <select
-                id="edit-status"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={editTask.status}
-                onChange={(e) => setEditTask({ ...editTask, status: e.target.value as Task["status"] })}
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status} className="bg-[#0e1629]">
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
             <div className="sm:col-span-2">
-              <label htmlFor="edit-description" className="block text-sm font-medium text-blue-200">
-                Description
-              </label>
-              <textarea
-                id="edit-description"
-                rows={3}
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 placeholder-blue-300/60 focus:border-[#18aead] focus:outline-none"
-                value={editTask.description}
-                onChange={(e) => setEditTask({ ...editTask, description: e.target.value })}
-              />
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-200">
+                <FiUser className="h-4 w-4 text-blue-300" />
+                <span>Assign To</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditAssigneeOpen((o) => !o);
+                  setShowAllEditAssignees(false);
+                }}
+                className="flex w-full items-center justify-between rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 transition-colors hover:border-[#18aead]"
+              >
+                <span className="truncate">
+                  {employees.find((e) => e.id === editTask.assignee)?.name ||
+                    employees.find((e) => e.id === editTask.assignee)?.email ||
+                    "Select assignee"}
+                </span>
+                <span className="text-blue-300/70">▼</span>
+              </button>
+              {editAssigneeOpen && (
+                <div className="relative">
+                  <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-3 shadow-lg">
+                    <div className="flex items-center justify-between gap-2">
+                      <PrimaryInput
+                        id="edit-assignee-search"
+                        type="text"
+                        placeholder="Search people"
+                        value={editAssigneeSearch}
+                        onChange={(e) => setEditAssigneeSearch(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditAssigneeOpen(false);
+                          setEditAssigneeSearch("");
+                          setShowAllEditAssignees(false);
+                        }}
+                        className="rounded p-1 text-blue-300/70 hover:bg-[#121c3d] hover:text-white"
+                      >
+                        <XMarkIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="mt-3 max-h-56 space-y-1 overflow-y-auto pr-1">
+                      {(showAllEditAssignees ? filteredEditAssignees : filteredEditAssignees.slice(0, 6)).map((a) => (
+                        <button
+                          key={a.id}
+                          type="button"
+                          onClick={() => {
+                            setEditTask({ ...editTask, assignee: a.id });
+                            setEditAssigneeOpen(false);
+                            setEditAssigneeSearch("");
+                            setShowAllEditAssignees(false);
+                          }}
+                          className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                        >
+                          <span className="flex items-center gap-2">
+                            <FiUser className="h-4 w-4" />
+                            {a.name || a.email}
+                          </span>
+                          {editTask.assignee === a.id && <span className="text-xs text-[#18aead]">Selected</span>}
+                        </button>
+                      ))}
+                      {!showAllEditAssignees && filteredEditAssignees.length > 6 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllEditAssignees(true)}
+                          className="w-full rounded-lg border border-dashed border-[#1a2446] px-3 py-2 text-center text-sm text-blue-200 transition-colors hover:border-[#18aead]"
+                        >
+                          Load more
+                        </button>
+                      )}
+                      {filteredEditAssignees.length === 0 && (
+                        <p className="px-1 py-2 text-xs text-blue-300/70">No people found</p>
+                      )}
+            </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="sm:col-span-2">
               <div className="mb-2 flex items-center justify-between">
-                <label htmlFor="edit-tags" className="block text-sm font-medium text-blue-200">
+                <label className="block text-sm font-medium text-blue-200">
                   Tags
-                </label>
-                <button
-                  type="button"
+              </label>
+                    <button
+                      type="button"
                   onClick={() => setEditTagOpen(true)}
                   className="flex items-center gap-1 rounded-full bg-[#121c3d] px-3 py-1 text-xs font-medium text-blue-200 transition-colors hover:bg-[#18aead] hover:text-white"
-                >
+                    >
                   <PlusIcon className="h-4 w-4" />
                   Add
-                </button>
+                    </button>
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 {editTask.tags.length > 0 ? (
@@ -891,8 +969,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-3 shadow-lg">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-blue-200">Select tags</span>
-                      <button
-                        type="button"
+                    <button
+                      type="button"
                         onClick={() => {
                           setEditTagOpen(false);
                           setEditTagSearch("");
@@ -900,7 +978,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                         className="rounded p-1 text-blue-300/70 hover:bg-[#121c3d] hover:text-white"
                       >
                         <XMarkIcon className="h-4 w-4" />
-                      </button>
+                    </button>
                     </div>
                     <div className="mt-2">
                       <PrimaryInput
@@ -914,20 +992,20 @@ export function Tasks({ accountId, employees }: TasksProps) {
                     <div className="mt-3 max-h-48 space-y-2 overflow-y-auto pr-1">
                       {filteredEditTags.length > 0 ? (
                         filteredEditTags.map((tag) => (
-                          <button
+                    <button
                             key={tag}
-                            type="button"
+                      type="button"
                             onClick={() => {
                               addTag(editTask.tags, tag, (tags) => setEditTask({ ...editTask, tags }), setEditTagInput);
                             }}
                             className="w-full rounded-lg border border-transparent bg-[#121c3d] px-3 py-2 text-left text-sm text-blue-200 transition-colors hover:border-[#18aead] hover:bg-[#121c3d]/70"
                           >
                             {tag}
-                          </button>
+                    </button>
                         ))
                       ) : editTagSearch.trim() ? (
-                        <button
-                          type="button"
+                    <button
+                      type="button"
                           onClick={() => {
                             addTag(editTask.tags, editTagSearch, (tags) => setEditTask({ ...editTask, tags }), setEditTagInput);
                             setEditTagSearch("");
@@ -937,11 +1015,222 @@ export function Tasks({ accountId, employees }: TasksProps) {
                         >
                           <span>Create tag “{editTagSearch}”</span>
                           <PlusIcon className="h-4 w-4" />
-                        </button>
+                    </button>
                       ) : (
                         <p className="text-xs text-blue-300/70">No tags yet.</p>
                       )}
                     </div>
+                  </div>
+                  </div>
+                )}
+            </div>
+            <div>
+              <label htmlFor="edit-dueDate" className="block text-sm font-medium text-blue-200 mb-2">
+                Date
+              </label>
+              <DatePicker
+                id="edit-dueDate"
+                value={editDueDate || (editTask.dueDate ? dayjs(editTask.dueDate) : null)}
+                onChange={(date) => {
+                  setEditDueDate(date);
+                  setEditTask({ ...editTask, dueDate: date ? date.format("YYYY-MM-DD") : "" });
+                }}
+                format="YYYY-MM-DD"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
+                placeholder="Select a date"
+              />
+              <div className="mt-2 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const today = dayjs();
+                        setEditDueDate(today);
+                        setEditTask({ ...editTask, dueDate: today.format("YYYY-MM-DD") });
+                      }}
+                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
+                    >
+                  <FiCalendar className="h-4 w-4" />
+                  Pick date
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                    setEditDueDate(null);
+                    setEditTask({ ...editTask, dueDate: "" });
+                      }}
+                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
+                    >
+                  <XMarkIcon className="h-4 w-4" />
+                  No date
+                    </button>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-200">
+                <FiFlag className="h-4 w-4 text-blue-300" />
+                <span>Priority</span>
+              </div>
+                    <button
+                      type="button"
+                onClick={() => setEditPriorityOpen((o) => !o)}
+                className="flex w-full items-center justify-between rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 transition-colors hover:border-[#18aead]"
+              >
+                <span className="flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getPriorityColor(editTask.priority)}`}>
+                    {editTask.priority}
+                  </span>
+                </span>
+                <span className="text-blue-300/70">▼</span>
+                    </button>
+              {editPriorityOpen && (
+                <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+                  {priorityOptions.map((priority) => (
+                    <button
+                      key={priority}
+                      type="button"
+                      onClick={() => {
+                        setEditTask({ ...editTask, priority: priority as Task["priority"] });
+                        setEditPriorityOpen(false);
+                      }}
+                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <FiFlag className="h-4 w-4" />
+                        {priority}
+                      </span>
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getPriorityColor(priority as Task["priority"])}`}>
+                        {priority}
+                      </span>
+                    </button>
+                  ))}
+                  </div>
+                )}
+            </div>
+            <div className="relative">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-200">
+                <Tag className="bg-transparent text-blue-200"> </Tag>
+                <span>Status</span>
+            </div>
+              <button
+                type="button"
+                onClick={() => setEditStatusOpen((o) => !o)}
+                className="flex w-full items-center justify-between rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 transition-colors hover:border-[#18aead]"
+              >
+                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(editTask.status)}`}>
+                  {editTask.status}
+                </span>
+                <span className="text-blue-300/70">▼</span>
+              </button>
+              {editStatusOpen && (
+                <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+                {statusOptions.map((status) => (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => {
+                        setEditTask({ ...editTask, status: status as Task["status"] });
+                        setEditStatusOpen(false);
+                      }}
+                      className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <FiFlag className="h-4 w-4" />
+                    {status}
+                      </span>
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getStatusColor(status as Task["status"])}`}>
+                        {status}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="edit-description" className="block text-sm font-medium text-blue-200">
+                Description
+              </label>
+              <textarea
+                id="edit-description"
+                rows={3}
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 placeholder-blue-300/60 focus:border-[#18aead] focus:outline-none"
+                value={editTask.description}
+                onChange={(e) => setEditTask({ ...editTask, description: e.target.value })}
+              />
+            </div>
+            <div className="relative">
+              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-200">
+                <FiUser className="h-4 w-4 text-blue-300" />
+                <span>Assign To</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditAssigneeOpen((o) => !o);
+                  setShowAllEditAssignees(false);
+                }}
+                className="flex w-full items-center justify-between rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 transition-colors hover:border-[#18aead]"
+              >
+                <span className="truncate">
+                  {employees.find((e) => e.id === editTask.assignee)?.name ||
+                    employees.find((e) => e.id === editTask.assignee)?.email ||
+                    "Select assignee"}
+                </span>
+                <span className="text-blue-300/70">▼</span>
+              </button>
+              {editAssigneeOpen && (
+                <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-3 shadow-lg">
+                  <div className="flex items-center justify-between gap-2">
+                <PrimaryInput
+                      id="edit-assignee-search"
+                  type="text"
+                      placeholder="Search people"
+                      value={editAssigneeSearch}
+                      onChange={(e) => setEditAssigneeSearch(e.target.value)}
+                    />
+                    <button
+                  type="button"
+                      onClick={() => {
+                        setEditAssigneeOpen(false);
+                        setEditAssigneeSearch("");
+                        setShowAllEditAssignees(false);
+                      }}
+                      className="rounded p-1 text-blue-300/70 hover:bg-[#121c3d] hover:text-white"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+              </div>
+                  <div className="mt-3 max-h-56 space-y-1 overflow-y-auto pr-1">
+                    {(showAllEditAssignees ? filteredEditAssignees : filteredEditAssignees.slice(0, 6)).map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => {
+                          setEditTask({ ...editTask, assignee: a.id });
+                          setEditAssigneeOpen(false);
+                          setEditAssigneeSearch("");
+                          setShowAllEditAssignees(false);
+                        }}
+                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                      >
+                        <span className="flex items-center gap-2">
+                          <FiUser className="h-4 w-4" />
+                          {a.name || a.email}
+                        </span>
+                        {editTask.assignee === a.id && <span className="text-xs text-[#18aead]">Selected</span>}
+                      </button>
+                    ))}
+                    {!showAllEditAssignees && filteredEditAssignees.length > 6 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllEditAssignees(true)}
+                        className="w-full rounded-lg border border-dashed border-[#1a2446] px-3 py-2 text-center text-sm text-blue-200 transition-colors hover:border-[#18aead]"
+                      >
+                        Load more
+                      </button>
+                    )}
+                    {filteredEditAssignees.length === 0 && (
+                      <p className="px-1 py-2 text-xs text-blue-300/70">No people found</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -963,7 +1252,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   tags: [],
                 });
                 setEditTagInput("");
-                setEditStartDate(null);
                 setEditDueDate(null);
               }}
               className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
