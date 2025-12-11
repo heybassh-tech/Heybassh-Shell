@@ -7,6 +7,7 @@ import {
   PlusIcon,
   ChevronRightIcon,
   XMarkIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline"
 import { PrimaryButton } from "../../PrimaryButton"
 import { PrimaryInput } from "../../PrimaryInput"
@@ -48,6 +49,9 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
   const [panelOpen, setPanelOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [permissionModalOpen, setPermissionModalOpen] = useState(false)
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set())
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Fetch users on mount and when accountId changes
   useEffect(() => {
@@ -247,6 +251,82 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
     Inactive: "border-rose-500/40 bg-rose-500/10 text-rose-200",
   }
 
+  const handleSelectUser = (userId: string) => {
+    setSelectedUserIds((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(userId)) {
+        newSet.delete(userId)
+      } else {
+        newSet.add(userId)
+      }
+      return newSet
+    })
+  }
+
+  const handleSelectAll = () => {
+    if (selectedUserIds.size === filteredUsers.length) {
+      setSelectedUserIds(new Set())
+    } else {
+      setSelectedUserIds(new Set(filteredUsers.map((u) => u.id)))
+    }
+  }
+
+  const handleDeleteSelected = async () => {
+    if (selectedUserIds.size === 0) return
+    
+    setIsDeleting(true)
+    try {
+      const userIdsArray = Array.from(selectedUserIds)
+      
+      // Delete users one by one
+      const deletePromises = userIdsArray.map(async (userId) => {
+        // Skip if it's a pending invitation (starts with "inv-")
+        if (userId.startsWith("inv-")) {
+          return { success: true, userId }
+        }
+        
+        const response = await fetch(`/api/accounts/${accountId}/users`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId }),
+        })
+        
+        if (!response.ok) {
+          const data = await response.json()
+          throw new Error(data?.message || data?.error || `Failed to delete user ${userId}`)
+        }
+        
+        return { success: true, userId }
+      })
+
+      await Promise.all(deletePromises)
+
+      // Refresh users list
+      const usersResponse = await fetch(`/api/accounts/${accountId}/users`)
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json()
+        setUsers(usersData.map((user: any) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          userType: user.userType || (user.role === "admin" ? "Employee" : "Others"),
+          access: user.role ? user.role : user.userType === "Employee" ? "admin" : "user",
+          role: user.role,
+          status: user.status || (user.emailVerified ? "Accepted" : "Invited"),
+          createdAt: user.createdAt,
+        })))
+      }
+
+      setSelectedUserIds(new Set())
+      setDeleteModalOpen(false)
+    } catch (error) {
+      console.error("Failed to delete users", error)
+      alert(error instanceof Error ? error.message : "Failed to delete users. Please try again.")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   if (isLoadingUsers) {
     return (
       <div className="flex items-center justify-center py-10 text-blue-200">
@@ -262,6 +342,15 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
         <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
           <h2 className="text-2xl font-bold text-[#18aead]">Users</h2>
           <div className="flex items-center gap-2">
+            {currentUserRole === "super_admin" && selectedUserIds.size > 0 && (
+              <PrimaryButton
+                onClick={() => setDeleteModalOpen(true)}
+                icon={<TrashIcon className="h-4 w-4" />}
+                variant="danger"
+              >
+                Delete Selected ({selectedUserIds.size})
+              </PrimaryButton>
+            )}
             <PrimaryButton onClick={openAddPanel} icon={<PlusIcon className="h-4 w-4" />} variant="brand">
               Add User
             </PrimaryButton>
@@ -285,6 +374,16 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
           <table className="min-w-full divide-y divide-[#1a2446]">
             <thead className="bg-[#0e1629]">
               <tr>
+                {currentUserRole === "super_admin" && (
+                  <th scope="col" className="px-6 py-3 text-left w-12">
+                    <input
+                      type="checkbox"
+                      checked={filteredUsers.length > 0 && selectedUserIds.size === filteredUsers.length}
+                      onChange={handleSelectAll}
+                      className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead] focus:ring-offset-0 cursor-pointer"
+                    />
+                  </th>
+                )}
                 <th scope="col" className="px-6 py-3 text-left">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Name</span>
@@ -324,8 +423,23 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                   <tr
                     key={user.id}
                     className="cursor-pointer transition-colors hover:bg-[#121c3d]"
-                    onClick={() => openEditPanel(user)}
+                    onClick={(e) => {
+                      // Don't open edit panel if clicking checkbox
+                      if ((e.target as HTMLElement).tagName !== "INPUT") {
+                        openEditPanel(user)
+                      }
+                    }}
                   >
+                    {currentUserRole === "super_admin" && (
+                      <td className="whitespace-nowrap px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selectedUserIds.has(user.id)}
+                          onChange={() => handleSelectUser(user.id)}
+                          className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead] focus:ring-offset-0 cursor-pointer"
+                        />
+                      </td>
+                    )}
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="text-sm font-medium text-white">{user.name || "—"}</div>
                     </td>
@@ -354,7 +468,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-blue-300">
+                  <td colSpan={currentUserRole === "super_admin" ? 7 : 6} className="px-6 py-8 text-center text-sm text-blue-300">
                     {searchTerm ? `No users found for "${searchTerm}".` : "No users yet. Add one to get started."}
                   </td>
                 </tr>
@@ -497,6 +611,60 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
           </div>
         </div>
       </PrimaryModal>
+
+      {/* Delete Confirmation Modal */}
+      {currentUserRole === "super_admin" && (
+        <PrimaryModal
+          open={deleteModalOpen}
+          title="Delete Users"
+          description={`Are you sure you want to delete ${selectedUserIds.size} user(s)? This action cannot be undone.`}
+          onClose={() => {
+            if (!isDeleting) {
+              setDeleteModalOpen(false)
+            }
+          }}
+          widthClassName="max-w-md"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-blue-200">
+              The following users will be permanently removed from this account:
+            </p>
+            <div className="max-h-40 overflow-y-auto rounded-lg border border-[#1a2446] bg-[#0e1629] p-3">
+              <ul className="space-y-1">
+                {Array.from(selectedUserIds).map((userId) => {
+                  const user = users.find((u) => u.id === userId)
+                  return (
+                    <li key={userId} className="text-sm text-blue-200">
+                      • {user?.email || user?.name || userId}
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+            <div className="flex justify-end gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isDeleting) {
+                    setDeleteModalOpen(false)
+                  }
+                }}
+                disabled={isDeleting}
+                className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <PrimaryButton
+                onClick={handleDeleteSelected}
+                disabled={isDeleting}
+                className="!bg-rose-600 !border-rose-600 hover:!bg-rose-500 hover:!border-rose-500"
+              >
+                {isDeleting ? "Deleting..." : "Delete Users"}
+              </PrimaryButton>
+            </div>
+          </div>
+        </PrimaryModal>
+      )}
     </>
   )
 }
