@@ -258,7 +258,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
 
   return (
     <>
-      <div className={`space-y-6 transition-all duration-300 ${isAddPanelOpen ? "blur-sm" : ""}`}>
+      <div className={`space-y-6 transition-all duration-300 ${panelOpen ? "blur-sm" : ""}`}>
         <div className="flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
           <h2 className="text-2xl font-bold text-[#18aead]">Users</h2>
           <div className="flex items-center gap-2">
