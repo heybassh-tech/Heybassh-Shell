@@ -7,16 +7,16 @@ export const runtime = "nodejs"
 
 const schema = z.object({
   email: z.string().email(),
+  name: z.string().optional(),
+  password: z.string().min(6),
+  role: z.enum(["user", "admin"]).optional(),
+})
+
 const patchSchema = z.object({
   userId: z.string(),
   name: z.string().nullable().optional(),
   role: z.enum(["user", "admin", "super_admin"]).optional(),
   status: z.enum(["Invited", "Accepted", "Inactive"]).optional(),
-})
-
-  name: z.string().optional(),
-  password: z.string().min(6),
-  role: z.enum(["user", "admin"]).optional()
 })
 
 export async function GET(_req: Request, { params }: { params: { account_id: string } }) {
