@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline"
 import { PrimaryButton } from "../../PrimaryButton"
 import { PrimaryInput } from "../../PrimaryInput"
+import { PrimaryModal } from "../../PrimaryModal"
 
 type UserType = "Employee" | "Others"
 
@@ -46,6 +47,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
   const [panelMode, setPanelMode] = useState<"add" | "edit" | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [permissionModalOpen, setPermissionModalOpen] = useState(false)
 
   // Fetch users on mount and when accountId changes
   useEffect(() => {
@@ -110,6 +112,10 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
   }, [users, searchTerm])
 
   const openAddPanel = () => {
+    if (!["admin", "super_admin"].includes(currentUserRole)) {
+      setPermissionModalOpen(true)
+      return
+    }
     setPanelMode("add")
     setSelectedUser(null)
     setEmail("")
@@ -476,6 +482,21 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
           onClick={closeAddPanel}
         />
       )}
+
+      <PrimaryModal
+        open={permissionModalOpen}
+        title="Request access"
+        description="You need admin access to add or invite users."
+        onClose={() => setPermissionModalOpen(false)}
+      >
+        <div className="space-y-4 text-blue-100">
+          <p>Only admins and super admins can add new users.</p>
+          <p>Please contact an admin or super admin to grant you access.</p>
+          <div className="flex justify-end">
+            <PrimaryButton onClick={() => setPermissionModalOpen(false)}>Got it</PrimaryButton>
+          </div>
+        </div>
+      </PrimaryModal>
     </>
   )
 }

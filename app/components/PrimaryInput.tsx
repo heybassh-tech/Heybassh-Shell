@@ -1,6 +1,6 @@
 import { forwardRef, InputHTMLAttributes } from "react"
 
-type PrimaryInputProps = InputHTMLAttributes<HTMLInputElement> & {
+type PrimaryInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   size?: "sm" | "md" | "lg"
 }
 

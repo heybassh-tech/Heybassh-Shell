@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 import { auth } from "@/lib/auth"
+import { sendEmail } from "@/lib/mailer"
 
 export const runtime = "nodejs"
 
@@ -140,7 +141,7 @@ export async function PATCH(req: Request, { params }: { params: { account_id: st
 
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { id: true, role: true, account_id: true },
+      select: { id: true, email: true, name: true, role: true, account_id: true },
     })
     if (!currentUser || currentUser.account_id !== params.account_id) {
       return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 })
@@ -157,6 +158,15 @@ export async function PATCH(req: Request, { params }: { params: { account_id: st
     if (!targetUser || targetUser.account_id !== params.account_id) {
       return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 })
     }
+
+    if (role && !targetUser.emailVerified) {
+      return NextResponse.json(
+        { error: "USER_NOT_VERIFIED", message: "User must accept the invite before role changes." },
+        { status: 400 },
+      )
+    }
+
+    const previousRole = targetUser.role
 
     const updated = await prisma.user.update({
       where: { id: userId },
@@ -175,6 +185,41 @@ export async function PATCH(req: Request, { params }: { params: { account_id: st
         createdAt: true,
       },
     })
+
+    const roleChanged = role && role !== previousRole
+    if (roleChanged && (role === "admin" || role === "super_admin")) {
+      const inviterName = currentUser.name || currentUser.email || "A teammate"
+      const subject =
+        role === "super_admin"
+          ? "You have been made a Super Admin on Heybassh"
+          : "You have been made an Admin on Heybassh"
+      const capabilities =
+        role === "super_admin"
+          ? "manage all settings, add users (including admins), and oversee workspace access."
+          : "add users and manage tasks for your company workspace."
+      const safeEmail = updated.email
+      if (safeEmail) {
+        const baseUrl =
+          process.env.NEXTAUTH_URL ||
+          (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+          process.env.NEXT_PUBLIC_APP_URL ||
+          "http://localhost:3000"
+        const dashboardUrl = `${baseUrl.replace(/\/$/, "")}/${params.account_id}/dashboard`
+        const html = `
+          <div style="font-family: Arial, sans-serif; color: #0b1124; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #3ab0ff; margin-bottom: 12px;">You've been granted ${role === "super_admin" ? "Super Admin" : "Admin"} access</h2>
+            <p style="margin: 0 0 12px;">${inviterName} updated your role on Heybassh.</p>
+            <p style="margin: 0 0 12px;">You can now ${capabilities}</p>
+            <p style="margin: 0 0 20px;">Sign in to start: <a href="${dashboardUrl}" style="color: #3ab0ff;">${dashboardUrl}</a></p>
+            <p style="color: #666; font-size: 14px;">If you weren't expecting this, please reach out to your workspace owner.</p>
+          </div>
+        `
+        const text = `${inviterName} updated your role on Heybassh.\nYou are now ${role === "super_admin" ? "a Super Admin" : "an Admin"} and can ${capabilities}\nSign in: ${dashboardUrl}`
+        sendEmail({ to: safeEmail, subject, html, text }).catch((error) =>
+          console.error("[users][PATCH] role change email failed", error),
+        )
+      }
+    }
 
     return NextResponse.json(updated)
   } catch (err: any) {
