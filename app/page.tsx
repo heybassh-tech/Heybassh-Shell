@@ -379,18 +379,14 @@ function HomeInner() {
               <PrimaryButton type="submit" disabled={loading} aria-busy={loading} className="w-full" size="lg">
                 {loading ? <span className="spinner" role="status" aria-label="Processing request" /> : <span>Sign in</span>}
               </PrimaryButton>
-            </form>
 
-            {/* <p className="text-xs text-blue-200/60">
-              By continuing, you agree to the Heybassh Shell Terms and acknowledge the Privacy Policy. Need assistance?{" "}
-              <a
-                className="font-medium text-[#5dd4ff] underline-offset-4 hover:underline"
-                href="mailto:support@heybassh.com?subject=Heybassh%20Shell%20Support"
-              >
-                Contact support
-              </a>
-              .
-            </p> */}
+            <p className="text-xs text-blue-200/70 text-center">
+              Need a full company workspace?{" "}
+              <Link href="/create-account" className="text-[#5dd4ff] underline-offset-4 hover:underline">
+                Create your free account →
+              </Link>
+            </p>
+            </form>
 
             <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-4">
               <button
