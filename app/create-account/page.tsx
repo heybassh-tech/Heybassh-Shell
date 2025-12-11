@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { PrimaryButton } from "../components/PrimaryButton"
+import { PrimaryInput } from "../components/PrimaryInput"
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const blockedPublicDomains = new Set([
@@ -141,59 +142,99 @@ export default function CreateAccountPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#0b1124]">
-      <div className="w-full max-w-md space-y-4 bg-[#0d142a] border border-[#111936] p-6 rounded-2xl">
-        <h1 className="text-white text-xl font-semibold">Create your free account</h1>
-        <p className="text-sm text-blue-200/80">
-          Drop in any work email. We’ll send a verification code to confirm ownership before you can secure the workspace.
-        </p>
-        <form onSubmit={onRequestCode} className="space-y-3">
-          <div>
-            <label className="block text-sm text-blue-200 mb-1">Work email</label>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                className="flex-1 rounded-lg border border-[#1a2446] bg-[#0b132c] p-2 text-white"
-                placeholder="you@company.com"
-                value={ownerEmail}
-                onChange={(e) => setOwnerEmail(e.target.value)}
-                required
-              />
-              <PrimaryButton type="submit" disabled={loading} className="whitespace-nowrap px-4">
-                {loading ? "Sending…" : otpSent ? "Resend code" : "Send code"}
-              </PrimaryButton>
-            </div>
-          </div>
-        </form>
-
-        {otpSent && (
-          <form onSubmit={onVerifyCode} className="space-y-3 border-t border-[#111936] pt-4">
-            <label className="block text-sm text-blue-200">Enter the 6-digit verification code</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={6}
-              className="w-full rounded-lg border border-[#1a2446] bg-[#0b132c] p-2 text-white tracking-[0.4em] text-center text-lg"
-              placeholder="______"
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-              disabled={verifyingOtp}
-              required
-            />
-            <button
-              type="submit"
-              disabled={verifyingOtp || otpCode.length < 4}
-              className="btn btn-primary w-full rounded-[6px] text-xs font-semibold disabled:opacity-60"
-            >
-              {verifyingOtp ? "Verifying…" : "Confirm code"}
-            </button>
-          </form>
-        )}
-
-        {status && <div className="text-green-300 text-sm">{status}</div>}
-        {error && <div className="text-red-400 text-sm">{error}</div>}
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#050915] via-[#060f24] to-[#030614] text-[#eef3ff]">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#3ab0ff]/30 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-80 w-80 translate-x-1/4 translate-y-1/4 rounded-full bg-[#5dd4ff]/20 blur-3xl" />
       </div>
-    </div>
+
+      <section className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12 lg:px-12">
+        <div className="w-full max-w-5xl grid gap-10 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-2xl lg:grid-cols-[1.1fr_0.9fr] lg:p-12">
+          <div className="space-y-6">
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-blue-100">
+              Workspace creation • Secure onboarding
+            </p>
+            <h1 className="text-3xl font-semibold leading-snug text-white md:text-4xl">
+              Create your company workspace
+            </h1>
+            <p className="text-base text-blue-100/90 leading-relaxed">
+              Use your work email to start your workspace. We’ll send a quick verification code to confirm you own the domain.
+            </p>
+            <ul className="space-y-2 text-sm text-blue-100/80">
+              <li>• Super admin access for the creator</li>
+              <li>• Invite teammates securely</li>
+              <li>• No credit card required</li>
+            </ul>
+          </div>
+
+          <div className="w-full space-y-5 rounded-2xl border border-white/10 bg-black/40 p-6 shadow-xl backdrop-blur">
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-white">Verify your work email</h2>
+              <p className="text-sm text-blue-200/80">
+                We’ll send a 6-digit code to confirm ownership. Public email domains are blocked for security.
+              </p>
+            </div>
+
+            <form onSubmit={onRequestCode} className="space-y-3">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-blue-200">Work email</label>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <div className="flex-1">
+                    <PrimaryInput
+                      type="email"
+                      placeholder="you@company.com"
+                      value={ownerEmail}
+                      onChange={(e) => setOwnerEmail(e.target.value)}
+                      required
+                      size="md"
+                    />
+                  </div>
+                  <PrimaryButton type="submit" disabled={loading} className="whitespace-nowrap px-5">
+                    {loading ? "Sending…" : otpSent ? "Resend code" : "Send code"}
+                  </PrimaryButton>
+                </div>
+              </div>
+            </form>
+
+            {otpSent && (
+              <form onSubmit={onVerifyCode} className="space-y-3 border-t border-white/10 pt-4">
+                <label className="block text-sm font-medium text-blue-200">Enter the 6-digit verification code</label>
+                <PrimaryInput
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  className="text-center tracking-[0.4em] text-lg"
+                  placeholder="______"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                  disabled={verifyingOtp}
+                  required
+                  size="lg"
+                />
+                <PrimaryButton
+                  type="submit"
+                  disabled={verifyingOtp || otpCode.length < 4}
+                  className="w-full"
+                >
+                  {verifyingOtp ? "Verifying…" : "Confirm code"}
+                </PrimaryButton>
+              </form>
+            )}
+
+            {(status || error) && (
+              <div className="space-y-2">
+                {status && <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">{status}</div>}
+                {error && <div className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">{error}</div>}
+              </div>
+            )}
+
+            <p className="text-[11px] text-blue-200/60">
+              By creating a workspace, you agree to receive service emails about your setup. You can manage invites once you’re inside.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
   )
 }
