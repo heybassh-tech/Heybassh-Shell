@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, Suspense, useEffect } from "react"
-import { useRouter, useSearchParams, usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 import {
   MagnifyingGlassIcon,
   PlusIcon,
@@ -15,9 +15,12 @@ type UserType = "Employee" | "Others"
 
 interface User {
   id: string
+  name?: string | null
   email: string
   userType: UserType
-  status: "Active" | "Pending" | "Inactive"
+  access: string
+  role?: "user" | "admin" | "super_admin"
+  status: "Invited" | "Accepted" | "Inactive"
   createdAt: string
 }
 
@@ -30,18 +33,19 @@ const SortIcon = ({ className }: { className?: string }) => (
 )
 
 function UsersContent({ accountId, companyName }: { accountId: string; companyName: string }) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const { data: session } = useSession()
+  const currentUserRole = (session?.user as any)?.role ?? "user"
   const [users, setUsers] = useState<User[]>(defaultUsers)
   const [searchTerm, setSearchTerm] = useState("")
   const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
   const [userType, setUserType] = useState<UserType>("Employee")
-  const [sendInvite, setSendInvite] = useState(true)
+  const [role, setRole] = useState<"user" | "admin" | "super_admin">("user")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoadingUsers, setIsLoadingUsers] = useState(true)
-
-  const isAddPanelOpen = searchParams.get("add") === "true"
+  const [panelMode, setPanelMode] = useState<"add" | "edit" | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   // Fetch users on mount and when accountId changes
   useEffect(() => {
@@ -57,9 +61,12 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
         if (!ignore) {
           setUsers(data.map((user: any) => ({
             id: user.id,
+            name: user.name,
             email: user.email,
             userType: user.userType || (user.role === "admin" ? "Employee" : "Others"),
-            status: user.status || (user.emailVerified ? "Active" : "Pending"),
+            access: user.role ? user.role : user.userType === "Employee" ? "admin" : "user",
+            role: user.role,
+            status: user.status || (user.emailVerified ? "Accepted" : "Invited"),
             createdAt: user.createdAt,
           })))
         }
@@ -78,7 +85,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
   }, [accountId])
 
   useEffect(() => {
-    if (isAddPanelOpen) {
+    if (panelOpen) {
       document.body.classList.add("user-panel-open")
     } else {
       document.body.classList.remove("user-panel-open")
@@ -86,33 +93,57 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
     return () => {
       document.body.classList.remove("user-panel-open")
     }
-  }, [isAddPanelOpen])
+  }, [panelOpen])
 
   const filteredUsers = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase()
-    return users.filter((user) =>
-      !normalizedSearch ||
-      user.email.toLowerCase().includes(normalizedSearch) ||
-      user.userType.toLowerCase().includes(normalizedSearch)
-    )
+    return users.filter((user) => {
+      if (!normalizedSearch) return true
+      return (
+        user.email.toLowerCase().includes(normalizedSearch) ||
+        (user.name ?? "").toLowerCase().includes(normalizedSearch) ||
+        user.userType.toLowerCase().includes(normalizedSearch) ||
+        (user.access ?? "").toLowerCase().includes(normalizedSearch) ||
+        user.status.toLowerCase().includes(normalizedSearch)
+      )
+    })
   }, [users, searchTerm])
 
   const openAddPanel = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set("add", "true")
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    setPanelMode("add")
+    setSelectedUser(null)
+    setEmail("")
+    setName("")
+    setUserType("Employee")
+    setRole("user")
+    setPanelOpen(true)
+  }
+
+  const openEditPanel = (user: User) => {
+    setPanelMode("edit")
+    setSelectedUser(user)
+    setEmail(user.email)
+    setName(user.name || "")
+    setUserType(user.userType)
+    const resolvedRole =
+      (user.role as any) ??
+      (user.access === "super_admin"
+        ? "super_admin"
+        : user.access === "admin"
+        ? "admin"
+        : "user")
+    setRole(resolvedRole)
+    setPanelOpen(true)
   }
 
   const closeAddPanel = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete("add")
-    const newUrl = params.toString() 
-      ? `${pathname}?${params.toString()}`
-      : pathname
-    router.push(newUrl, { scroll: false })
+    setPanelOpen(false)
+    setPanelMode(null)
+    setSelectedUser(null)
     setEmail("")
+    setName("")
     setUserType("Employee")
-    setSendInvite(true)
+    setRole("user")
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,7 +158,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
         body: JSON.stringify({
           account_id: accountId,
           email: email.trim(),
-          role: userType === "Employee" ? "admin" : "user", // Fix: Employee should be admin role
+          role: role || (userType === "Employee" ? "admin" : "user"),
         }),
       })
 
@@ -143,9 +174,12 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
         const usersData = await usersResponse.json()
         setUsers(usersData.map((user: any) => ({
           id: user.id,
+          name: user.name,
           email: user.email,
           userType: user.userType || (user.role === "admin" ? "Employee" : "Others"),
-          status: user.status || (user.emailVerified ? "Active" : "Pending"),
+          access: user.role ? user.role : user.userType === "Employee" ? "admin" : "user",
+          role: user.role,
+          status: user.status || (user.emailVerified ? "Accepted" : "Invited"),
           createdAt: user.createdAt,
         })))
       }
@@ -159,9 +193,51 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
     }
   }
 
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedUser) return
+    setIsSubmitting(true)
+    try {
+      const response = await fetch(`/api/accounts/${accountId}/users`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          name: name.trim() || null,
+          role: role,
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data?.message || data?.error || "Failed to update user")
+      }
+      // refresh list
+      const usersResponse = await fetch(`/api/accounts/${accountId}/users`)
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json()
+        setUsers(usersData.map((user: any) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          userType: user.userType || (user.role === "admin" ? "Employee" : "Others"),
+          access: user.role ? user.role : user.userType === "Employee" ? "admin" : "user",
+          role: user.role,
+          status: user.status || (user.emailVerified ? "Accepted" : "Invited"),
+          createdAt: user.createdAt,
+        })))
+      }
+      closeAddPanel()
+    } catch (error) {
+      console.error("Failed to update user", error)
+      alert(error instanceof Error ? error.message : "Failed to update user. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const statusColors: Record<User["status"], string> = {
-    Active: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
-    Pending: "border-amber-500/40 bg-amber-500/10 text-amber-200",
+    Accepted: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
+    Invited: "border-amber-500/40 bg-amber-500/10 text-amber-200",
     Inactive: "border-rose-500/40 bg-rose-500/10 text-rose-200",
   }
 
@@ -205,6 +281,12 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
               <tr>
                 <th scope="col" className="px-6 py-3 text-left">
                   <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Name</span>
+                    <SortIcon className="h-4 w-4 text-blue-300/60" />
+                  </div>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left">
+                  <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Email</span>
                     <SortIcon className="h-4 w-4 text-blue-300/60" />
                   </div>
@@ -217,7 +299,13 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                 </th>
                 <th scope="col" className="px-6 py-3 text-left">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Status</span>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Access</span>
+                    <SortIcon className="h-4 w-4 text-blue-300/60" />
+                  </div>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Invite Status</span>
                     <SortIcon className="h-4 w-4 text-blue-300/60" />
                   </div>
                 </th>
@@ -227,12 +315,22 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
             <tbody className="divide-y divide-[#1a2446] bg-[#0c142a]">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="cursor-pointer transition-colors hover:bg-[#121c3d]">
+                  <tr
+                    key={user.id}
+                    className="cursor-pointer transition-colors hover:bg-[#121c3d]"
+                    onClick={() => openEditPanel(user)}
+                  >
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm font-medium text-white">{user.name || "—"}</div>
+                    </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="text-sm font-medium text-white">{user.email}</div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="text-sm text-blue-200">{user.userType}</div>
+                    </td>
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="text-sm text-blue-200 uppercase">{user.access || "—"}</div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <span
@@ -250,7 +348,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-blue-300">
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-blue-300">
                     {searchTerm ? `No users found for "${searchTerm}".` : "No users yet. Add one to get started."}
                   </td>
                 </tr>
@@ -263,15 +361,17 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
       {/* Side Panel */}
       <div
         className={`fixed inset-y-0 right-0 z-50 w-full max-w-md transform bg-[#0e1629] border-l border-[#1a2446] shadow-2xl transition-transform duration-300 ease-in-out ${
-          isAddPanelOpen ? "translate-x-0" : "translate-x-full"
+          panelOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[#1a2446] px-6 py-4">
             <div>
-              <h3 className="text-lg font-semibold text-white">Add User</h3>
-              <p className="text-sm text-blue-300/70">Invite a new user to join {companyName}</p>
+              <h3 className="text-lg font-semibold text-white">{panelMode === "edit" ? "Edit User" : "Add User"}</h3>
+              <p className="text-sm text-blue-300/70">
+                {panelMode === "edit" ? "Update user details and roles" : `Invite a new user to join ${companyName}`}
+              </p>
             </div>
             <button
               onClick={closeAddPanel}
@@ -282,7 +382,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
           </div>
 
           {/* Content */}
-          <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
+          <form onSubmit={panelMode === "edit" ? handleUpdateUser : handleSubmit} className="flex flex-1 flex-col">
             <div className="flex-1 space-y-6 overflow-y-auto px-6 py-6">
               <div>
                 <label htmlFor="user-email" className="block text-sm font-medium text-blue-200 mb-2">
@@ -295,6 +395,20 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                   placeholder="user@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={panelMode === "edit"}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="user-name" className="block text-sm font-medium text-blue-200 mb-2">
+                  Name
+                </label>
+                <PrimaryInput
+                  id="user-name"
+                  type="text"
+                  placeholder="Full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
 
@@ -307,24 +421,33 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                   className="w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                   value={userType}
                   onChange={(e) => setUserType(e.target.value as UserType)}
+                  disabled={panelMode === "edit"}
                 >
                   <option value="Employee">Employee</option>
                   <option value="Others">Others</option>
                 </select>
               </div>
 
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="send-invite"
-                  checked={sendInvite}
-                  onChange={(e) => setSendInvite(e.target.checked)}
-                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
-                />
-                <label htmlFor="send-invite" className="text-sm text-white cursor-pointer font-medium">
-                  Send invitation email to this user
+              <div>
+                <label htmlFor="user-role" className="block text-sm font-medium text-blue-200 mb-2">
+                  Role
                 </label>
+                <select
+                  id="user-role"
+                  className="w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as any)}
+                  disabled={currentUserRole !== "super_admin"}
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+                {currentUserRole !== "super_admin" && (
+                  <p className="mt-1 text-xs text-blue-300/70">Only super admins can change roles.</p>
+                )}
               </div>
+
             </div>
 
             {/* Footer */}
@@ -338,7 +461,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                   Cancel
                 </button>
                 <PrimaryButton type="submit" disabled={isSubmitting || !email.trim()}>
-                  {isSubmitting ? "Sending..." : "Send Invite"}
+                  {isSubmitting ? "Saving..." : panelMode === "edit" ? "Save changes" : "Send invite"}
                 </PrimaryButton>
               </div>
             </div>
@@ -347,7 +470,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
       </div>
 
       {/* Backdrop */}
-      {isAddPanelOpen && (
+      {panelOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={closeAddPanel}

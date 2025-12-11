@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, ChangeEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { FunnelIcon } from "@heroicons/react/24/outline"
+import { FunnelIcon, ChevronDownIcon } from "@heroicons/react/24/outline"
 import { SearchIcon, AcademyIcon, MediaIcon, BellIcon } from "../icons"
 import type { Contact } from "../types"
 import { nameMatchesTokens } from "../utils"
@@ -16,6 +16,7 @@ interface DashboardHeaderProps {
   searchQuery: string
   setSearchQuery: (query: string) => void
   navigate: (viewKey: string) => void
+  currentView: string
 }
 
 export function DashboardHeader({
@@ -25,13 +26,16 @@ export function DashboardHeader({
   searchQuery,
   setSearchQuery,
   navigate,
+  currentView,
 }: DashboardHeaderProps) {
   const [searchPreviewOpen, setSearchPreviewOpen] = useState(false)
   const [searchPreviewSelection, setSearchPreviewSelection] = useState<string | null>(null)
   const [searchTransitioning, setSearchTransitioning] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [companyMenuOpen, setCompanyMenuOpen] = useState(false)
+  const [hrMenuOpen, setHrMenuOpen] = useState(false)
   const filterRef = useRef<HTMLDivElement>(null)
+  const hrMenuRef = useRef<HTMLDivElement>(null)
   const searchLoaderTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const filteredContacts = contacts.filter((contact) => {
@@ -78,6 +82,9 @@ export function DashboardHeader({
     function handleClickOutside(event: MouseEvent) {
       if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
         setIsFilterOpen(false)
+      }
+      if (hrMenuRef.current && !hrMenuRef.current.contains(event.target as Node)) {
+        setHrMenuOpen(false)
       }
     }
 
@@ -128,6 +135,8 @@ export function DashboardHeader({
     scheduleSearchLoader()
     navigate("customers_contacts")
   }
+
+  const hrLabel = currentView === "hr_users" ? "Users" : "Leave requests"
 
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between bg-[rgba(9,15,31,.95)] px-4 py-2 backdrop-blur">
@@ -257,6 +266,39 @@ export function DashboardHeader({
               {filteredContacts.length > 5 && (
                 <div className="border-t border-[#111936] px-4 py-2 text-[11px] text-blue-300">Showing top 5 results</div>
               )}
+            </div>
+          )}
+        </div>
+        <div className="relative" ref={hrMenuRef} data-dropdown>
+          <button
+            onClick={() => setHrMenuOpen((o) => !o)}
+            className="inline-flex items-center gap-2 rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3 py-1.5 text-xs font-medium text-blue-200 hover:bg-[#121c3d] hover:text-white transition-colors"
+          >
+            <span>HR</span>
+            <span className="text-blue-100/80">•</span>
+            <span className="text-white">{hrLabel}</span>
+            <ChevronDownIcon className="h-4 w-4 text-blue-300" />
+          </button>
+          {hrMenuOpen && (
+            <div className="absolute left-0 top-full mt-1.5 w-48 rounded-[16px] border border-[#1a2446] bg-[#0e1629] text-xs shadow-lg z-50 py-1">
+              <button
+                className={`block w-full px-3 py-2 text-left transition-colors ${currentView === "hr_leave_request" ? "bg-[#121c3d] text-white" : "text-blue-100 hover:bg-[#121c3d] hover:text-white"}`}
+                onClick={() => {
+                  setHrMenuOpen(false)
+                  navigate("hr_leave_request")
+                }}
+              >
+                Leave requests
+              </button>
+              <button
+                className={`block w-full px-3 py-2 text-left transition-colors ${currentView === "hr_users" ? "bg-[#121c3d] text-white" : "text-blue-100 hover:bg-[#121c3d] hover:text-white"}`}
+                onClick={() => {
+                  setHrMenuOpen(false)
+                  navigate("hr_users")
+                }}
+              >
+                Users
+              </button>
             </div>
           )}
         </div>

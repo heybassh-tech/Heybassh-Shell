@@ -97,10 +97,17 @@ export async function POST(req: Request) {
       // Handle invitation-based registration
       if (invitationToken) {
         // Validate invitation token
-        const invitationRecord = await validateInvitationToken(invitationToken, normalizedEmail)
+        const invitationRecord = await validateInvitationToken(invitationToken, normalizedEmail, account_id)
         if (!invitationRecord) {
           return NextResponse.json(
             { error: "INVALID_INVITATION", message: "Invalid or expired invitation link." },
+            { status: 400 },
+          )
+        }
+
+        if (invitationRecord.account_id && invitationRecord.account_id !== account_id) {
+          return NextResponse.json(
+            { error: "INVITATION_ACCOUNT_MISMATCH", message: "This invitation is not for this company." },
             { status: 400 },
           )
         }
@@ -145,12 +152,13 @@ export async function POST(req: Request) {
 
         // Create user with invitation
         const passwordHash = await bcrypt.hash(password, 10);
+        const userRole = normalizedEmail === account.owner_email ? "super_admin" : role ?? "user"
         const user = await prisma.user.create({
           data: {
             email: normalizedEmail,
             name: name.trim(),
             passwordHash,
-            role: role ?? "user",
+            role: userRole,
             account_id,
             companyName: account.company_name,
             emailVerified: new Date(), // Email is pre-verified via invitation
@@ -220,14 +228,24 @@ export async function POST(req: Request) {
       const passwordHash = await bcrypt.hash(password, 10);
 
       const emailVerifiedAt = account_id ? new Date() : null;
+
+      const accountRecord = await prisma.account.findUnique({
+        where: { account_id: resolvedAccountId },
+        select: { owner_email: true },
+      })
       
       console.log('Creating user...');
+      const userRole =
+        normalizedEmail === accountRecord?.owner_email
+          ? "super_admin"
+          : role ?? "user"
+
       const user = await prisma.user.create({ 
         data: { 
           email: normalizedEmail, 
           name, 
           passwordHash,
-          role: role ?? "user",
+          role: userRole,
           account_id: resolvedAccountId,
           companyName: companyName || undefined,
           emailVerified: emailVerifiedAt ?? undefined,

@@ -1,26 +1,25 @@
-import { forwardRef } from "react"
-import { Input, InputProps } from "antd"
-import type { InputRef } from "antd"
+import { forwardRef, InputHTMLAttributes } from "react"
 
-type PrimaryInputProps = Omit<InputProps, "size"> & {
-  size?: "sm" | "lg" | "md"
+type PrimaryInputProps = InputHTMLAttributes<HTMLInputElement> & {
+  size?: "sm" | "md" | "lg"
 }
 
-export const PrimaryInput = forwardRef<InputRef, PrimaryInputProps>(function PrimaryInput(
+const sizeToPadding: Record<NonNullable<PrimaryInputProps["size"]>, string> = {
+  sm: "py-2",
+  md: "py-2.5",
+  lg: "py-3",
+}
+
+export const PrimaryInput = forwardRef<HTMLInputElement, PrimaryInputProps>(function PrimaryInput(
   { className = "", size = "sm", ...props },
   ref,
 ) {
-  const resolvedSize = size === "lg" ? "large" : size === "sm" ? "small" : "middle"
-  const combinedClassName = ["w-full", "!pl-4", className].filter(Boolean).join(" ")
+  const base =
+    "w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
+  const padding = sizeToPadding[size] ?? sizeToPadding.sm
+  const combinedClassName = [base, padding, className].filter(Boolean).join(" ")
 
-  return (
-    <Input
-      ref={ref}
-      size={resolvedSize}
-      className={combinedClassName}
-      {...props}
-    />
-  )
+  return <input ref={ref} className={combinedClassName} {...props} />
 })
 
 

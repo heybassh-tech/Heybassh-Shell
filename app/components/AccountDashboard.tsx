@@ -173,6 +173,7 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             navigate={navigate}
+            currentView={view}
           />
           <div className="h-px bg-[#1a2446]/50"></div>
           <div className={`grid flex-1 grid-cols-1 ${contentGrid} transition-[grid-template-columns] duration-250 ease-linear`}>

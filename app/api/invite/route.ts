@@ -10,7 +10,7 @@ const schema = z.object({
   account_id: z.string().length(7),
   email: z.string().email(),
   name: z.string().optional(),
-  role: z.enum(["user", "admin"]).optional(),
+  role: z.enum(["user", "admin", "super_admin"]).optional(),
 })
 
 export async function POST(req: Request) {
@@ -57,8 +57,8 @@ export async function POST(req: Request) {
     }
 
     // Check if user is an admin AND belongs to this account
-    // Only admins can invite users, and only to their own company
-    if (currentUser.role !== "admin" || currentUser.account_id !== account_id) {
+    // Only admins/super-admins can invite users, and only to their own company
+    if (!["admin", "super_admin"].includes(currentUser.role) || currentUser.account_id !== account_id) {
       return NextResponse.json(
         { error: "FORBIDDEN", message: "Only company admins can invite users to this company." },
         { status: 403 }
@@ -71,6 +71,14 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "USER_EXISTS", message: "A user with this email already exists." },
         { status: 409 }
+      )
+    }
+
+    // Only super-admins can assign super_admin role
+    if (role === "super_admin" && currentUser.role !== "super_admin") {
+      return NextResponse.json(
+        { error: "FORBIDDEN", message: "Only super admins can assign super admin role." },
+        { status: 403 }
       )
     }
 
@@ -88,15 +96,18 @@ export async function POST(req: Request) {
       })
     } catch (emailError) {
       console.error("Failed to send invitation email:", emailError)
-      // Still return success with the URL for testing
       const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
       const inviteUrl = `${baseUrl}/register?email=${encodeURIComponent(normalizedEmail)}&account_id=${account_id}&token=${invitationToken.token}`
-      return NextResponse.json({
-        success: true,
-        message: "Invitation created but email sending failed. Use the inviteUrl to share with the user.",
-        inviteUrl,
-        smtpConfigured: false,
-      })
+      return NextResponse.json(
+        {
+          success: false,
+          error: "EMAIL_DELIVERY_FAILED",
+          message: "Invitation could not be emailed. Use the inviteUrl to share manually or fix SMTP.",
+          inviteUrl,
+          smtpConfigured: false,
+        },
+        { status: 502 },
+      )
     }
   } catch (error) {
     if (error instanceof z.ZodError) {

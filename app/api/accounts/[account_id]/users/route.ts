@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
+import { auth } from "@/lib/auth"
 
 export const runtime = "nodejs"
 
 const schema = z.object({
   email: z.string().email(),
+const patchSchema = z.object({
+  userId: z.string(),
+  name: z.string().nullable().optional(),
+  role: z.enum(["user", "admin", "super_admin"]).optional(),
+  status: z.enum(["Invited", "Accepted", "Inactive"]).optional(),
+})
+
   name: z.string().optional(),
   password: z.string().min(6),
   role: z.enum(["user", "admin"]).optional()
@@ -32,10 +40,12 @@ export async function GET(_req: Request, { params }: { params: { account_id: str
     const allInvitations = await prisma.emailVerificationToken.findMany({
       where: {
         expires: { gt: new Date() }, // Not expired
+        account_id: params.account_id,
       },
       select: {
         email: true,
         createdAt: true,
+        account_id: true,
       },
     })
 
@@ -58,7 +68,7 @@ export async function GET(_req: Request, { params }: { params: { account_id: str
         account_id: user.account_id,
         emailVerified: user.emailVerified,
         createdAt: user.createdAt.toISOString(),
-        status: user.emailVerified ? "Active" : "Pending",
+        status: user.emailVerified ? "Accepted" : "Invited",
         userType: user.role === "admin" ? "Employee" : "Others",
       })),
       // Pending invitations
@@ -70,7 +80,7 @@ export async function GET(_req: Request, { params }: { params: { account_id: str
         account_id: params.account_id,
         emailVerified: null,
         createdAt: inv.createdAt.toISOString(),
-        status: "Pending",
+        status: "Invited",
         userType: "Others", // Default, we don't know the type until they register
       })),
     ]
@@ -117,6 +127,61 @@ export async function POST(req: Request, { params }: { params: { account_id: str
       return NextResponse.json({ error: "VALIDATION_ERROR", details: err.errors }, { status: 400 })
     }
     console.error("Create user error", err)
+    return NextResponse.json({ error: "SERVER_ERROR" }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: Request, { params }: { params: { account_id: string } }) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 })
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true, role: true, account_id: true },
+    })
+    if (!currentUser || currentUser.account_id !== params.account_id) {
+      return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 })
+    }
+
+    const body = await req.json()
+    const { userId, name, role, status } = patchSchema.parse(body)
+
+    if (role && currentUser.role !== "super_admin") {
+      return NextResponse.json({ error: "FORBIDDEN", message: "Only super admins can change roles." }, { status: 403 })
+    }
+
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } })
+    if (!targetUser || targetUser.account_id !== params.account_id) {
+      return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 })
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: name === undefined ? targetUser.name : name || null,
+        role: role ?? targetUser.role,
+        // Keep emailVerified untouched; status is derived in GET
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        account_id: true,
+        emailVerified: true,
+        createdAt: true,
+      },
+    })
+
+    return NextResponse.json(updated)
+  } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: "VALIDATION_ERROR", details: err.errors }, { status: 400 })
+    }
+    console.error("Update user error", err)
     return NextResponse.json({ error: "SERVER_ERROR" }, { status: 500 })
   }
 }

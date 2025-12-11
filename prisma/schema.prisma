@@ -37,6 +37,8 @@ model EmailVerificationToken {
   token     String   @unique
   expires   DateTime
   createdAt DateTime @default(now())
+  /// Optional account context for invitations
+  account_id String?
 }
 
 /// Company account model

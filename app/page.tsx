@@ -381,13 +381,6 @@ function HomeInner() {
               </PrimaryButton>
             </form>
 
-            <p className="text-xs text-blue-200/70 text-center">
-              Need a full company workspace?{" "}
-              <Link href="/create-account" className="text-[#5dd4ff] underline-offset-4 hover:underline">
-                Create your free account →
-              </Link>
-            </p>
-
             {/* <p className="text-xs text-blue-200/60">
               By continuing, you agree to the Heybassh Shell Terms and acknowledge the Privacy Policy. Need assistance?{" "}
               <a

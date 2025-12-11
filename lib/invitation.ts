@@ -10,11 +10,12 @@ export async function createInvitationToken(
   tokenValue?: string,
   expiresInMs: number = INVITATION_TOKEN_EXPIRY,
 ) {
-  await prisma.emailVerificationToken.deleteMany({ where: { email } })
+  // Ensure only one active invite per email per account
+  await prisma.emailVerificationToken.deleteMany({ where: { email, account_id } })
   const token = tokenValue ?? uuidv4()
   const expires = new Date(Date.now() + expiresInMs)
   return prisma.emailVerificationToken.create({
-    data: { email, token, expires },
+    data: { email, token, expires, account_id },
   })
 }
 
@@ -47,9 +48,14 @@ export async function sendInvitationEmail(email: string, token: string, account_
   return inviteUrl
 }
 
-export async function validateInvitationToken(token: string, email: string) {
+export async function validateInvitationToken(token: string, email: string, account_id?: string) {
   const record = await prisma.emailVerificationToken.findUnique({ where: { token } })
-  if (!record || record.expires < new Date() || record.email.toLowerCase() !== email.toLowerCase()) {
+  if (!record) {
+    return null
+  }
+  const emailMatches = record.email.toLowerCase() === email.toLowerCase()
+  const accountMatches = account_id ? record.account_id === account_id : true
+  if (!emailMatches || !accountMatches || record.expires < new Date()) {
     return null
   }
   return record

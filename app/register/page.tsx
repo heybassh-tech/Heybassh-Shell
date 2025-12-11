@@ -8,7 +8,7 @@ import { PrimaryButton } from "../components/PrimaryButton"
 import { PrimaryInput } from "../components/PrimaryInput"
 
 type Feedback = { type: "success" | "error" | "info"; message: string }
-type FormErrors = Partial<Record<"name" | "password", string>>
+type FormErrors = Partial<Record<"firstName" | "lastName" | "password", string>>
 
 function RegisterContent() {
   const router = useRouter()
@@ -17,7 +17,8 @@ function RegisterContent() {
   const [accountId, setAccountId] = useState("")
   const [token, setToken] = useState("")
   const [companyName, setCompanyName] = useState("")
-  const [name, setName] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [password, setPassword] = useState("")
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const [formErrors, setFormErrors] = useState<FormErrors>({})
@@ -75,13 +76,17 @@ function RegisterContent() {
     return () => clearTimeout(timer)
   }, [feedback])
 
-  function validateForm() {
+function validateForm() {
     const errors: FormErrors = {}
-    const trimmedName = name.trim()
+    const trimmedFirst = firstName.trim()
+    const trimmedLast = lastName.trim()
     const trimmedPassword = password.trim()
 
-    if (!trimmedName) errors.name = "Full name is required."
-    else if (trimmedName.length < 2) errors.name = "Name should be at least 2 characters."
+    if (!trimmedFirst) errors.firstName = "First name is required."
+    else if (trimmedFirst.length < 2) errors.firstName = "First name should be at least 2 characters."
+
+    if (!trimmedLast) errors.lastName = "Last name is required."
+    else if (trimmedLast.length < 2) errors.lastName = "Last name should be at least 2 characters."
 
     if (!trimmedPassword) errors.password = "Password is required."
     else if (trimmedPassword.length < 6) errors.password = "Use at least 6 characters."
@@ -104,7 +109,7 @@ function RegisterContent() {
         body: JSON.stringify({
           email: email.trim(),
           password: password.trim(),
-          name: name.trim(),
+          name: `${firstName.trim()} ${lastName.trim()}`.trim(),
           account_id: accountId,
           companyName: companyName,
           invitationToken: token,
@@ -199,32 +204,35 @@ function RegisterContent() {
               </div>
 
               <div className="grid gap-2">
-                <label className="block text-sm font-medium text-blue-200" htmlFor="company">
-                  Company
+                <label className="block text-sm font-medium text-blue-200" htmlFor="first-name">
+                  First name
                 </label>
                 <PrimaryInput
-                  id="company"
+                  id="first-name"
                   type="text"
-                  value={companyName}
-                  disabled
-                  className="bg-[#0e1629]/50 text-blue-300/70"
+                  required
+                  placeholder="Jane"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className={formErrors.firstName ? "ring-2 ring-rose-400/70" : ""}
                 />
+                {formErrors.firstName && <p className="text-xs font-medium text-rose-300">{formErrors.firstName}</p>}
               </div>
 
               <div className="grid gap-2">
-                <label className="block text-sm font-medium text-blue-200" htmlFor="name">
-                  Full Name
+                <label className="block text-sm font-medium text-blue-200" htmlFor="last-name">
+                  Last name
                 </label>
                 <PrimaryInput
-                  id="name"
+                  id="last-name"
                   type="text"
                   required
-                  placeholder="Jane Developer"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className={formErrors.name ? "ring-2 ring-rose-400/70" : ""}
+                  placeholder="Developer"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className={formErrors.lastName ? "ring-2 ring-rose-400/70" : ""}
                 />
-                {formErrors.name && <p className="text-xs font-medium text-rose-300">{formErrors.name}</p>}
+                {formErrors.lastName && <p className="text-xs font-medium text-rose-300">{formErrors.lastName}</p>}
               </div>
 
               <div className="grid gap-2">

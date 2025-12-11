@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     }
 
     // Validate the invitation token
-    const invitationRecord = await validateInvitationToken(token, email)
+    const invitationRecord = await validateInvitationToken(token, email, account_id)
     if (!invitationRecord) {
       return NextResponse.json(
         { valid: false, message: "Invalid or expired invitation link." },
