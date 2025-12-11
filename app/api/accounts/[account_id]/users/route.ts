@@ -20,6 +20,10 @@ const patchSchema = z.object({
   status: z.enum(["Invited", "Accepted", "Inactive"]).optional(),
 })
 
+const deleteSchema = z.object({
+  userId: z.string(),
+})
+
 export async function GET(_req: Request, { params }: { params: { account_id: string } }) {
   try {
     // Get all registered users for this account
@@ -227,6 +231,61 @@ export async function PATCH(req: Request, { params }: { params: { account_id: st
       return NextResponse.json({ error: "VALIDATION_ERROR", details: err.errors }, { status: 400 })
     }
     console.error("Update user error", err)
+    return NextResponse.json({ error: "SERVER_ERROR" }, { status: 500 })
+  }
+}
+
+export async function DELETE(req: Request, { params }: { params: { account_id: string } }) {
+  try {
+    const session = await auth()
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 })
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true, email: true, name: true, role: true, account_id: true },
+    })
+    
+    if (!currentUser || currentUser.account_id !== params.account_id) {
+      return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 })
+    }
+
+    // Only super admins can delete users
+    if (currentUser.role !== "super_admin") {
+      return NextResponse.json(
+        { error: "FORBIDDEN", message: "Only super admins can delete users." },
+        { status: 403 }
+      )
+    }
+
+    const body = await req.json()
+    const { userId } = deleteSchema.parse(body)
+
+    // Prevent self-deletion
+    if (userId === currentUser.id) {
+      return NextResponse.json(
+        { error: "FORBIDDEN", message: "You cannot delete your own account." },
+        { status: 403 }
+      )
+    }
+
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } })
+    if (!targetUser || targetUser.account_id !== params.account_id) {
+      return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 })
+    }
+
+    // Delete the user
+    await prisma.user.delete({
+      where: { id: userId },
+    })
+
+    return NextResponse.json({ success: true, message: "User deleted successfully" })
+  } catch (err: any) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: "VALIDATION_ERROR", details: err.errors }, { status: 400 })
+    }
+    console.error("Delete user error", err)
     return NextResponse.json({ error: "SERVER_ERROR" }, { status: 500 })
   }
 }
