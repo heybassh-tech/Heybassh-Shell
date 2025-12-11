@@ -52,6 +52,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return null
           }
 
+          // Ensure account owner is always super_admin
+          let effectiveRole = user.role
+          if (user.account_id) {
+            const account = await prisma.account.findUnique({
+              where: { account_id: user.account_id },
+              select: { owner_email: true },
+            })
+            if (account && account.owner_email.toLowerCase() === user.email.toLowerCase() && user.role !== "super_admin") {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { role: "super_admin" },
+              })
+              effectiveRole = "super_admin"
+            }
+          }
+
           // Verify password
           const passwordMatch = await bcrypt.compare(password, user.passwordHash)
           
@@ -71,7 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           // Credentials are valid
-          return { id: user.id, email: user.email, name: user.name ?? user.email, role: user.role, account_id: user.account_id, companyName: user.companyName }
+          return { id: user.id, email: user.email, name: user.name ?? user.email, role: effectiveRole, account_id: user.account_id, companyName: user.companyName }
         } catch (err) {
           console.error("Credentials authorize error:", err)
           return null
