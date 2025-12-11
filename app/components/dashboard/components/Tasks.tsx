@@ -1070,9 +1070,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 <th scope="col" className="px-6 py-3 text-left">
                   <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Status</span>
                 </th>
-                <th scope="col" className="px-6 py-3 text-left">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-blue-300">Tags</span>
-                </th>
                 <th scope="col" className="relative px-6 py-3">
                   <span className="sr-only">Actions</span>
                 </th>
@@ -1107,19 +1104,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
                       <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(task.status)}`}>
                         {task.status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1">
-                        {task.tags && task.tags.length > 0 ? (
-                          task.tags.map((tag, index) => (
-                            <Tag key={index} className="bg-[#121c3d] border-[#1a2446] text-blue-200 text-xs">
-                              {tag}
-                            </Tag>
-                          ))
-                        ) : (
-                          <span className="text-xs text-blue-300/50">No tags</span>
-                        )}
-                      </div>
                     </td>
                     <td className="relative whitespace-nowrap px-6 py-4 overflow-visible">
                       <div className="relative" ref={(el) => { menuRefs.current[task.id] = el; }}>
@@ -1162,7 +1146,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-blue-300">
+                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-blue-300">
                     {filters.search ? `No tasks found for "${filters.search}".` : tasks.length === 0 ? 'No tasks yet. Add one to get started.' : 'Try adjusting your filters.'}
                   </td>
                 </tr>
