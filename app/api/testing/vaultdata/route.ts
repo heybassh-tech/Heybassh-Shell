@@ -40,7 +40,7 @@ function normalizePayload(body: Partial<VaultEntry>): VaultEntry | null {
     url: body.url ? String(body.url) : "",
     notes: body.notes ? String(body.notes) : "",
     tags: Array.isArray(body.tags) ? body.tags.map(String) : [],
-    favorite: Boolean(body.favorite),
+    favorite: body.favorite === true,
   }
 }
 

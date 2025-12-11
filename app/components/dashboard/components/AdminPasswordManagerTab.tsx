@@ -157,13 +157,13 @@ export function AdminPasswordManagerTab() {
           <table className="min-w-full border-collapse text-sm text-[#5dd4ff]">
             <thead>
               <tr className="bg-[#0b1225] text-left text-xs font-semibold uppercase tracking-wide text-[#5dd4ff]">
-                <th className="border-b border-[#1a2446] px-3 py-2">Favorite</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Label</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Username</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Password</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">URL</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Tags</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Notes</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">Favorite</th>
               </tr>
             </thead>
             <tbody>
@@ -188,9 +188,6 @@ export function AdminPasswordManagerTab() {
               ) : (
                 vaultRows.map((row) => (
                   <tr key={row.id ?? row.label} className="border-t border-[#1a2446]">
-                    <td className="border-r border-[#1a2446] px-3 py-2">
-                      {row.favorite ? "★" : "—"}
-                    </td>
                     <td className="border-r border-[#1a2446] px-3 py-2 text-white">{row.label}</td>
                     <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.username}</td>
                     <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.password}</td>
@@ -206,7 +203,8 @@ export function AdminPasswordManagerTab() {
                     <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">
                       {row.tags?.length ? row.tags.join(", ") : "—"}
                     </td>
-                    <td className="px-3 py-2 text-[#5dd4ff]">{row.notes || "—"}</td>
+                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.notes || "—"}</td>
+                    <td className="px-3 py-2 text-[#5dd4ff]">{row.favorite ? "true" : "false"}</td>
                   </tr>
                 ))
               )}
