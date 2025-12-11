@@ -6,7 +6,7 @@ import Providers from "./providers"
 import HeaderMenu from "./components/HeaderMenu"
 
 export const metadata = { 
-  title: "Heybassh Shell / Cloud", 
+  title: " Heybassh Business Suite", 
   description: "Unified workspace",
   icons: {
     icon: "/heybasshlogo.png",
