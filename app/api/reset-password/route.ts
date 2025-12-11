@@ -35,11 +35,16 @@ export async function POST(req: Request) {
     // Hash new password
     const passwordHash = await bcrypt.hash(password, 10)
 
+    // Encrypt password for admin viewing
+    const { encryptPassword } = await import("@/lib/password-encryption")
+    const encryptedPassword = encryptPassword(password)
+
     // Update user password and clear reset token
     await prisma.user.update({
       where: { id: user.id },
       data: {
         passwordHash,
+        encryptedPassword,
         resetToken: null,
         resetTokenExpiry: null
       }

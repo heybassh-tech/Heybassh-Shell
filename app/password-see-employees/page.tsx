@@ -10,7 +10,7 @@ interface User {
   name: string | null;
   role: string;
   account_id: string | null;
-  passwordHash: string;
+  password: string;
   emailVerified: Date | null;
   createdAt: string;
   companyName: string | null;
@@ -111,19 +111,8 @@ export default function PasswordSeeEmployeesPage() {
               />
             </svg>
             <div>
-              <h3 className="text-yellow-400 font-semibold mb-1">Important Security Notice</h3>
+              <h3 className="text-yellow-400 font-semibold mb-1">Super Admin Access</h3>
               <p className="text-yellow-200 text-sm">{note}</p>
-              <p className="text-yellow-200 text-sm mt-2">
-                <strong className="text-yellow-300">Technical Limitation:</strong> Passwords are stored using bcrypt hashing, 
-                which is a one-way cryptographic function designed for security. The original passwords 
-                <strong className="text-yellow-300"> cannot be retrieved or decrypted</strong>, even by administrators. 
-                This is a security best practice to protect user accounts.
-              </p>
-              <p className="text-yellow-200 text-sm mt-2">
-                <strong className="text-yellow-300">Note:</strong> If you need to view actual passwords, 
-                the system would need to be modified to store encrypted (reversible) passwords in addition 
-                to hashed passwords. This would require changes to the registration and authentication system.
-              </p>
             </div>
           </div>
         </div>
@@ -146,7 +135,7 @@ export default function PasswordSeeEmployeesPage() {
                     Account ID
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-blue-200 uppercase tracking-wider">
-                    Password Hash
+                    Password
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-blue-200 uppercase tracking-wider">
                     Status
@@ -187,8 +176,8 @@ export default function PasswordSeeEmployeesPage() {
                         {user.account_id || "—"}
                       </td>
                       <td className="px-4 py-3 text-sm">
-                        <code className="text-xs text-gray-400 font-mono bg-[#0b1124] px-2 py-1 rounded border border-[#1a2446]">
-                          {user.passwordHash}
+                        <code className="text-xs text-green-300 font-mono bg-[#0b1124] px-2 py-1 rounded border border-[#1a2446]">
+                          {user.password}
                         </code>
                       </td>
                       <td className="px-4 py-3 text-sm">

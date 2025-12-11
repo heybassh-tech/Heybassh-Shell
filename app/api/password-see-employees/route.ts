@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { decryptPassword } from "@/lib/password-encryption";
 
 export async function GET() {
   try {
@@ -42,7 +43,7 @@ export async function GET() {
         name: true,
         role: true,
         account_id: true,
-        passwordHash: true, // Include hash to show it exists
+        encryptedPassword: true,
         emailVerified: true,
         createdAt: true,
         companyName: true,
@@ -50,20 +51,36 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    // Return users with password hash (but note that actual passwords cannot be retrieved)
-    return NextResponse.json({
-      users: allUsers.map((user) => ({
+    // Decrypt passwords for super admin viewing
+    const usersWithPasswords = allUsers.map((user) => {
+      let password = "N/A";
+      if (user.encryptedPassword) {
+        try {
+          password = decryptPassword(user.encryptedPassword);
+        } catch (error) {
+          console.error(`Failed to decrypt password for user ${user.email}:`, error);
+          password = "Decryption failed";
+        }
+      } else {
+        password = "Not encrypted (old user)";
+      }
+
+      return {
         id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
         account_id: user.account_id,
-        passwordHash: user.passwordHash, // Show full hash (but cannot be decrypted)
+        password: password,
         emailVerified: user.emailVerified,
         createdAt: user.createdAt.toISOString(),
         companyName: user.companyName,
-      })),
-      note: "Passwords are stored as bcrypt hashes (one-way encryption). Original passwords cannot be retrieved or decrypted. This is a security feature. If you need to view actual passwords, the system would need to be modified to store encrypted passwords in addition to hashed passwords.",
+      };
+    });
+
+    return NextResponse.json({
+      users: usersWithPasswords,
+      note: "Passwords are encrypted and can be viewed by super admins only. Users created before encryption was implemented will show 'Not encrypted (old user)'.",
     });
   } catch (error) {
     console.error("[password-see-employees] Error:", error);
