@@ -57,9 +57,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
   });
   const [tagInput, setTagInput] = useState("");
   const [editTagInput, setEditTagInput] = useState("");
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [dueDate, setDueDate] = useState<Dayjs | null>(null);
-  const [editStartDate, setEditStartDate] = useState<Dayjs | null>(null);
   const [editDueDate, setEditDueDate] = useState<Dayjs | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [tagSearch, setTagSearch] = useState("");
@@ -74,6 +72,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const [editTagOpen, setEditTagOpen] = useState(false);
   const [assigneeOpen, setAssigneeOpen] = useState(false);
   const [editAssigneeOpen, setEditAssigneeOpen] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -184,10 +184,11 @@ export function Tasks({ accountId, employees }: TasksProps) {
 
   const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (createLoading) return;
+    setCreateLoading(true);
     try {
       const taskToAdd = {
         ...newTask,
-        startDate: startDate ? startDate.format("YYYY-MM-DD") : newTask.startDate || "",
         dueDate: dueDate ? dueDate.format("YYYY-MM-DD") : newTask.dueDate || "",
       };
       
@@ -206,7 +207,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
       setNewTask({
         title: "",
         assignee: "",
-        startDate: "",
         dueDate: "",
         priority: "Normal",
         status: "Todo",
@@ -214,12 +214,13 @@ export function Tasks({ accountId, employees }: TasksProps) {
         tags: [],
       });
       setTagInput("");
-      setStartDate(null);
       setDueDate(null);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to create task", error);
       alert(error instanceof Error ? error.message : "Failed to create task");
+    } finally {
+      setCreateLoading(false);
     }
   };
 
@@ -236,7 +237,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
       tags: task.tags || [],
     });
     setEditTagInput("");
-    setEditStartDate((task as any).startDate ? dayjs((task as any).startDate) : null);
     setEditDueDate(task.dueDate ? dayjs(task.dueDate) : null);
     setIsEditModalOpen(true);
     setOpenMenuId(null);
@@ -245,11 +245,12 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const handleUpdateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingTask) return;
+    if (updateLoading) return;
+    setUpdateLoading(true);
 
     try {
       const taskToUpdate = {
         ...editTask,
-        startDate: editStartDate ? editStartDate.format("YYYY-MM-DD") : editTask.startDate || "",
         dueDate: editDueDate ? editDueDate.format("YYYY-MM-DD") : editTask.dueDate || "",
       };
 
@@ -272,7 +273,6 @@ export function Tasks({ accountId, employees }: TasksProps) {
       setEditTask({
         title: "",
         assignee: "",
-        startDate: "",
         dueDate: "",
         priority: "Normal",
         status: "Todo",
@@ -280,12 +280,13 @@ export function Tasks({ accountId, employees }: TasksProps) {
         tags: [],
       });
       setEditTagInput("");
-      setEditStartDate(null);
       setEditDueDate(null);
       setIsEditModalOpen(false);
     } catch (error) {
       console.error("Failed to update task", error);
       alert(error instanceof Error ? error.message : "Failed to update task");
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -507,53 +508,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
               </select>
             </div>
             <div>
-              <label htmlFor="startDate" className="block text-sm font-medium text-blue-200 mb-2">
-                Start Date
-              </label>
-              <DatePicker
-                id="startDate"
-                value={startDate}
-                onChange={(date) => setStartDate(date)}
-                format="YYYY-MM-DD"
-                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
-                placeholder="Select start date"
-                renderExtraFooter={() => (
-                  <div className="flex gap-2 p-2 border-t border-[#1a2446]">
-                    <button
-                      type="button"
-                      onClick={() => setStartDate(dayjs())}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setStartDate(dayjs().add(1, "day"))}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +1 day
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setStartDate(dayjs().add(7, "day"))}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +7 days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setStartDate(null)}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors ml-auto"
-                    >
-                      None
-                    </button>
-                  </div>
-                )}
-              />
-            </div>
-            <div>
               <label htmlFor="dueDate" className="block text-sm font-medium text-blue-200 mb-2">
-                Due Date
+                Date
               </label>
               <DatePicker
                 id="dueDate"
@@ -564,55 +520,33 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 }}
                 format="YYYY-MM-DD"
                 className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
-                placeholder="Select due date"
-                renderExtraFooter={() => (
-                  <div className="flex gap-2 p-2 border-t border-[#1a2446]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const today = dayjs();
-                        setDueDate(today);
-                        setNewTask({ ...newTask, dueDate: today.format("YYYY-MM-DD") });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const plus1 = dayjs().add(1, "day");
-                        setDueDate(plus1);
-                        setNewTask({ ...newTask, dueDate: plus1.format("YYYY-MM-DD") });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +1 day
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const plus7 = dayjs().add(7, "day");
-                        setDueDate(plus7);
-                        setNewTask({ ...newTask, dueDate: plus7.format("YYYY-MM-DD") });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +7 days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDueDate(null);
-                        setNewTask({ ...newTask, dueDate: "" });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors ml-auto"
-                    >
-                      None
-                    </button>
-                  </div>
-                )}
+                placeholder="Select a date"
               />
+              <div className="mt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const today = dayjs();
+                    setDueDate(today);
+                    setNewTask({ ...newTask, dueDate: today.format("YYYY-MM-DD") });
+                  }}
+                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
+                >
+                  <FiCalendar className="h-4 w-4" />
+                  Pick date
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDueDate(null);
+                    setNewTask({ ...newTask, dueDate: "" });
+                  }}
+                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                  No date
+                </button>
+              </div>
             </div>
             <div>
               <label htmlFor="priority" className="block text-sm font-medium text-blue-200">
@@ -661,42 +595,94 @@ export function Tasks({ accountId, employees }: TasksProps) {
               />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="tags" className="block text-sm font-medium text-blue-200 mb-2">
-                Tags
-              </label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {newTask.tags.map((tag, index) => (
-                  <Tag
-                    key={index}
-                    closable
-                    onClose={() => removeTag(newTask.tags, tag, (tags) => setNewTask({ ...newTask, tags }))}
-                    className="bg-[#121c3d] border-[#1a2446] text-blue-200"
-                  >
-                    {tag}
-                  </Tag>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <PrimaryInput
-                  id="tags"
-                  type="text"
-                  placeholder="Add a tag and press Enter"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addTag(newTask.tags, tagInput, (tags) => setNewTask({ ...newTask, tags }), setTagInput);
-                    }
-                  }}
-                />
-                <PrimaryButton
+              <div className="mb-2 flex items-center justify-between">
+                <label htmlFor="tags" className="block text-sm font-medium text-blue-200">
+                  Tags
+                </label>
+                <button
                   type="button"
-                  onClick={() => addTag(newTask.tags, tagInput, (tags) => setNewTask({ ...newTask, tags }), setTagInput)}
+                  onClick={() => setTagOpen(true)}
+                  className="flex items-center gap-1 rounded-full bg-[#121c3d] px-3 py-1 text-xs font-medium text-blue-200 transition-colors hover:bg-[#18aead] hover:text-white"
                 >
+                  <PlusIcon className="h-4 w-4" />
                   Add
-                </PrimaryButton>
+                </button>
               </div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {newTask.tags.length > 0 ? (
+                  newTask.tags.map((tag, index) => (
+                    <Tag
+                      key={index}
+                      closable
+                      onClose={() => removeTag(newTask.tags, tag, (tags) => setNewTask({ ...newTask, tags }))}
+                      className="bg-[#121c3d] border-[#1a2446] text-blue-200"
+                    >
+                      {tag}
+                    </Tag>
+                  ))
+                ) : (
+                  <span className="text-xs text-blue-300/70">No tags</span>
+                )}
+              </div>
+              {tagOpen && (
+                <div className="relative">
+                  <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-3 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-blue-200">Select tags</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTagOpen(false);
+                          setTagSearch("");
+                        }}
+                        className="rounded p-1 text-blue-300/70 hover:bg-[#121c3d] hover:text-white"
+                      >
+                        <XMarkIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="mt-2">
+                      <PrimaryInput
+                        id="tags"
+                        type="text"
+                        placeholder="Search tags"
+                        value={tagSearch}
+                        onChange={(e) => setTagSearch(e.target.value)}
+                      />
+                    </div>
+                    <div className="mt-3 max-h-48 space-y-2 overflow-y-auto pr-1">
+                      {filteredTags.length > 0 ? (
+                        filteredTags.map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => {
+                              addTag(newTask.tags, tag, (tags) => setNewTask({ ...newTask, tags }), setTagInput);
+                            }}
+                            className="w-full rounded-lg border border-transparent bg-[#121c3d] px-3 py-2 text-left text-sm text-blue-200 transition-colors hover:border-[#18aead] hover:bg-[#121c3d]/70"
+                          >
+                            {tag}
+                          </button>
+                        ))
+                      ) : tagSearch.trim() ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            addTag(newTask.tags, tagSearch, (tags) => setNewTask({ ...newTask, tags }), setTagInput);
+                            setTagSearch("");
+                            setTagOpen(false);
+                          }}
+                          className="flex w-full items-center justify-between rounded-lg border border-dashed border-[#18aead] px-3 py-2 text-left text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                        >
+                          <span>Create tag “{tagSearch}”</span>
+                          <PlusIcon className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <p className="text-xs text-blue-300/70">No tags yet.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-white/5 pt-4">
@@ -717,11 +703,12 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 setDueDate(null);
               }}
               className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
+              disabled={createLoading}
             >
               Cancel
             </button>
-            <PrimaryButton type="submit">
-              Save Task
+            <PrimaryButton type="submit" disabled={createLoading}>
+              {createLoading ? "Saving..." : "Save Task"}
             </PrimaryButton>
           </div>
         </form>
@@ -783,53 +770,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
               </select>
             </div>
             <div>
-              <label htmlFor="edit-startDate" className="block text-sm font-medium text-blue-200 mb-2">
-                Start Date
-              </label>
-              <DatePicker
-                id="edit-startDate"
-                value={editStartDate}
-                onChange={(date) => setEditStartDate(date)}
-                format="YYYY-MM-DD"
-                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
-                placeholder="Select start date"
-                renderExtraFooter={() => (
-                  <div className="flex gap-2 p-2 border-t border-[#1a2446]">
-                    <button
-                      type="button"
-                      onClick={() => setEditStartDate(dayjs())}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditStartDate(dayjs().add(1, "day"))}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +1 day
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditStartDate(dayjs().add(7, "day"))}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +7 days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditStartDate(null)}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors ml-auto"
-                    >
-                      None
-                    </button>
-                  </div>
-                )}
-              />
-            </div>
-            <div>
               <label htmlFor="edit-dueDate" className="block text-sm font-medium text-blue-200 mb-2">
-                Due Date
+                Date
               </label>
               <DatePicker
                 id="edit-dueDate"
@@ -840,55 +782,33 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 }}
                 format="YYYY-MM-DD"
                 className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
-                placeholder="Select due date"
-                renderExtraFooter={() => (
-                  <div className="flex gap-2 p-2 border-t border-[#1a2446]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const today = dayjs();
-                        setEditDueDate(today);
-                        setEditTask({ ...editTask, dueDate: today.format("YYYY-MM-DD") });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const plus1 = dayjs().add(1, "day");
-                        setEditDueDate(plus1);
-                        setEditTask({ ...editTask, dueDate: plus1.format("YYYY-MM-DD") });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +1 day
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const plus7 = dayjs().add(7, "day");
-                        setEditDueDate(plus7);
-                        setEditTask({ ...editTask, dueDate: plus7.format("YYYY-MM-DD") });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors"
-                    >
-                      +7 days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditDueDate(null);
-                        setEditTask({ ...editTask, dueDate: "" });
-                      }}
-                      className="px-3 py-1 text-xs text-blue-200 hover:text-white hover:bg-[#121c3d] rounded transition-colors ml-auto"
-                    >
-                      None
-                    </button>
-                  </div>
-                )}
+                placeholder="Select a date"
               />
+              <div className="mt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const today = dayjs();
+                    setEditDueDate(today);
+                    setEditTask({ ...editTask, dueDate: today.format("YYYY-MM-DD") });
+                  }}
+                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
+                >
+                  <FiCalendar className="h-4 w-4" />
+                  Pick date
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditDueDate(null);
+                    setEditTask({ ...editTask, dueDate: "" });
+                  }}
+                  className="flex items-center gap-1 text-xs text-blue-200 hover:text-white"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                  No date
+                </button>
+              </div>
             </div>
             <div>
               <label htmlFor="edit-priority" className="block text-sm font-medium text-blue-200">
@@ -937,42 +857,94 @@ export function Tasks({ accountId, employees }: TasksProps) {
               />
             </div>
             <div className="sm:col-span-2">
-              <label htmlFor="edit-tags" className="block text-sm font-medium text-blue-200 mb-2">
-                Tags
-              </label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {editTask.tags.map((tag, index) => (
-                  <Tag
-                    key={index}
-                    closable
-                    onClose={() => removeTag(editTask.tags, tag, (tags) => setEditTask({ ...editTask, tags }))}
-                    className="bg-[#121c3d] border-[#1a2446] text-blue-200"
-                  >
-                    {tag}
-                  </Tag>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <PrimaryInput
-                  id="edit-tags"
-                  type="text"
-                  placeholder="Add a tag and press Enter"
-                  value={editTagInput}
-                  onChange={(e) => setEditTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addTag(editTask.tags, editTagInput, (tags) => setEditTask({ ...editTask, tags }), setEditTagInput);
-                    }
-                  }}
-                />
-                <PrimaryButton
+              <div className="mb-2 flex items-center justify-between">
+                <label htmlFor="edit-tags" className="block text-sm font-medium text-blue-200">
+                  Tags
+                </label>
+                <button
                   type="button"
-                  onClick={() => addTag(editTask.tags, editTagInput, (tags) => setEditTask({ ...editTask, tags }), setEditTagInput)}
+                  onClick={() => setEditTagOpen(true)}
+                  className="flex items-center gap-1 rounded-full bg-[#121c3d] px-3 py-1 text-xs font-medium text-blue-200 transition-colors hover:bg-[#18aead] hover:text-white"
                 >
+                  <PlusIcon className="h-4 w-4" />
                   Add
-                </PrimaryButton>
+                </button>
               </div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {editTask.tags.length > 0 ? (
+                  editTask.tags.map((tag, index) => (
+                    <Tag
+                      key={index}
+                      closable
+                      onClose={() => removeTag(editTask.tags, tag, (tags) => setEditTask({ ...editTask, tags }))}
+                      className="bg-[#121c3d] border-[#1a2446] text-blue-200"
+                    >
+                      {tag}
+                    </Tag>
+                  ))
+                ) : (
+                  <span className="text-xs text-blue-300/70">No tags</span>
+                )}
+              </div>
+              {editTagOpen && (
+                <div className="relative">
+                  <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-3 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-blue-200">Select tags</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditTagOpen(false);
+                          setEditTagSearch("");
+                        }}
+                        className="rounded p-1 text-blue-300/70 hover:bg-[#121c3d] hover:text-white"
+                      >
+                        <XMarkIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="mt-2">
+                      <PrimaryInput
+                        id="edit-tags"
+                        type="text"
+                        placeholder="Search tags"
+                        value={editTagSearch}
+                        onChange={(e) => setEditTagSearch(e.target.value)}
+                      />
+                    </div>
+                    <div className="mt-3 max-h-48 space-y-2 overflow-y-auto pr-1">
+                      {filteredEditTags.length > 0 ? (
+                        filteredEditTags.map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => {
+                              addTag(editTask.tags, tag, (tags) => setEditTask({ ...editTask, tags }), setEditTagInput);
+                            }}
+                            className="w-full rounded-lg border border-transparent bg-[#121c3d] px-3 py-2 text-left text-sm text-blue-200 transition-colors hover:border-[#18aead] hover:bg-[#121c3d]/70"
+                          >
+                            {tag}
+                          </button>
+                        ))
+                      ) : editTagSearch.trim() ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            addTag(editTask.tags, editTagSearch, (tags) => setEditTask({ ...editTask, tags }), setEditTagInput);
+                            setEditTagSearch("");
+                            setEditTagOpen(false);
+                          }}
+                          className="flex w-full items-center justify-between rounded-lg border border-dashed border-[#18aead] px-3 py-2 text-left text-sm text-blue-200 transition-colors hover:bg-[#121c3d]"
+                        >
+                          <span>Create tag “{editTagSearch}”</span>
+                          <PlusIcon className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <p className="text-xs text-blue-300/70">No tags yet.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-white/5 pt-4">
@@ -995,11 +967,12 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 setEditDueDate(null);
               }}
               className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
+              disabled={updateLoading}
             >
               Cancel
             </button>
-            <PrimaryButton type="submit">
-              Update Task
+            <PrimaryButton type="submit" disabled={updateLoading}>
+              {updateLoading ? "Updating..." : "Update Task"}
             </PrimaryButton>
           </div>
         </form>
