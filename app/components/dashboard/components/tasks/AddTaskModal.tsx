@@ -26,7 +26,7 @@ const initialTask: Omit<Task, "id"> = {
   assignee: "",
   startDate: "",
   dueDate: "",
-  priority: "Normal",
+  priority: "" as any,
   status: "Todo",
   description: "",
   tags: [],
@@ -101,6 +101,7 @@ export function AddTaskModal({
         assignee: selectedAssignees.length > 0 ? selectedAssignees[0] : "", // For now, use first assignee for backward compatibility
         startDate: startDate ? startDate.format("YYYY-MM-DD") : task.startDate || "",
         dueDate: endDate ? endDate.format("YYYY-MM-DD") : task.dueDate || "",
+        priority: task.priority || "Normal", // Default to Normal if empty for API
       };
 
       const response = await fetch(`/api/accounts/${accountId}/tasks`, {
@@ -547,8 +548,25 @@ export function AddTaskModal({
 
             {/* Inline Priority Panel */}
             {priorityPanelOpen && (
-              <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+              <div className="absolute z-[1001] mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
                 <div className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTask({ ...task, priority: "" as any });
+                      setPriorityPanelOpen(false);
+                    }}
+                    className={`w-full rounded-lg border px-4 py-2.5 text-left transition-colors ${
+                      !task.priority
+                        ? "border-[#18aead] bg-[#18aead]/10"
+                        : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <FiFlag className="h-4 w-4 text-blue-300" />
+                      <span className="text-sm text-blue-200">No priority</span>
+                    </div>
+                  </button>
                   {priorityOptions.map((priority) => {
                     const isSelected = priority === task.priority;
                     return (
