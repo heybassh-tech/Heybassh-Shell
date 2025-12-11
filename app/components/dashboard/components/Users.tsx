@@ -424,7 +424,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                 </label>
                 <select
                   id="user-type"
-                  className="w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  className="w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2.5 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
                   value={userType}
                   onChange={(e) => setUserType(e.target.value as UserType)}
                   disabled={panelMode === "edit"}
@@ -440,7 +440,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                 </label>
                 <select
                   id="user-role"
-                  className="w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  className="w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2.5 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
                   value={role}
                   onChange={(e) => setRole(e.target.value as any)}
                   disabled={currentUserRole !== "super_admin"}
