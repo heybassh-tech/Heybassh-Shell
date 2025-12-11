@@ -319,7 +319,7 @@ export function AddTaskModal({
                       onClick={() => setCreateTagOpen(true)}
                       className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#18aead] bg-[#18aead]/10 px-4 py-2 text-sm font-medium text-[#18aead] transition-colors hover:bg-[#18aead]/20"
                     >
-                      <PlusIcon className="h-4 w-4" />
+                      <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2"><PlusIcon className="h-4 w-4 text-blue-300" /></div>
                       Add Tag
                     </button>
                   </div>
@@ -340,7 +340,7 @@ export function AddTaskModal({
               }}
               className="flex items-center justify-center rounded-full p-2 text-blue-300 hover:text-white/50 transition-colors"
               >
-              <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
+              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2"><FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0 p-2" /></div>
               <div className="flex-1">
                 {startDate && endDate ? (
                   <span className="text-sm text-blue-200">{formatDateRange()}</span>
