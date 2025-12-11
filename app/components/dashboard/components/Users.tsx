@@ -187,7 +187,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
         </div>
 
         <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+          <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#18aead] focus-within:ring-1 focus-within:ring-[#18aead] lg:max-w-xl">
             <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
             <input
               type="text"
@@ -304,7 +304,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                 </label>
                 <select
                   id="user-type"
-                  className="w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                  className="w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                   value={userType}
                   onChange={(e) => setUserType(e.target.value as UserType)}
                 >
@@ -319,7 +319,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                   id="send-invite"
                   checked={sendInvite}
                   onChange={(e) => setSendInvite(e.target.checked)}
-                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff]"
+                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
                 />
                 <label htmlFor="send-invite" className="text-sm text-white cursor-pointer font-medium">
                   Send invitation email to this user

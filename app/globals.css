@@ -53,11 +53,11 @@ body { @apply min-h-screen bg-[#020617] text-[#eef3ff]; font-family: system-ui, 
 }
 
 .ant-picker:hover {
-  border-color: #2b9bff !important;
+  border-color: #18aead !important;
 }
 
 .ant-picker-focused {
-  border-color: #2b9bff !important;
+  border-color: #18aead !important;
   box-shadow: 0 0 0 2px rgba(43, 155, 255, 0.1) !important;
 }
 
@@ -86,7 +86,7 @@ body { @apply min-h-screen bg-[#020617] text-[#eef3ff]; font-family: system-ui, 
 }
 
 .ant-picker-header-view button:hover {
-  color: #2b9bff !important;
+  color: #18aead !important;
 }
 
 .ant-picker-content th {
@@ -102,12 +102,12 @@ body { @apply min-h-screen bg-[#020617] text-[#eef3ff]; font-family: system-ui, 
 }
 
 .ant-picker-cell-selected .ant-picker-cell-inner {
-  background-color: #2b9bff !important;
+  background-color: #18aead !important;
   color: #fff !important;
 }
 
 .ant-picker-cell-today .ant-picker-cell-inner {
-  border-color: #2b9bff !important;
+  border-color: #18aead !important;
 }
 
 .ant-picker-cell-disabled {

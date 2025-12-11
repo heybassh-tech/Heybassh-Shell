@@ -109,7 +109,7 @@ export function LeaveRequest() {
               onClick={() => setActiveTab("employees")}
               className={`px-4 py-1.5 text-xs font-medium transition-colors ${
                 activeTab === "employees"
-                  ? "bg-[#142044] text-white border-[#2b9bff]"
+                  ? "bg-[#142044] text-white border-[#18aead]"
                   : "text-blue-200 hover:bg-[#121c3d] hover:text-white"
               }`}
             >
@@ -120,7 +120,7 @@ export function LeaveRequest() {
               onClick={() => setActiveTab("leave")}
               className={`px-4 py-1.5 text-xs font-medium transition-colors ${
                 activeTab === "leave"
-                  ? "bg-[#142044] text-white border-[#2b9bff]"
+                  ? "bg-[#142044] text-white border-[#18aead]"
                   : "text-blue-200 hover:bg-[#121c3d] hover:text-white"
               }`}
             >
@@ -148,7 +148,7 @@ export function LeaveRequest() {
       {activeTab === "employees" ? (
         <>
           <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+            <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#18aead] focus-within:ring-1 focus-within:ring-[#18aead] lg:max-w-xl">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
               <input
                 type="text"
@@ -290,7 +290,7 @@ export function LeaveRequest() {
       ) : (
         <>
           <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+            <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#18aead] focus-within:ring-1 focus-within:ring-[#18aead] lg:max-w-xl">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
               <input
                 type="text"
@@ -304,7 +304,7 @@ export function LeaveRequest() {
               </label>
               <select
                 id="leave-filter"
-                className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3 py-1.5 text-xs font-medium text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3 py-1.5 text-xs font-medium text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={leaveFilter}
                 onChange={(e) => setLeaveFilter(e.target.value as "All" | LeaveRequest['status'])}
               >
@@ -430,7 +430,7 @@ export function LeaveRequest() {
                   <select
                     id="leave-employee"
                     required
-                    className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                    className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                     value={newLeaveRequest.employeeId}
                     onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, employeeId: e.target.value })}
                   >
@@ -448,7 +448,7 @@ export function LeaveRequest() {
                   </label>
                   <select
                     id="leave-type"
-                    className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                    className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                     value={newLeaveRequest.type}
                     onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, type: e.target.value })}
                   >

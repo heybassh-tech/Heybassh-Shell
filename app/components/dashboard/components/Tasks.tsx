@@ -281,7 +281,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       </div>
 
       <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+        <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#18aead] focus-within:ring-1 focus-within:ring-[#18aead] lg:max-w-xl">
           <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
           <input
             type="text"
@@ -296,7 +296,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
           <select
             value={filters.priority}
             onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#2b9bff] focus:outline-none"
+            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#18aead] focus:outline-none"
           >
             <option value="All" className="bg-[#0e1629]">All Priorities</option>
             {priorityOptions.map((priority) => (
@@ -309,7 +309,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value as Task["status"] })}
-            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#2b9bff] focus:outline-none"
+            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#18aead] focus:outline-none"
           >
             <option value="All" className="bg-[#0e1629]">All Statuses</option>
             {statusOptions.map((status) => (
@@ -322,7 +322,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
           <select
             value={filters.assignee}
             onChange={(e) => setFilters({ ...filters, assignee: e.target.value })}
-            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#2b9bff] focus:outline-none"
+            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#18aead] focus:outline-none"
           >
             <option value="All" className="bg-[#0e1629]">All Assignees</option>
             {employees.map((employee) => (
@@ -338,7 +338,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               onClick={() => setViewMode("list")}
               className={`rounded-[18px] px-3 py-1.5 text-xs font-medium transition ${
                 viewMode === "list"
-                  ? 'bg-[#2b9bff] text-white'
+                  ? 'bg-[#18aead] text-white'
                   : 'text-blue-200 hover:bg-[#121c3d]'
               }`}
             >
@@ -349,7 +349,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               onClick={() => setViewMode("board")}
               className={`rounded-[18px] px-3 py-1.5 text-xs font-medium transition ${
                 viewMode === "board"
-                  ? 'bg-[#2b9bff] text-white'
+                  ? 'bg-[#18aead] text-white'
                   : 'text-blue-200 hover:bg-[#121c3d]'
               }`}
             >
@@ -397,7 +397,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               <select
                 id="assignee"
                 required
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={newTask.assignee}
                 onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })}
               >
@@ -418,7 +418,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 value={startDate}
                 onChange={(date) => setStartDate(date)}
                 format="YYYY-MM-DD"
-                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
                 placeholder="Select start date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -466,7 +466,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   setNewTask({ ...newTask, dueDate: date ? date.format("YYYY-MM-DD") : "" });
                 }}
                 format="YYYY-MM-DD"
-                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
                 placeholder="Select due date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -523,7 +523,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               </label>
               <select
                 id="priority"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={newTask.priority}
                 onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as Task["priority"] })}
               >
@@ -540,7 +540,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               </label>
               <select
                 id="status"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={newTask.status}
                 onChange={(e) => setNewTask({ ...newTask, status: e.target.value as Task["status"] })}
               >
@@ -558,7 +558,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               <textarea
                 id="description"
                 rows={3}
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 placeholder-blue-300/60 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 placeholder-blue-300/60 focus:border-[#18aead] focus:outline-none"
                 value={newTask.description}
                 onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
               />
@@ -673,7 +673,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               <select
                 id="edit-assignee"
                 required
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={editTask.assignee}
                 onChange={(e) => setEditTask({ ...editTask, assignee: e.target.value })}
               >
@@ -694,7 +694,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 value={editStartDate}
                 onChange={(date) => setEditStartDate(date)}
                 format="YYYY-MM-DD"
-                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
                 placeholder="Select start date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -742,7 +742,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   setEditTask({ ...editTask, dueDate: date ? date.format("YYYY-MM-DD") : "" });
                 }}
                 format="YYYY-MM-DD"
-                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#2b9bff] focus-within:!outline-none"
+                className="w-full !rounded-[10px] !border !border-[#1a2446] !bg-[#0e1629] !px-4 !py-2 !text-sm !text-blue-100 placeholder:!text-blue-300/60 focus-within:!border-[#18aead] focus-within:!outline-none"
                 placeholder="Select due date"
                 renderExtraFooter={() => (
                   <div className="flex gap-2 p-2 border-t border-[#1a2446]">
@@ -799,7 +799,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               </label>
               <select
                 id="edit-priority"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={editTask.priority}
                 onChange={(e) => setEditTask({ ...editTask, priority: e.target.value as Task["priority"] })}
               >
@@ -816,7 +816,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               </label>
               <select
                 id="edit-status"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={editTask.status}
                 onChange={(e) => setEditTask({ ...editTask, status: e.target.value as Task["status"] })}
               >
@@ -834,7 +834,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
               <textarea
                 id="edit-description"
                 rows={3}
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 placeholder-blue-300/60 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 placeholder-blue-300/60 focus:border-[#18aead] focus:outline-none"
                 value={editTask.description}
                 onChange={(e) => setEditTask({ ...editTask, description: e.target.value })}
               />

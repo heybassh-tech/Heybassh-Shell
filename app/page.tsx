@@ -319,7 +319,7 @@ function HomeInner() {
                   <input
                     id="email"
                     type="email"
-                    className={`flex-1 rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#2b9bff] focus:outline-none ${formErrors.email ? "ring-2 ring-rose-400/70" : ""}`}
+                    className={`flex-1 rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#18aead] focus:outline-none ${formErrors.email ? "ring-2 ring-rose-400/70" : ""}`}
                     placeholder="name@company.com"
                     value={email}
                     autoComplete="email"
@@ -348,7 +348,7 @@ function HomeInner() {
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    className={`w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 pr-12 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#2b9bff] focus:outline-none ${formErrors.password ? "ring-2 ring-rose-400/70" : ""}`}
+                    className={`w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 pr-12 text-sm text-blue-200 placeholder:text-xs placeholder:text-blue-300/60 focus:border-[#18aead] focus:outline-none ${formErrors.password ? "ring-2 ring-rose-400/70" : ""}`}
                     placeholder="Your password"
                     value={password}
                     autoComplete="current-password"

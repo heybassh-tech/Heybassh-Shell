@@ -368,7 +368,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
           onClick={() => toggleFilterPanel(panel)}
           className={`inline-flex items-center gap-2 rounded-[20px] border px-3.5 py-1.5 text-xs font-medium transition-colors ${
             isActive || activeFilterPanel === panel
-              ? "border-[#2b9bff] bg-[#142044] text-white"
+              ? "border-[#18aead] bg-[#142044] text-white"
               : "border-[#1a2446] bg-[#0e1629] text-blue-200 hover:bg-[#121c3d] hover:text-white"
           }`}
         >
@@ -475,7 +475,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
           </div>
         ) : (
           <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+            <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#18aead] focus-within:ring-1 focus-within:ring-[#18aead] lg:max-w-xl">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
               <input
                 type="text"
@@ -495,7 +495,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                 "Contact Owner",
                 <UserCircleIcon className="h-4 w-4" />,
                 <select
-                  className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                  className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#18aead] focus:outline-none"
                   value={filters.owner}
                   onChange={(event) => handleFilterChange("owner", event.target.value)}
                 >
@@ -519,7 +519,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                     <p className="text-xs font-semibold uppercase tracking-wide text-blue-300/70">From</p>
                     <input
                       type="date"
-                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#18aead] focus:outline-none"
                       value={filters.createdFrom}
                       onChange={(event) => handleFilterChange("createdFrom", event.target.value)}
                     />
@@ -528,7 +528,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                     <p className="text-xs font-semibold uppercase tracking-wide text-blue-300/70">To</p>
                     <input
                       type="date"
-                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#18aead] focus:outline-none"
                       value={filters.createdTo}
                       onChange={(event) => handleFilterChange("createdTo", event.target.value)}
                     />
@@ -547,7 +547,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                       key={activity.value}
                       className={`cursor-pointer rounded-[18px] border px-3 py-2 text-xs font-medium transition ${
                         filters.activity === activity.value
-                          ? "border-[#2b9bff] bg-[#142044] text-white"
+                          ? "border-[#18aead] bg-[#142044] text-white"
                           : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                       }`}
                     >
@@ -576,7 +576,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                     onClick={() => handleFilterChange("status", "all")}
                     className={`rounded-[18px] border px-3 py-1.5 text-xs font-medium transition ${
                       filters.status === "all"
-                        ? "border-[#2b9bff] bg-[#142044] text-white"
+                        ? "border-[#18aead] bg-[#142044] text-white"
                         : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                     }`}
                   >
@@ -589,7 +589,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                       onClick={() => handleFilterChange("status", status)}
                       className={`rounded-[18px] border px-3 py-1.5 text-xs font-medium transition ${
                         filters.status === status
-                          ? "border-[#2b9bff] bg-[#142044] text-white"
+                          ? "border-[#18aead] bg-[#142044] text-white"
                           : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                       }`}
                     >
@@ -625,7 +625,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                   ref={selectAllCheckboxRef}
                   checked={allSelected}
                   onChange={handleSelectAll}
-                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff]"
+                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
                 />
               </th>
               <th scope="col" className="px-6 py-3 text-left">
@@ -681,7 +681,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleSelectContact(contact.id)}
-                        className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff]"
+                        className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
                       />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
@@ -800,7 +800,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
                 </label>
                 <select
                   id="contact-status"
-                  className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                  className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                   value={newContact.status}
                   onChange={(event) =>
                     setNewContact((prev) => ({ ...prev, status: event.target.value as Contact["status"] }))
@@ -912,7 +912,7 @@ const toggleFilterPanel = (panel: FilterPanel) => {
             </label>
             <select
               id="edit-contact-status"
-              className="mt-2 w-full rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+              className="mt-2 w-full rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
               value={editContact.status}
               onChange={(event) =>
                 setEditContact((prev) => ({ ...prev, status: event.target.value as Contact["status"] }))

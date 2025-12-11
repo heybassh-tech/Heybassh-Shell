@@ -60,7 +60,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
       </div>
 
       <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+        <div className="relative flex max-w-[200px] items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#18aead] focus-within:ring-1 focus-within:ring-[#18aead] lg:max-w-xl">
           <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
           <input
             type="text"
@@ -75,7 +75,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#2b9bff] focus:outline-none"
+            className="rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-3.5 py-1.5 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] focus:border-[#18aead] focus:outline-none"
           >
             {categories.map(category => (
               <option key={category} value={category} className="bg-[#0e1629]">
@@ -133,7 +133,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
               </label>
               <select
                 id="category"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                 value={newProduct.category}
                 onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
               >

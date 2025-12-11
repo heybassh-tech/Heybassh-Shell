@@ -337,7 +337,7 @@ export function Deals({
           onClick={() => toggleFilterPanel(panel)}
           className={`inline-flex items-center gap-2 rounded-[20px] border px-3 py-1.5 text-xs transition-colors ${
             isActive || activeFilterPanel === panel
-              ? "border-[#2b9bff] bg-[#142044] text-white"
+              ? "border-[#18aead] bg-[#142044] text-white"
               : "border-[#1a2446] bg-[#0e1629] text-blue-200 hover:bg-[#121c3d] hover:text-white"
           }`}
         >
@@ -461,7 +461,7 @@ export function Deals({
           </div>
         ) : (
           <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative flex max-w-[200px items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#2b9bff] focus-within:ring-1 focus-within:ring-[#2b9bff] lg:max-w-xl">
+            <div className="relative flex max-w-[200px items-center rounded-[24px] border border-[#1a2446] bg-[#0e1629] pl-12 pr-4 text-sm shadow-sm transition-colors focus-within:border-[#18aead] focus-within:ring-1 focus-within:ring-[#18aead] lg:max-w-xl">
               <MagnifyingGlassIcon className="pointer-events-none absolute left-4 h-5 w-5 text-blue-300/60" />
               <input
                 type="text"
@@ -481,7 +481,7 @@ export function Deals({
                 "Deal Owner",
                 <UserCircleIcon className="h-4 w-4" />,
                 <select
-                  className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                  className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#18aead] focus:outline-none"
                   value={filters.owner}
                   onChange={(event) => handleFilterChange("owner", event.target.value)}
                 >
@@ -505,7 +505,7 @@ export function Deals({
                     <p className="text-xs font-semibold uppercase tracking-wide text-blue-300/70">From</p>
                     <input
                       type="date"
-                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#18aead] focus:outline-none"
                       value={filters.createdFrom}
                       onChange={(event) => handleFilterChange("createdFrom", event.target.value)}
                     />
@@ -514,7 +514,7 @@ export function Deals({
                     <p className="text-xs font-semibold uppercase tracking-wide text-blue-300/70">To</p>
                     <input
                       type="date"
-                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                      className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-xs text-blue-100 focus:border-[#18aead] focus:outline-none"
                       value={filters.createdTo}
                       onChange={(event) => handleFilterChange("createdTo", event.target.value)}
                     />
@@ -533,7 +533,7 @@ export function Deals({
                       key={activity.value}
                       className={`cursor-pointer rounded-[18px] border px-3 py-2 text-xs font-medium transition ${
                         filters.activity === activity.value
-                          ? "border-[#2b9bff] bg-[#142044] text-white"
+                          ? "border-[#18aead] bg-[#142044] text-white"
                           : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                       }`}
                     >
@@ -562,7 +562,7 @@ export function Deals({
                     onClick={() => handleFilterChange("stage", "all")}
                     className={`rounded-[18px] border px-3 py-1.5 text-xs font-medium transition ${
                       filters.stage === "all"
-                        ? "border-[#2b9bff] bg-[#142044] text-white"
+                        ? "border-[#18aead] bg-[#142044] text-white"
                         : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                     }`}
                   >
@@ -575,7 +575,7 @@ export function Deals({
                       onClick={() => handleFilterChange("stage", stage)}
                       className={`rounded-[18px] border px-3 py-1.5 text-xs font-medium transition ${
                         filters.stage === stage
-                          ? "border-[#2b9bff] bg-[#142044] text-white"
+                          ? "border-[#18aead] bg-[#142044] text-white"
                           : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                       }`}
                     >
@@ -596,7 +596,7 @@ export function Deals({
                     onClick={() => handleFilterChange("status", "all")}
                     className={`rounded-[18px] border px-3 py-1.5 text-xs font-medium transition ${
                       filters.status === "all"
-                        ? "border-[#2b9bff] bg-[#142044] text-white"
+                        ? "border-[#18aead] bg-[#142044] text-white"
                         : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                     }`}
                   >
@@ -609,7 +609,7 @@ export function Deals({
                       onClick={() => handleFilterChange("status", status)}
                       className={`rounded-[18px] border px-3 py-1.5 text-xs font-medium transition ${
                         filters.status === status
-                          ? "border-[#2b9bff] bg-[#142044] text-white"
+                          ? "border-[#18aead] bg-[#142044] text-white"
                           : "border-[#1a2446] bg-[#0e1629] text-blue-100"
                       }`}
                     >
@@ -645,7 +645,7 @@ export function Deals({
                   ref={selectAllCheckboxRef}
                   checked={allSelected}
                   onChange={handleSelectAll}
-                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff]"
+                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
                 />
               </th>
               <th scope="col" className="px-6 py-3 text-left">
@@ -707,7 +707,7 @@ export function Deals({
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleSelectDeal(deal.id)}
-                        className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#2b9bff] focus:ring-[#2b9bff]"
+                        className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
                       />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
@@ -797,7 +797,7 @@ export function Deals({
                     name="company"
                     value={newDeal.company}
                     onChange={(e) => setNewDeal({ ...newDeal, company: e.target.value })}
-                    className="mt-1 block w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-white shadow-sm focus:border-[#2b9bff] focus:outline-none focus:ring-1 focus:ring-[#2b9bff]"
+                    className="mt-1 block w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-white shadow-sm focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
                     required
                   >
                     <option value="">Select a company</option>
@@ -827,7 +827,7 @@ export function Deals({
                   </label>
                   <select
                     id="deal-stage"
-                    className="mt-2 w-full rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                    className="mt-2 w-full rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                     value={newDeal.stage}
                     onChange={(event) =>
                       setNewDeal((prev) => ({ ...prev, stage: event.target.value as Deal["stage"] }))
@@ -848,7 +848,7 @@ export function Deals({
                 </label>
                 <select
                   id="deal-status"
-                  className="mt-2 w-full rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#2b9bff] focus:outline-none"
+                  className="mt-2 w-full rounded-[20px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
                   value={newDeal.status}
                   onChange={(event) =>
                     setNewDeal((prev) => ({ ...prev, status: event.target.value as Deal["status"] }))
