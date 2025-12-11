@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { useEffect, useMemo, useState } from "react";
+import { MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { Product } from "../types";
 import { PrimaryModal } from "../../PrimaryModal";
 import { PrimaryButton } from "../../PrimaryButton";
@@ -12,8 +12,10 @@ interface ProductsProps {
 
 export function Products({ products, onAddProduct }: ProductsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
+  const [localProducts, setLocalProducts] = useState<Product[]>(products);
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({ 
     sku: "",
     name: "", 
@@ -22,19 +24,32 @@ export function Products({ products, onAddProduct }: ProductsProps) {
     stock: 0
   });
 
-  const categories = ["All", ...new Set(products.map(p => p.category))];
+  useEffect(() => {
+    setLocalProducts(products);
+  }, [products]);
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = 
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === "All" || product.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const categories = ["All", ...new Set(localProducts.map(p => p.category))];
+
+  const filteredProducts = useMemo(() => {
+    return localProducts.filter(product => {
+      const matchesSearch = 
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = categoryFilter === "All" || product.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+  }, [localProducts, searchTerm, categoryFilter]);
 
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    onAddProduct(newProduct);
+    if (isEditing) {
+      setLocalProducts((prev) =>
+        prev.map((p) => (p.sku === newProduct.sku ? { ...p, ...newProduct } as Product : p)),
+      );
+    } else {
+      onAddProduct(newProduct);
+      setLocalProducts((prev) => [...prev, { ...newProduct, id: crypto.randomUUID() } as Product]);
+    }
     setNewProduct({ 
       sku: "",
       name: "", 
@@ -42,7 +57,26 @@ export function Products({ products, onAddProduct }: ProductsProps) {
       price: 0,
       stock: 0
     });
+    setIsEditing(false);
     setIsModalOpen(false);
+  };
+
+  const openAddModal = () => {
+    setIsEditing(false);
+    setNewProduct({ sku: "", name: "", category: "General", price: 0, stock: 0 });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (product: Product) => {
+    setIsEditing(true);
+    setNewProduct({
+      sku: product.sku,
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+    });
+    setIsModalOpen(true);
   };
 
   return (
@@ -51,7 +85,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
         <h2 className="text-2xl font-bold text-[#18aead]">Products</h2>
         <div className="flex items-center gap-2">
           <PrimaryButton
-            onClick={() => setIsModalOpen(true)}
+            onClick={openAddModal}
             icon={<PlusIcon className="h-4 w-4" />}
           >
             Add Product
@@ -87,10 +121,11 @@ export function Products({ products, onAddProduct }: ProductsProps) {
       </div>
       <PrimaryModal
         open={isModalOpen}
-        title="Add Product"
-        description="Create a new product in your listing."
+        title={isEditing ? "Edit Product" : "Add Product"}
+        description={isEditing ? "Update product details." : "Create a new product in your listing."}
         onClose={() => {
           setIsModalOpen(false);
+          setIsEditing(false);
           setNewProduct({ 
             sku: "",
             name: "", 
@@ -112,6 +147,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
                 type="text"
                 required
                 value={newProduct.sku}
+                disabled={isEditing}
                 onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })}
               />
             </div>
@@ -133,7 +169,7 @@ export function Products({ products, onAddProduct }: ProductsProps) {
               </label>
               <select
                 id="category"
-                className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2.5 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
                 value={newProduct.category}
                 onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
               >
@@ -242,7 +278,13 @@ export function Products({ products, onAddProduct }: ProductsProps) {
                     <div className="text-sm text-blue-200">{product.stock}</div>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                    <button className="text-[#7ed0ff] transition-colors hover:text-white">Edit</button>
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className="inline-flex items-center gap-1 rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-3 py-1.5 text-xs font-semibold text-blue-100 transition-colors hover:bg-[#121c3d] hover:text-white"
+                    >
+                      <PencilSquareIcon className="h-4 w-4" />
+                      Edit
+                    </button>
                   </td>
                 </tr>
               ))
