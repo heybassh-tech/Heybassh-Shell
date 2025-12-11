@@ -151,33 +151,39 @@ function validateForm() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#050915] via-[#060f24] to-[#030614] text-[#eef3ff]">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#3ab0ff]/30 blur-3xl" />
+        <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#0e6f69]/30 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-80 w-80 translate-x-1/4 translate-y-1/4 rounded-full bg-[#5dd4ff]/20 blur-3xl" />
       </div>
 
       {/* Top-right toast container */}
       <div className="pointer-events-none fixed right-4 top-4 z-50 flex max-w-md flex-col gap-3">
         {feedback && (
-          <div
-            className={`pointer-events-auto rounded-2xl border px-4 py-3 text-sm shadow-xl backdrop-blur-md ${
-              feedback.type === "success"
-                ? "border-emerald-400/50 bg-emerald-500/15 text-emerald-100"
-                : feedback.type === "error"
-                ? "border-rose-500/60 bg-rose-500/15 text-rose-100"
-                : "border-blue-400/50 bg-blue-500/10 text-blue-100"
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 h-2 w-2 flex-shrink-0 rounded-full bg-current" />
-              <div className="flex-1">{feedback.message}</div>
-              <button
-                type="button"
-                className="ml-2 text-xs text-blue-200/80 hover:text-white"
-                onClick={() => setFeedback(null)}
-              >
-                ✕
-              </button>
+          <div className="pointer-events-auto flex items-center gap-3 rounded-2xl border border-white/10 bg-[#1c1c1e] px-4 py-3 text-sm text-white shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)]">
+            <div
+              className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                feedback.type === "success"
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : feedback.type === "error"
+                  ? "bg-rose-500/20 text-rose-400"
+                  : "bg-blue-500/20 text-blue-300"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                {feedback.type === "error" ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                )}
+              </svg>
             </div>
+            <div className="flex-1">{feedback.message}</div>
+            <button
+              type="button"
+              className="text-sm text-blue-200/80 transition hover:text-white"
+              onClick={() => setFeedback(null)}
+            >
+              ✕
+            </button>
           </div>
         )}
       </div>

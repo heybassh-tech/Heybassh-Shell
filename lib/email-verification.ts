@@ -33,7 +33,7 @@ export async function sendVerificationEmail(email: string, token: string, compan
         <h2>Welcome${companyName ? ` to ${companyName}` : ""}!</h2>
         <p>Thanks for creating a Heybassh Shell workspace. Please confirm your email address to activate your account.</p>
         <p>
-          <a href="${verifyUrl}" style="background:#3ab0ff;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block;">Verify email</a>
+          <a href="${verifyUrl}" style="background:#0e6f69;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;display:inline-block;">Verify email</a>
         </p>
         <p>This link will expire in 24 hours. If you didn't request this, feel free to ignore this email.</p>
       </div>
@@ -52,7 +52,7 @@ export async function sendVerificationCodeEmail(email: string, code: string, com
       <div style="font-family: Arial, sans-serif; color: #0b1124;">
         <h2>Verify your email ${companyName ? `for ${companyName}` : ""}</h2>
         <p>Use the verification code below to continue setting up your Heybassh Shell workspace.</p>
-        <p style="font-size: 32px; letter-spacing: 8px; font-weight: bold; color: #3ab0ff; margin: 24px 0;">${code}</p>
+        <p style="font-size: 32px; letter-spacing: 8px; font-weight: bold; color: #0e6f69; margin: 24px 0;">${code}</p>
         <p>This code will expire in 10 minutes. If you didn't request it, you can safely ignore this email.</p>
       </div>
     `,

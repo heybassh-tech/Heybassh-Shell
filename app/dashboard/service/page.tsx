@@ -18,7 +18,7 @@ export default function Service() {
           }}
         >
           <PrimaryInput placeholder="Subject" size="lg" className="h-[44px]" />
-          <select className="h-[44px] w-full rounded-md border border-white/10 bg-black/40 px-3 text-sm text-blue-100 focus:border-[#3ab0ff]/60 focus:outline-none focus:ring-2 focus:ring-[#3ab0ff]/40">
+          <select className="h-[44px] w-full rounded-md border border-white/10 bg-black/40 px-3 text-sm text-blue-100 focus:border-[#0e6f69]/60 focus:outline-none focus:ring-2 focus:ring-[#0e6f69]/40">
             <option>Website Support</option>
             <option>HubSpot</option>
             <option>Integrations</option>
@@ -26,7 +26,7 @@ export default function Service() {
             <option>Custom</option>
           </select>
           <textarea
-            className="min-h-[120px] w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-blue-100 placeholder:text-blue-200/60 focus:border-[#3ab0ff]/60 focus:outline-none focus:ring-2 focus:ring-[#3ab0ff]/40"
+            className="min-h-[120px] w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-blue-100 placeholder:text-blue-200/60 focus:border-[#0e6f69]/60 focus:outline-none focus:ring-2 focus:ring-[#0e6f69]/40"
             rows={5}
             placeholder="Details"
           />

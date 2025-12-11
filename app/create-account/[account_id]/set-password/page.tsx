@@ -138,7 +138,7 @@ export default function SetPasswordPage({ params }: { params: { account_id: stri
           <label className="text-sm text-blue-100">Work email</label>
           <input
             type="email"
-            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#3ab0ff] focus:outline-none"
+            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#0e6f69] focus:outline-none"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
@@ -150,7 +150,7 @@ export default function SetPasswordPage({ params }: { params: { account_id: stri
           <label className="text-sm text-blue-100">Full name</label>
           <input
             type="text"
-            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#3ab0ff] focus:outline-none"
+            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#0e6f69] focus:outline-none"
             placeholder="Primary contact"
             value={fullName}
             onChange={(event) => setFullName(event.target.value)}
@@ -162,7 +162,7 @@ export default function SetPasswordPage({ params }: { params: { account_id: stri
           <label className="text-sm text-blue-100">Create password</label>
           <input
             type="password"
-            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#3ab0ff] focus:outline-none"
+            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#0e6f69] focus:outline-none"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             minLength={6}
@@ -174,7 +174,7 @@ export default function SetPasswordPage({ params }: { params: { account_id: stri
           <label className="text-sm text-blue-100">Confirm password</label>
           <input
             type="password"
-            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#3ab0ff] focus:outline-none"
+            className="w-full rounded-xl border border-[#1a2446] bg-[#050b1f] p-3 text-sm focus:border-[#0e6f69] focus:outline-none"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             minLength={6}

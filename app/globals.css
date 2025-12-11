@@ -127,13 +127,13 @@ body { @apply min-h-screen bg-[#020617] text-[#eef3ff]; font-family: system-ui, 
   border-radius: 10px 10px 0 0 !important;
 }
 .btn { @apply inline-flex items-center justify-center gap-2 border border-[#1a2446] px-3 py-1.5 text-xs font-semibold transition-all duration-200; border-radius: 9999px; }
-.btn-primary { @apply border-0 bg-gradient-to-tr from-[#3ab0ff] to-[#5dd4ff] text-[#031226] font-semibold shadow-[0_12px_30px_-18px_rgba(39,172,255,0.85)]; }
+.btn-primary { @apply border-0 bg-gradient-to-tr from-[#0e6f69] to-[#5dd4ff] text-[#031226] font-semibold shadow-[0_12px_30px_-18px_rgba(39,172,255,0.85)]; }
 .btn-primary:hover { @apply shadow-[0_25px_45px_-20px_rgba(39,172,255,0.75)] brightness-105; }
 .btn:disabled { @apply cursor-not-allowed opacity-60; }
 .btn-gold { @apply border border-[#d4a017] bg-gradient-to-tr from-[#FFD54A] to-[#FFC107] text-[#031226] font-semibold; }
 .card { @apply border border-[#1a2446] bg-[#0e1629] p-4; border-radius: var(--radius-box); }
 .input { @apply border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm transition-all duration-200 focus:border-transparent; border-radius: var(--radius-input); }
-.input:focus { @apply outline-none ring-2 ring-[#3ab0ff]/60; }
+.input:focus { @apply outline-none ring-2 ring-[#0e6f69]/60; }
 .input:disabled { @apply cursor-not-allowed opacity-60; }
 .radius-6 { border-radius: 6px !important; }
 .spinner { @apply inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white; }

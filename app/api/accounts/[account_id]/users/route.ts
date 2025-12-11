@@ -207,10 +207,10 @@ export async function PATCH(req: Request, { params }: { params: { account_id: st
         const dashboardUrl = `${baseUrl.replace(/\/$/, "")}/${params.account_id}/dashboard`
         const html = `
           <div style="font-family: Arial, sans-serif; color: #0b1124; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #3ab0ff; margin-bottom: 12px;">You've been granted ${role === "super_admin" ? "Super Admin" : "Admin"} access</h2>
+            <h2 style="color: #0e6f69; margin-bottom: 12px;">You've been granted ${role === "super_admin" ? "Super Admin" : "Admin"} access</h2>
             <p style="margin: 0 0 12px;">${inviterName} updated your role on Heybassh.</p>
             <p style="margin: 0 0 12px;">You can now ${capabilities}</p>
-            <p style="margin: 0 0 20px;">Sign in to start: <a href="${dashboardUrl}" style="color: #3ab0ff;">${dashboardUrl}</a></p>
+            <p style="margin: 0 0 20px;">Sign in to start: <a href="${dashboardUrl}" style="color: #0e6f69;">${dashboardUrl}</a></p>
             <p style="color: #666; font-size: 14px;">If you weren't expecting this, please reach out to your workspace owner.</p>
           </div>
         `

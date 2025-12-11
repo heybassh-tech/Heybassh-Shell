@@ -118,10 +118,10 @@ export async function POST(req: Request) {
         subject: "Password Reset Request - Heybassh Shell",
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #3ab0ff;">Password Reset Request</h2>
+              <h2 style="color: #0e6f69;">Password Reset Request</h2>
               <p>You requested to reset your password. Click the link below to reset it:</p>
               <p style="margin: 20px 0;">
-                <a href="${resetUrl}" style="background-color: #3ab0ff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Reset Password</a>
+                <a href="${resetUrl}" style="background-color: #0e6f69; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Reset Password</a>
               </p>
               <p>Or copy and paste this link into your browser:</p>
               <p style="word-break: break-all; color: #666; background-color: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">${resetUrl}</p>
