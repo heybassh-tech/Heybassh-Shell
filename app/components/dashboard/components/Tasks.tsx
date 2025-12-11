@@ -57,6 +57,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
   });
   const [tagInput, setTagInput] = useState("");
   const [editTagInput, setEditTagInput] = useState("");
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [editStartDate, setEditStartDate] = useState<Dayjs | null>(null);
   const [dueDate, setDueDate] = useState<Dayjs | null>(null);
   const [editDueDate, setEditDueDate] = useState<Dayjs | null>(null);
   const [tags, setTags] = useState<string[]>([]);
@@ -72,6 +74,8 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const [editTagOpen, setEditTagOpen] = useState(false);
   const [assigneeOpen, setAssigneeOpen] = useState(false);
   const [editAssigneeOpen, setEditAssigneeOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [editStatusOpen, setEditStatusOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [showAllAssignees, setShowAllAssignees] = useState(false);
@@ -191,6 +195,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
     try {
       const taskToAdd = {
         ...newTask,
+        startDate: startDate ? startDate.format("YYYY-MM-DD") : newTask.startDate || "",
         dueDate: dueDate ? dueDate.format("YYYY-MM-DD") : newTask.dueDate || "",
       };
       
@@ -209,6 +214,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       setNewTask({
         title: "",
         assignee: "",
+        startDate: "",
         dueDate: "",
         priority: "Normal",
         status: "Todo",
@@ -216,6 +222,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
         tags: [],
       });
       setTagInput("");
+      setStartDate(null);
       setDueDate(null);
       setIsModalOpen(false);
     } catch (error) {
@@ -239,6 +246,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       tags: task.tags || [],
     });
     setEditTagInput("");
+    setEditStartDate((task as any).startDate ? dayjs((task as any).startDate) : null);
     setEditDueDate(task.dueDate ? dayjs(task.dueDate) : null);
     setIsEditModalOpen(true);
     setOpenMenuId(null);
@@ -253,6 +261,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
     try {
       const taskToUpdate = {
         ...editTask,
+        startDate: editStartDate ? editStartDate.format("YYYY-MM-DD") : editTask.startDate || "",
         dueDate: editDueDate ? editDueDate.format("YYYY-MM-DD") : editTask.dueDate || "",
       };
 
@@ -275,6 +284,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       setEditTask({
         title: "",
         assignee: "",
+        startDate: "",
         dueDate: "",
         priority: "Normal",
         status: "Todo",
@@ -282,6 +292,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
         tags: [],
       });
       setEditTagInput("");
+      setEditStartDate(null);
       setEditDueDate(null);
       setIsEditModalOpen(false);
     } catch (error) {
@@ -466,12 +477,15 @@ export function Tasks({ accountId, employees }: TasksProps) {
           setNewTask({
             title: "",
             assignee: "",
+            startDate: "",
             dueDate: "",
             priority: "Normal",
             status: "Todo",
             description: "",
             tags: [],
           });
+          setStartDate(null);
+          setDueDate(null);
         }}
         widthClassName="max-w-2xl"
       >
@@ -799,12 +813,14 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 setNewTask({
                   title: "",
                   assignee: "",
+                  startDate: "",
                   dueDate: "",
                   priority: "Normal",
                   status: "Todo",
                   description: "",
                   tags: [],
                 });
+                setStartDate(null);
                 setDueDate(null);
               }}
               className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
@@ -829,6 +845,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
           setEditTask({
             title: "",
             assignee: "",
+            startDate: "",
             dueDate: "",
             priority: "Normal",
             status: "Todo",
@@ -836,6 +853,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
             tags: [],
           });
           setEditTagInput("");
+          setEditStartDate(null);
           setEditDueDate(null);
         }}
         widthClassName="max-w-2xl"
@@ -1245,6 +1263,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 setEditTask({
                   title: "",
                   assignee: "",
+                  startDate: "",
                   dueDate: "",
                   priority: "Normal",
                   status: "Todo",
@@ -1252,6 +1271,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                   tags: [],
                 });
                 setEditTagInput("");
+                setEditStartDate(null);
                 setEditDueDate(null);
               }}
               className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
