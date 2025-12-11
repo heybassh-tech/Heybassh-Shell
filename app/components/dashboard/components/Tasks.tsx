@@ -31,6 +31,9 @@ export function Tasks({ accountId, employees }: TasksProps) {
   });
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const menuRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const [newTask, setNewTask] = useState<Omit<Task, 'id'>>({
     title: "",
@@ -286,23 +289,33 @@ export function Tasks({ accountId, employees }: TasksProps) {
     }
   };
 
-  const handleDeleteTask = async (taskId: string) => {
-    if (!confirm("Are you sure you want to delete this task?")) return;
+  const requestDeleteTask = (task: Task) => {
+    setTaskToDelete(task);
+    setIsDeleteModalOpen(true);
+    setOpenMenuId(null);
+  };
 
+  const confirmDeleteTask = async () => {
+    if (!taskToDelete) return;
+    setDeleteLoading(true);
     try {
-      const response = await fetch(`/api/accounts/${accountId}/tasks?id=${taskId}`, {
+      const response = await fetch(`/api/accounts/${accountId}/tasks?id=${taskToDelete.id}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete task");
+        const payload = await response.json().catch(() => ({}));
+        throw new Error((payload as { error?: string })?.error ?? "Failed to delete task");
       }
 
-      setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      setOpenMenuId(null);
+      setTasks((prev) => prev.filter((t) => t.id !== taskToDelete.id));
+      setIsDeleteModalOpen(false);
+      setTaskToDelete(null);
     } catch (error) {
       console.error("Failed to delete task", error);
-      alert("Failed to delete task");
+      alert(error instanceof Error ? error.message : "Failed to delete task");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -992,6 +1005,51 @@ export function Tasks({ accountId, employees }: TasksProps) {
         </form>
       </PrimaryModal>
 
+      {/* Delete confirmation modal */}
+      <PrimaryModal
+        open={isDeleteModalOpen}
+        title="Delete Task"
+        description={
+          taskToDelete
+            ? `Are you sure you want to delete "${taskToDelete.title}"? This cannot be undone.`
+            : "Are you sure you want to delete this task?"
+        }
+        onClose={() => {
+          if (deleteLoading) return;
+          setIsDeleteModalOpen(false);
+          setTaskToDelete(null);
+        }}
+        widthClassName="max-w-md"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-blue-200">
+            The task will be removed permanently from this account.
+          </p>
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (deleteLoading) return;
+                setIsDeleteModalOpen(false);
+                setTaskToDelete(null);
+              }}
+              className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
+              disabled={deleteLoading}
+            >
+              Cancel
+            </button>
+            <PrimaryButton
+              type="button"
+              onClick={confirmDeleteTask}
+              disabled={deleteLoading}
+              className="!bg-rose-600 !border-rose-600 hover:!bg-rose-500 hover:!border-rose-500"
+            >
+              {deleteLoading ? "Deleting..." : "Delete"}
+            </PrimaryButton>
+          </div>
+        </div>
+      </PrimaryModal>
+
       {viewMode === "list" ? (
         <div className="overflow-hidden rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
           <table className="min-w-full divide-y divide-[#1a2446]">
@@ -1089,7 +1147,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteTask(task.id);
+                                requestDeleteTask(task);
                               }}
                               className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-rose-400 transition-colors hover:bg-[#121c3d]"
                             >
@@ -1172,7 +1230,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDeleteTask(task.id);
+                                  requestDeleteTask(task);
                                 }}
                                 className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-rose-400 transition-colors hover:bg-[#121c3d]"
                               >

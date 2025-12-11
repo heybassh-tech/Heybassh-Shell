@@ -44,8 +44,22 @@ function normalizePayload(body: Partial<VaultEntry>): VaultEntry | null {
   }
 }
 
-export async function GET() {
-  return NextResponse.json({ ok: true, data: vaultEntries })
+export async function GET(req: Request) {
+  const url = new URL(req.url)
+  const id = url.searchParams.get("id")
+
+  // Fetch a single entry (including password) when id is provided
+  if (id) {
+    const entry = vaultEntries.find((item) => item.id === id)
+    if (!entry) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 })
+    }
+    return NextResponse.json({ ok: true, data: entry })
+  }
+
+  // List mode: omit passwords
+  const sanitized = vaultEntries.map(({ password, ...rest }) => rest)
+  return NextResponse.json({ ok: true, data: sanitized })
 }
 
 export async function POST(request: Request) {

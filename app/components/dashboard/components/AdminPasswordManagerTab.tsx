@@ -8,7 +8,7 @@ type VaultRow = {
   id: string
   label: string
   username: string
-  password: string
+  password?: string
   url?: string
   notes?: string
   tags?: string[]
@@ -24,6 +24,7 @@ export function AdminPasswordManagerTab() {
   const [vaultRows, setVaultRows] = useState<VaultRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [passwordLoading, setPasswordLoading] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     let ignore = false
@@ -58,6 +59,28 @@ export function AdminPasswordManagerTab() {
   }, [])
 
   const favoriteCount = useMemo(() => vaultRows.filter((row) => row.favorite).length, [vaultRows])
+
+  async function handleRevealPassword(id: string) {
+    if (!id) return
+    setPasswordLoading((prev) => ({ ...prev, [id]: true }))
+    try {
+      const response = await fetch(`/api/testing/vaultdata?id=${encodeURIComponent(id)}`)
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error((payload as { error?: string })?.error ?? "Failed to load password")
+      }
+      const entry = (payload as any).data as VaultRow | undefined
+      if (entry && entry.id) {
+        setVaultRows((rows) =>
+          rows.map((row) => (row.id === entry.id ? { ...row, password: entry.password } : row))
+        )
+      }
+    } catch (err) {
+      console.error("Failed to reveal password", err)
+    } finally {
+      setPasswordLoading((prev) => ({ ...prev, [id]: false }))
+    }
+  }
 
   return (
     <div className="card rounded-[32px] bg-[#0e1629] p-6">
@@ -190,7 +213,22 @@ export function AdminPasswordManagerTab() {
                   <tr key={row.id ?? row.label} className="border-t border-[#1a2446]">
                     <td className="border-r border-[#1a2446] px-3 py-2 text-white">{row.label}</td>
                     <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.username}</td>
-                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.password}</td>
+                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono">
+                          {row.password ? row.password : "••••••••"}
+                        </span>
+                        {!row.password && (
+                          <button
+                            className="rounded bg-sky-900 px-2 py-1 text-xs text-sky-100 hover:bg-sky-800 disabled:opacity-60"
+                            onClick={() => handleRevealPassword(row.id)}
+                            disabled={passwordLoading[row.id]}
+                          >
+                            {passwordLoading[row.id] ? "Loading..." : "Show"}
+                          </button>
+                        )}
+                      </div>
+                    </td>
                     <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">
                       {row.url ? (
                         <a href={row.url} target="_blank" rel="noreferrer" className="text-sky-300 hover:text-sky-200">
