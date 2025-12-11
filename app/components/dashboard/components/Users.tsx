@@ -346,7 +346,8 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
               <PrimaryButton
                 onClick={() => setDeleteModalOpen(true)}
                 icon={<TrashIcon className="h-4 w-4" />}
-                variant="danger"
+                variant="primary"
+                className="!bg-rose-600 !border-rose-600 hover:!bg-rose-500 hover:!border-rose-500"
               >
                 Delete Selected ({selectedUserIds.size})
               </PrimaryButton>
