@@ -196,7 +196,7 @@ export function AddTaskModal({
             {/* Tags - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={tagPanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Tags</label>
-              <div className="flex w-full items-center gap-2 rounded-[10px] border border-[#1a2446] px-4 py-3">
+              <div className="flex w-full items-center gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -205,9 +205,11 @@ export function AddTaskModal({
                     setPriorityPanelOpen(false);
                     setStatusPanelOpen(false);
                   }}
-                  className="flex items-center justify-center rounded-full p-2 text-blue-300 hover:text-white/50 transition-colors"
+                  className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
                 >
-                  <PlusIcon className="h-4 w-4" />
+                  <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                    <PlusIcon className="h-4 w-4 text-blue-300" />
+                  </div>
                 </button>
                 <div className="flex flex-wrap gap-2 flex-1">
                   {task.tags.map((tag, index) => {
@@ -317,7 +319,7 @@ export function AddTaskModal({
                     <button
                       type="button"
                       onClick={() => setCreateTagOpen(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#18aead] bg-[#18aead]/10 px-4 py-2 text-sm font-medium text-[#18aead] transition-colors hover:bg-[#18aead]/20"
+                      className="flex w-full items-center justify-center gap-2 text-sm font-medium text-[#18aead] transition-colors  hover:text-[#18aead]/20"
                     >
                       <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2"><PlusIcon className="h-4 w-4 text-blue-300" /></div>
                       Add Tag
@@ -338,9 +340,11 @@ export function AddTaskModal({
                 setPriorityPanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex items-center justify-center rounded-full p-2 text-blue-300 hover:text-white/50 transition-colors"
+              className="flex w-full items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
               >
-              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2"><FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0 p-2" /></div>
+              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              </div>
               <div className="flex-1">
                 {startDate && endDate ? (
                   <span className="text-sm text-blue-200">{formatDateRange()}</span>
@@ -397,9 +401,11 @@ export function AddTaskModal({
                 setDatePanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
+              className="flex w-full items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
             >
-              <FiFlag className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
+              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                <FiFlag className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              </div>
               <div className="flex-1">
                 {task.priority ? (
                   <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getPriorityColor(task.priority)}`}>
@@ -463,9 +469,11 @@ export function AddTaskModal({
                 setDatePanelOpen(false);
                 setPriorityPanelOpen(false);
               }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
+              className="flex w-full items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
             >
-              <FiCheckCircle className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
+              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                <FiCheckCircle className="h-4 w-4 text-blue-300 flex-shrink-0" />
+              </div>
               <div className="flex-1">
                 {task.status ? (
                   <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(task.status)}`}>
