@@ -1,20 +1,20 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   MagnifyingGlassIcon,
   PlusIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline"
 import type { Employee, LeaveRequest } from "../types"
-import { defaultEmployees, defaultLeaveRequests } from "../types"
+import { defaultLeaveRequests } from "../types"
 import { PrimaryModal } from "../../PrimaryModal"
 import { PrimaryButton } from "../../PrimaryButton"
 import { PrimaryInput } from "../../PrimaryInput"
 
-export function LeaveRequest() {
-  const [employees, setEmployees] = useState<Employee[]>(defaultEmployees)
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>(defaultLeaveRequests)
+export function LeaveRequest({ accountId, employees: externalEmployees }: { accountId: string; employees?: Employee[] }) {
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([])
   const [activeTab, setActiveTab] = useState<"employees" | "leave">("employees")
   const [isAddingEmployee, setIsAddingEmployee] = useState(false)
   const [isRequestingLeave, setIsRequestingLeave] = useState(false)
@@ -44,12 +44,27 @@ export function LeaveRequest() {
     (leaveFilter === "All" || request.status === leaveFilter)
   )
 
+  useEffect(() => {
+    if (externalEmployees && externalEmployees.length) {
+      const filtered = externalEmployees
+        .filter((emp) => (emp as any).userType ? (emp as any).userType === "Employee" : true)
+        .map((emp) => ({
+          id: emp.id,
+          name: emp.name,
+          email: emp.email,
+          role: (emp as any).role || "Employee",
+        }))
+      setEmployees(filtered)
+    }
+  }, [externalEmployees])
+
   const handleAddEmployee = (e: React.FormEvent) => {
     e.preventDefault()
-    const nextId = `E-${String(employees.length + 1).padStart(4, "0")}`
-    setEmployees([...employees, { id: nextId, ...newEmployee }])
-    setNewEmployee({ name: "", email: "", role: "" })
+    // redirect to dedicated employee add page with employee type preset
     setIsAddingEmployee(false)
+    if (typeof window !== "undefined") {
+      window.location.href = `/${accountId}/users/new?type=employee`
+    }
   }
 
   const handleRequestLeave = (e: React.FormEvent) => {
@@ -276,7 +291,7 @@ export function LeaveRequest() {
                     setIsAddingEmployee(false)
                     setNewEmployee({ name: "", email: "", role: "" })
                   }}
-                  className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
+                  className="rounded-full border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
                 >
                   Cancel
                 </button>
@@ -430,7 +445,7 @@ export function LeaveRequest() {
                   <select
                     id="leave-employee"
                     required
-                    className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                    className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2.5 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
                     value={newLeaveRequest.employeeId}
                     onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, employeeId: e.target.value })}
                   >
@@ -448,7 +463,7 @@ export function LeaveRequest() {
                   </label>
                   <select
                     id="leave-type"
-                    className="mt-2 w-full rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                    className="mt-2 w-full rounded-[18px] border border-[#1a2446] bg-[#0e1629] px-4 py-2.5 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
                     value={newLeaveRequest.type}
                     onChange={(e) => setNewLeaveRequest({ ...newLeaveRequest, type: e.target.value })}
                   >
@@ -499,7 +514,7 @@ export function LeaveRequest() {
                       endDate: "",
                     })
                   }}
-                  className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
+                  className="rounded-full border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
                 >
                   Cancel
                 </button>

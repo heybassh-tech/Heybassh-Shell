@@ -462,7 +462,7 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
                 <button
                   type="button"
                   onClick={closeAddPanel}
-                  className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
+                  className="rounded-full border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-sm font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
                 >
                   Cancel
                 </button>

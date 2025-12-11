@@ -39,7 +39,7 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<Product[]>(defaultProducts)
   const [employees] = useState<Employee[]>(defaultEmployees)
-  const [users, setUsers] = useState<Array<{ id: string; name: string; email: string }>>([])
+  const [users, setUsers] = useState<Array<{ id: string; name: string; email: string; role: string; userType?: string; status?: string }>>([])
   const [usersLoading, setUsersLoading] = useState(true)
 
   useEffect(() => {
@@ -102,6 +102,9 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
             id: user.id,
             name: user.name || user.email,
             email: user.email,
+            role: (user.role as string) ?? "Employee",
+            userType: (user.userType as string) ?? "Employee",
+            status: (user.status as string) ?? "Invited",
           })))
         }
       } catch (error) {
@@ -208,7 +211,7 @@ export default function AccountDashboard({ accountId, initialViewKey = "overview
                     <Tasks accountId={accountId} employees={users} />
                   </div>
                 ) : view === "hr_leave_request" ? (
-                  <LeaveRequest />
+                  <LeaveRequest accountId={accountId} employees={users} />
                 ) : view === "hr_users" ? (
                   <Users accountId={accountId} companyName={companyName} />
                 ) : view === "admin_overview" ? (
