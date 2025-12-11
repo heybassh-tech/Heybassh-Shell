@@ -5,8 +5,8 @@ import { Task } from "../../types";
 import { PrimaryModal } from "../../../PrimaryModal";
 import { PrimaryButton } from "../../../PrimaryButton";
 import { PrimaryInput } from "../../../PrimaryInput";
-import { FiTag, FiCalendar, FiFlag, FiCheckCircle } from "react-icons/fi";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { FiTag, FiCalendar, FiFlag, FiCheckCircle, FiX } from "react-icons/fi";
+import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { getTagColor, getPriorityColor, getStatusColor } from "./taskUtils";
 import { Tag, DatePicker } from "antd";
 import { CreateTagPopup } from "./popups/CreateTagPopup";
@@ -191,57 +191,81 @@ export function AddTaskModal({
             />
           </div>
 
-          {/* Tags - Label + Clickable Row + Inline Panel */}
-          <div className="relative" ref={tagPanelRef}>
-            <label className="block text-sm font-medium text-blue-200 mb-2">Tags</label>
-            <button
-              type="button"
-              onClick={() => {
-                setTagPanelOpen(!tagPanelOpen);
-                setDatePanelOpen(false);
-                setPriorityPanelOpen(false);
-                setStatusPanelOpen(false);
-              }}
-              className="flex w-full items-center gap-3 rounded-[10px] border border-[#1a2446] px-4 py-3 text-left transition-colors hover:border-[#18aead]"
-            >
-              <FiTag className="h-4 w-4 text-blue-300 flex-shrink-0 rounded-full bg-[#0e1629] p-2" />
-              <div className="flex-1">
-                {task.tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {task.tags.map((tag, index) => {
-                      const color = getTagColor(tag);
-                      return (
+          {/* Grid Layout: Tags and Dates in first row, Priority and Status in second row */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Tags - Label + Clickable Row + Inline Panel */}
+            <div className="relative" ref={tagPanelRef}>
+              <label className="block text-sm font-medium text-blue-200 mb-2">Tags</label>
+              <div className="flex w-full items-center gap-2 rounded-[10px] border border-[#1a2446] px-4 py-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTagPanelOpen(!tagPanelOpen);
+                    setDatePanelOpen(false);
+                    setPriorityPanelOpen(false);
+                    setStatusPanelOpen(false);
+                  }}
+                  className="flex items-center justify-center rounded-full p-2 text-blue-300 hover:text-white/50 transition-colors"
+                >
+                  <PlusIcon className="h-4 w-4" />
+                </button>
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {task.tags.map((tag, index) => {
+                    const color = getTagColor(tag);
+                    return (
+                      <div
+                        key={index}
+                        className="group relative inline-flex items-center"
+                      >
                         <Tag
-                          key={index}
-                          className={`${color} border text-xs px-2 py-0.5 rounded-full`}
+                          className={`${color} border text-xs px-2 py-0.5 rounded-full cursor-pointer`}
                         >
                           {tag}
                         </Tag>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <span className="text-sm text-blue-200">No tags</span>
-                )}
+                        <button
+                          type="button"
+                          onClick={() => handleTagToggle(tag)}
+                          className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 rounded-full p-0.5 text-white hover:bg-red-600"
+                        >
+                          <XMarkIcon className="h-3 w-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {task.tags.length === 0 && (
+                    <span className="text-sm text-blue-200">No tags</span>
+                  )}
+                </div>
               </div>
-            </button>
-            
-            {/* Inline Tag Panel */}
-            {tagPanelOpen && (
-              <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
-                <div className="space-y-3">
-                  {/* Search */}
-                  <PrimaryInput
-                    type="text"
-                    placeholder="Search tags"
-                    value={tagSearch}
-                    onChange={(e) => setTagSearch(e.target.value)}
-                  />
+              
+              {/* Inline Tag Panel */}
+              {tagPanelOpen && (
+                <div className="absolute z-[1001] mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
+                  <div className="space-y-3">
+                    {/* Search */}
+                    <PrimaryInput
+                      type="text"
+                      placeholder="Search tags"
+                      value={tagSearch}
+                      onChange={(e) => setTagSearch(e.target.value)}
+                    />
 
-                  {/* Selected Tags */}
-                  {task.tags.length > 0 && (
-                    <div>
-                      <p className="mb-2 text-xs font-medium text-blue-200">Selected</p>
+                    {/* Selected Tags Summary */}
+                    {task.tags.length > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-blue-200">{task.tags.length} selected tags</span>
+                        <button
+                          type="button"
+                          onClick={() => setTask({ ...task, tags: [] })}
+                          className="text-xs text-blue-300 hover:text-blue-200"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Selected Tag Chips */}
+                    {task.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {task.tags.map((tag) => {
                           const color = getTagColor(tag);
@@ -256,59 +280,56 @@ export function AddTaskModal({
                           );
                         })}
                       </div>
-                    </div>
-                  )}
-
-                  {/* Tags List */}
-                  <div className="max-h-48 space-y-1 overflow-y-auto">
-                    {filteredTags.length > 0 ? (
-                      filteredTags.map((tag) => {
-                        const isSelected = task.tags.includes(tag);
-                        const color = getTagColor(tag);
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => handleTagToggle(tag)}
-                            className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                              isSelected
-                                ? "border-[#18aead] bg-[#18aead]/10"
-                                : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <Tag className={`${color} border text-xs px-2 py-0.5 rounded-full`}>
-                                {tag}
-                              </Tag>
-                              {isSelected && (
-                                <span className="text-xs text-[#18aead]">Selected</span>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })
-                    ) : (
-                      <p className="px-1 py-2 text-xs text-blue-300/70">No tags found</p>
                     )}
+
+                    {/* Global Tags Section */}
+                    <div>
+                      <p className="mb-2 text-xs font-medium text-blue-200">Global</p>
+                      <div className="max-h-48 space-y-1 overflow-y-auto">
+                        {filteredTags.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {filteredTags.map((tag) => {
+                              const isSelected = task.tags.includes(tag);
+                              const color = getTagColor(tag);
+                              return (
+                                <button
+                                  key={tag}
+                                  type="button"
+                                  onClick={() => handleTagToggle(tag)}
+                                  className={`rounded-full border text-xs px-2 py-0.5 transition-colors ${
+                                    isSelected
+                                      ? "border-[#18aead] bg-[#18aead]/20"
+                                      : `${color} border`
+                                  }`}
+                                >
+                                  {tag}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="px-1 py-2 text-xs text-blue-300/70">No tags found</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Add Tag Button */}
+                    <button
+                      type="button"
+                      onClick={() => setCreateTagOpen(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#18aead] bg-[#18aead]/10 px-4 py-2 text-sm font-medium text-[#18aead] transition-colors hover:bg-[#18aead]/20"
+                    >
+                      <PlusIcon className="h-4 w-4" />
+                      Add Tag
+                    </button>
                   </div>
-
-                  {/* Add Tag Button */}
-                  <button
-                    type="button"
-                    onClick={() => setCreateTagOpen(true)}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#18aead] bg-[#18aead]/10 px-4 py-2 text-sm font-medium text-[#18aead] transition-colors hover:bg-[#18aead]/20"
-                  >
-                    <PlusIcon className="h-4 w-4" />
-                    Add Tag
-                  </button>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Dates - Label + Clickable Row + Inline Panel */}
-          <div className="relative" ref={datePanelRef}>
-            <label className="block text-sm font-medium text-blue-200 mb-2">Dates</label>
+            {/* Dates - Label + Clickable Row + Inline Panel */}
+            <div className="relative" ref={datePanelRef}>
+              <label className="block text-sm font-medium text-blue-200 mb-2">Dates</label>
             <button
               type="button"
               onClick={() => {
@@ -397,10 +418,13 @@ export function AddTaskModal({
                 </div>
               </div>
             )}
+            </div>
           </div>
 
-          {/* Priority - Label + Clickable Row + Inline Panel */}
-          <div className="relative" ref={priorityPanelRef}>
+          {/* Grid Layout: Priority and Status in second row */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Priority - Label + Clickable Row + Inline Panel */}
+            <div className="relative" ref={priorityPanelRef}>
             <label className="block text-sm font-medium text-blue-200 mb-2">Priority</label>
             <button
               type="button"
@@ -463,10 +487,10 @@ export function AddTaskModal({
                 </div>
               </div>
             )}
-          </div>
+            </div>
 
-          {/* Status - Label + Clickable Row + Inline Panel */}
-          <div className="relative" ref={statusPanelRef}>
+            {/* Status - Label + Clickable Row + Inline Panel */}
+            <div className="relative" ref={statusPanelRef}>
             <label className="block text-sm font-medium text-blue-200 mb-2">Status</label>
             <button
               type="button"
@@ -529,6 +553,7 @@ export function AddTaskModal({
                 </div>
               </div>
             )}
+            </div>
           </div>
 
           {/* Action Buttons */}
