@@ -117,6 +117,7 @@ model Task {
   account     Account  @relation(fields: [accountSeq], references: [accountSeq])
   title       String
   assignee    String?
+  startDate   String?
   dueDate     String?
   priority    String   @default("Normal")
   status      String   @default("Todo")

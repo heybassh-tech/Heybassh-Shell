@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { MagnifyingGlassIcon, PlusIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { FiCalendar, FiFlag, FiTag, FiUser } from "react-icons/fi";
 import { DatePicker, Tag } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
@@ -58,6 +59,18 @@ export function Tasks({ accountId, employees }: TasksProps) {
   const [editStartDate, setEditStartDate] = useState<Dayjs | null>(null);
   const [editDueDate, setEditDueDate] = useState<Dayjs | null>(null);
   const [tags, setTags] = useState<string[]>([]);
+  const [tagSearch, setTagSearch] = useState("");
+  const [editTagSearch, setEditTagSearch] = useState("");
+  const [assigneeSearch, setAssigneeSearch] = useState("");
+  const [editAssigneeSearch, setEditAssigneeSearch] = useState("");
+  const [priorityOpen, setPriorityOpen] = useState(false);
+  const [editPriorityOpen, setEditPriorityOpen] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
+  const [editDateOpen, setEditDateOpen] = useState(false);
+  const [tagOpen, setTagOpen] = useState(false);
+  const [editTagOpen, setEditTagOpen] = useState(false);
+  const [assigneeOpen, setAssigneeOpen] = useState(false);
+  const [editAssigneeOpen, setEditAssigneeOpen] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -112,6 +125,40 @@ export function Tasks({ accountId, employees }: TasksProps) {
     
     return matchesSearch && matchesPriority && matchesStatus && matchesAssignee;
   });
+
+  const availableTags = useMemo(() => {
+    const set = new Set<string>();
+    tasks.forEach((t) => {
+      (t.tags || []).forEach((tg) => set.add(tg));
+    });
+    return Array.from(set);
+  }, [tasks]);
+
+  const filteredAssignees = useMemo(
+    () =>
+      activeAssignees.filter((a) =>
+        (a.name || a.email || "").toLowerCase().includes(assigneeSearch.toLowerCase()),
+      ),
+    [activeAssignees, assigneeSearch],
+  );
+
+  const filteredEditAssignees = useMemo(
+    () =>
+      activeAssignees.filter((a) =>
+        (a.name || a.email || "").toLowerCase().includes(editAssigneeSearch.toLowerCase()),
+      ),
+    [activeAssignees, editAssigneeSearch],
+  );
+
+  const filteredTags = useMemo(() => {
+    if (!tagSearch.trim()) return availableTags;
+    return availableTags.filter((t) => t.toLowerCase().includes(tagSearch.toLowerCase()));
+  }, [availableTags, tagSearch]);
+
+  const filteredEditTags = useMemo(() => {
+    if (!editTagSearch.trim()) return availableTags;
+    return availableTags.filter((t) => t.toLowerCase().includes(editTagSearch.toLowerCase()));
+  }, [availableTags, editTagSearch]);
 
   useEffect(() => {
     let ignore = false;
@@ -222,6 +269,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
       setEditTask({
         title: "",
         assignee: "",
+        startDate: "",
         dueDate: "",
         priority: "Normal",
         status: "Todo",
@@ -402,6 +450,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
           setNewTask({
             title: "",
             assignee: "",
+        startDate: "",
             dueDate: "",
             priority: "Normal",
             status: "Todo",
@@ -1014,7 +1063,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                         )}
                       </div>
                     </td>
-                    <td className="relative whitespace-nowrap px-6 py-4">
+                    <td className="relative whitespace-nowrap px-6 py-4 overflow-visible">
                       <div className="relative" ref={(el) => { menuRefs.current[task.id] = el; }}>
                         <button
                           onClick={(e) => {
@@ -1074,7 +1123,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                 {filteredTasks
                   .filter((task) => task.status === status)
                   .map((task) => (
-                    <div key={task.id} className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] p-3 transition-colors hover:bg-[#121c3d]">
+                    <div key={task.id} className="relative rounded-[10px] border border-[#1a2446] bg-[#0e1629] p-3 transition-colors hover:bg-[#121c3d] overflow-visible">
                       <div className="flex items-start justify-between">
                         <h4 className="text-sm font-medium text-white">{task.title}</h4>
                         <span className={`inline-flex items-center rounded-full border px-2 text-xs font-semibold ${getPriorityColor(task.priority)}`}>
@@ -1098,7 +1147,7 @@ export function Tasks({ accountId, employees }: TasksProps) {
                         </div>
                       )}
                       <div className="mt-2 flex justify-end">
-                        <div className="relative" ref={(el) => { menuRefs.current[`board-${task.id}`] = el; }}>
+                        <div className="relative overflow-visible" ref={(el) => { menuRefs.current[`board-${task.id}`] = el; }}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
