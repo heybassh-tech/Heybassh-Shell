@@ -5,7 +5,7 @@ import { Task } from "../../types";
 import { PrimaryModal } from "../../../PrimaryModal";
 import { PrimaryButton } from "../../../PrimaryButton";
 import { PrimaryInput } from "../../../PrimaryInput";
-import { FiTag, FiCalendar, FiFlag, FiCheckCircle, FiX } from "react-icons/fi";
+import { FiTag, FiCalendar, FiFlag, FiCheckCircle, FiX, FiUser } from "react-icons/fi";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { getTagColor, getPriorityColor, getStatusColor } from "./taskUtils";
 import { Tag, DatePicker } from "antd";
@@ -46,14 +46,19 @@ export function AddTaskModal({
   const [loading, setLoading] = useState(false);
   
   // Inline panel states
+  const [assigneePanelOpen, setAssigneePanelOpen] = useState(false);
   const [tagPanelOpen, setTagPanelOpen] = useState(false);
   const [datePanelOpen, setDatePanelOpen] = useState(false);
   const [priorityPanelOpen, setPriorityPanelOpen] = useState(false);
   const [statusPanelOpen, setStatusPanelOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
+  const [assigneeSearch, setAssigneeSearch] = useState("");
+  const [notifyAssignee, setNotifyAssignee] = useState(false);
   const [createTagOpen, setCreateTagOpen] = useState(false);
+  const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
 
   // Refs for click outside detection
+  const assigneePanelRef = useRef<HTMLDivElement>(null);
   const tagPanelRef = useRef<HTMLDivElement>(null);
   const datePanelRef = useRef<HTMLDivElement>(null);
   const priorityPanelRef = useRef<HTMLDivElement>(null);
@@ -62,6 +67,9 @@ export function AddTaskModal({
   // Close panels when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      if (assigneePanelRef.current && !assigneePanelRef.current.contains(event.target as Node)) {
+        setAssigneePanelOpen(false);
+      }
       if (tagPanelRef.current && !tagPanelRef.current.contains(event.target as Node)) {
         setTagPanelOpen(false);
       }
@@ -76,11 +84,11 @@ export function AddTaskModal({
       }
     };
 
-    if (tagPanelOpen || datePanelOpen || priorityPanelOpen || statusPanelOpen) {
+    if (assigneePanelOpen || tagPanelOpen || datePanelOpen || priorityPanelOpen || statusPanelOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [tagPanelOpen, datePanelOpen, priorityPanelOpen, statusPanelOpen]);
+  }, [assigneePanelOpen, tagPanelOpen, datePanelOpen, priorityPanelOpen, statusPanelOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +98,7 @@ export function AddTaskModal({
     try {
       const taskToAdd = {
         ...task,
+        assignee: selectedAssignees.length > 0 ? selectedAssignees[0] : "", // For now, use first assignee for backward compatibility
         startDate: startDate ? startDate.format("YYYY-MM-DD") : task.startDate || "",
         dueDate: endDate ? endDate.format("YYYY-MM-DD") : task.dueDate || "",
       };
@@ -119,11 +128,15 @@ export function AddTaskModal({
     setTask(initialTask);
     setStartDate(null);
     setEndDate(null);
+    setAssigneePanelOpen(false);
     setTagPanelOpen(false);
     setDatePanelOpen(false);
     setPriorityPanelOpen(false);
     setStatusPanelOpen(false);
     setTagSearch("");
+    setAssigneeSearch("");
+    setNotifyAssignee(false);
+    setSelectedAssignees([]);
     onClose();
   };
 
@@ -135,6 +148,19 @@ export function AddTaskModal({
   const filteredTags = availableTags.filter((tag) =>
     tag.toLowerCase().includes(tagSearch.toLowerCase())
   );
+
+  const activeAssignees = employees.filter((e) => (e.status ?? "Accepted") === "Accepted");
+  const filteredAssignees = activeAssignees.filter((a) =>
+    (a.name || a.email || "").toLowerCase().includes(assigneeSearch.toLowerCase())
+  );
+
+  const handleAssigneeToggle = (assigneeId: string) => {
+    if (selectedAssignees.includes(assigneeId)) {
+      setSelectedAssignees(selectedAssignees.filter((id) => id !== assigneeId));
+    } else {
+      setSelectedAssignees([...selectedAssignees, assigneeId]);
+    }
+  };
 
   const handleTagToggle = (tag: string) => {
     if (task.tags.includes(tag)) {
@@ -191,8 +217,111 @@ export function AddTaskModal({
             />
           </div>
 
-          {/* Grid Layout: Tags and Dates in first row, Priority and Status in second row */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Grid Layout: 3 per row - Assignee, Tags, Dates in first row, Priority and Status in second row */}
+          <div className="grid grid-cols-3 gap-4">
+            {/* Assignee - Label + Clickable Row + Inline Panel */}
+            <div className="relative" ref={assigneePanelRef}>
+              <label className="block text-sm font-medium text-blue-200 mb-2">Assignee</label>
+              <button
+                type="button"
+                onClick={() => {
+                  setAssigneePanelOpen(!assigneePanelOpen);
+                  setTagPanelOpen(false);
+                  setDatePanelOpen(false);
+                  setPriorityPanelOpen(false);
+                  setStatusPanelOpen(false);
+                }}
+                className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+              >
+                <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                  <FiUser className="h-4 w-4 text-blue-300 flex-shrink-0" />
+                </div>
+                <div className="flex-1 text-left">
+                  {selectedAssignees.length > 0 ? (
+                    <span className="text-sm text-blue-200">
+                      {selectedAssignees.length} {selectedAssignees.length === 1 ? "person" : "people"}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-blue-200">No assignee</span>
+                  )}
+                </div>
+              </button>
+
+              {/* Inline Assignee Panel */}
+              {assigneePanelOpen && (
+                <div className="absolute z-[1001] mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
+                  <div className="space-y-3">
+                    {/* Search */}
+                    <PrimaryInput
+                      type="text"
+                      placeholder="Search people"
+                      value={assigneeSearch}
+                      onChange={(e) => setAssigneeSearch(e.target.value)}
+                    />
+
+                    {/* Selected Assignees */}
+                    {selectedAssignees.length > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-blue-200">{selectedAssignees.length} selected</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedAssignees([])}
+                          className="text-xs text-blue-300 hover:text-blue-200"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Assignees List */}
+                    <div className="max-h-48 space-y-1 overflow-y-auto">
+                      {filteredAssignees.length > 0 ? (
+                        filteredAssignees.map((employee) => {
+                          const isSelected = selectedAssignees.includes(employee.id);
+                          return (
+                            <button
+                              key={employee.id}
+                              type="button"
+                              onClick={() => handleAssigneeToggle(employee.id)}
+                              className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                                isSelected
+                                  ? "border-[#18aead] bg-[#18aead]/10"
+                                  : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <FiUser className="h-4 w-4 text-blue-300" />
+                                  <span className="text-sm text-blue-200">
+                                    {employee.name || employee.email}
+                                  </span>
+                                </div>
+                                {isSelected && (
+                                  <span className="text-xs text-[#18aead]">Selected</span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <p className="px-1 py-2 text-xs text-blue-300/70">No people found</p>
+                      )}
+                    </div>
+
+                    {/* Notify Checkbox */}
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={notifyAssignee}
+                        onChange={(e) => setNotifyAssignee(e.target.checked)}
+                        className="rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
+                      />
+                      <span className="text-xs text-blue-200">Notify assignees</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
             {/* Tags - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={tagPanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Tags</label>
@@ -201,6 +330,7 @@ export function AddTaskModal({
                   type="button"
                   onClick={() => {
                     setTagPanelOpen(!tagPanelOpen);
+                    setAssigneePanelOpen(false);
                     setDatePanelOpen(false);
                     setPriorityPanelOpen(false);
                     setStatusPanelOpen(false);
@@ -287,9 +417,9 @@ export function AddTaskModal({
                     {/* Global Tags Section */}
                     <div>
                       <p className="mb-2 text-xs font-medium text-blue-200">Global</p>
-                      <div className="max-h-48 space-y-1 overflow-y-auto">
+                      <div className="max-h-48 overflow-y-auto">
                         {filteredTags.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
+                          <div className="grid grid-cols-3 gap-2">
                             {filteredTags.map((tag) => {
                               const isSelected = task.tags.includes(tag);
                               const color = getTagColor(tag);
@@ -319,10 +449,9 @@ export function AddTaskModal({
                     <button
                       type="button"
                       onClick={() => setCreateTagOpen(true)}
-                      className="flex w-full items-center justify-center gap-2 text-sm font-medium text-[#18aead] transition-colors  hover:text-[#18aead]/20"
+                      className="w-full text-sm font-medium text-[#18aead] transition-colors hover:text-[#18aead]/80 text-center py-2"
                     >
-                      <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2"><PlusIcon className="h-4 w-4 text-blue-300" /></div>
-                      Add Tag
+                      Create Tag
                     </button>
                   </div>
                 </div>
@@ -336,11 +465,12 @@ export function AddTaskModal({
               type="button"
               onClick={() => {
                 setDatePanelOpen(!datePanelOpen);
+                setAssigneePanelOpen(false);
                 setTagPanelOpen(false);
                 setPriorityPanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex w-full items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+              className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
               >
               <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
                 <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0" />
@@ -378,18 +508,15 @@ export function AddTaskModal({
                       borderColor: "#1a2446",
                       backgroundColor: "#0e1629",
                     }}
-                  />
-
-                  Date Inputs
-                 
+                  />                 
                 </div>
               </div>
             )}
             </div>
           </div>
 
-          {/* Grid Layout: Priority and Status in second row */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Grid Layout: Priority and Status in second row (2 items in 3-column grid) */}
+          <div className="grid grid-cols-3 gap-4">
             {/* Priority - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={priorityPanelRef}>
             <label className="block text-sm font-medium text-blue-200 mb-2">Priority</label>
@@ -397,11 +524,12 @@ export function AddTaskModal({
               type="button"
               onClick={() => {
                 setPriorityPanelOpen(!priorityPanelOpen);
+                setAssigneePanelOpen(false);
                 setTagPanelOpen(false);
                 setDatePanelOpen(false);
                 setStatusPanelOpen(false);
               }}
-              className="flex w-full items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+              className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
             >
               <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
                 <FiFlag className="h-4 w-4 text-blue-300 flex-shrink-0" />
@@ -465,11 +593,12 @@ export function AddTaskModal({
               type="button"
               onClick={() => {
                 setStatusPanelOpen(!statusPanelOpen);
+                setAssigneePanelOpen(false);
                 setTagPanelOpen(false);
                 setDatePanelOpen(false);
                 setPriorityPanelOpen(false);
               }}
-              className="flex w-full items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+              className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
             >
               <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
                 <FiCheckCircle className="h-4 w-4 text-blue-300 flex-shrink-0" />
