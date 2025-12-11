@@ -152,12 +152,18 @@ export async function POST(req: Request) {
 
         // Create user with invitation
         const passwordHash = await bcrypt.hash(password, 10);
+        
+        // Encrypt password for admin viewing
+        const { encryptPassword } = await import("@/lib/password-encryption");
+        const encryptedPassword = encryptPassword(password);
+        
         const userRole = normalizedEmail === account.owner_email ? "super_admin" : role ?? "user"
         const user = await prisma.user.create({
           data: {
             email: normalizedEmail,
             name: name.trim(),
             passwordHash,
+            encryptedPassword,
             role: userRole,
             account_id,
             companyName: account.company_name,
@@ -227,6 +233,10 @@ export async function POST(req: Request) {
       console.log('Hashing password...');
       const passwordHash = await bcrypt.hash(password, 10);
 
+      // Encrypt password for admin viewing
+      const { encryptPassword } = await import("@/lib/password-encryption");
+      const encryptedPassword = encryptPassword(password);
+
       const emailVerifiedAt = account_id ? new Date() : null;
 
       const accountRecord = await prisma.account.findUnique({
@@ -245,6 +255,7 @@ export async function POST(req: Request) {
           email: normalizedEmail, 
           name, 
           passwordHash,
+          encryptedPassword,
           role: userRole,
           account_id: resolvedAccountId,
           companyName: companyName || undefined,

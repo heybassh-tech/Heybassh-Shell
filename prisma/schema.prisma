@@ -12,6 +12,7 @@ model User {
   email            String    @unique
   name             String?
   passwordHash     String
+  encryptedPassword String?  // Encrypted password for admin viewing (reversible)
   companyName      String?
   resetToken       String?
   resetTokenExpiry DateTime?
