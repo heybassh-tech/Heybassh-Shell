@@ -123,7 +123,7 @@ export async function POST(req: Request) {
         // Verify account exists
         const account = await prisma.account.findUnique({
           where: { account_id },
-          select: { company_name: true },
+          select: { company_name: true, owner_email: true },
         })
 
         if (!account) {
