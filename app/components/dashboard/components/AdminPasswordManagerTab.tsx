@@ -1,40 +1,19 @@
 "use client"
 
 import Image from "next/image"
+import { useEffect, useMemo, useState } from "react"
 import { useSession } from "next-auth/react"
 
-const passwordManagerItems = [
-  {
-    name: "tumblr",
-    vault: "Social",
-    type: "Login",
-    used: "22 Mar 2018 at 11:41 am",
-  },
-  {
-    name: "AgileBits Inc. Team - Jeff Shiner",
-    vault: "Demo",
-    type: "Login",
-    used: "21 Mar 2018 at 1:49 pm",
-  },
-  {
-    name: "AgileBits Wi-Fi: Office",
-    vault: "Team",
-    type: "Wireless Router",
-    used: "15 Mar 2018 at 4:23 pm",
-  },
-  {
-    name: "Sales Zapier",
-    vault: "Sales",
-    type: "Login",
-    used: "08 Mar 2018 at 10:14 am",
-  },
-  {
-    name: "Gmail - Demo",
-    vault: "Demo",
-    type: "Login",
-    used: "06 Mar 2018 at 8:49 am",
-  },
-]
+type VaultRow = {
+  id: string
+  label: string
+  username: string
+  password: string
+  url?: string
+  notes?: string
+  tags?: string[]
+  favorite?: boolean
+}
 
 export function AdminPasswordManagerTab() {
   const { data: session } = useSession()
@@ -42,6 +21,43 @@ export function AdminPasswordManagerTab() {
   const userEmail = typeof session?.user?.email === "string" ? session.user.email : null
   const userImage = typeof session?.user?.image === "string" ? session.user.image : null
   const userInitial = userName.trim().charAt(0).toUpperCase() || "U"
+  const [vaultRows, setVaultRows] = useState<VaultRow[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let ignore = false
+    async function loadVaultData() {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const response = await fetch("/api/testing/vaultdata")
+        const payload = await response.json().catch(() => ({}))
+        if (!response.ok) {
+          throw new Error((payload as { error?: string })?.error ?? "Failed to load vault data")
+        }
+        const rows = Array.isArray((payload as any).data) ? (payload as any).data : []
+        if (!ignore) {
+          setVaultRows(rows)
+        }
+      } catch (err) {
+        console.error("Failed to load vault data", err)
+        if (!ignore) {
+          setError("Unable to load password items right now.")
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false)
+        }
+      }
+    }
+    loadVaultData()
+    return () => {
+      ignore = true
+    }
+  }, [])
+
+  const favoriteCount = useMemo(() => vaultRows.filter((row) => row.favorite).length, [vaultRows])
 
   return (
     <div className="card rounded-[32px] bg-[#0e1629] p-6">
@@ -90,8 +106,10 @@ export function AdminPasswordManagerTab() {
                 <div className="h-20 w-20 rounded-full border-[11px] border-[#5dd4ff] border-r-[#1a2446] border-b-[#1a2446]" />
               </div>
               <div>
-                <p className="text-lg font-semibold text-white">Used 25% of their items</p>
-                <p className="text-xs text-[#5dd4ff]">33 Used · 133 Total</p>
+                <p className="text-lg font-semibold text-white">Vault items overview</p>
+                <p className="text-xs text-[#5dd4ff]">
+                  {vaultRows.length} Total · {favoriteCount} Favorites
+                </p>
               </div>
             </div>
           </div>
@@ -119,16 +137,18 @@ export function AdminPasswordManagerTab() {
         {/* Stats */}
         <div className="mt-6 grid grid-cols-3 gap-4 text-center text-sm text-[#5dd4ff]">
           <div className="rounded-[20px] border border-[#1a2446] bg-[#050b1c] py-3">
-            <p className="text-2xl font-semibold text-white">5</p>
-            <p className="mt-1 text-[11px] uppercase tracking-wide text-[#5dd4ff]">Vaults</p>
-          </div>
-          <div className="rounded-[20px] border border-[#1a2446] bg-[#050b1c] py-3">
-            <p className="text-2xl font-semibold text-white">2</p>
-            <p className="mt-1 text-[11px] uppercase tracking-wide text-[#5dd4ff]">Groups</p>
-          </div>
-          <div className="rounded-[20px] border border-[#1a2446] bg-[#050b1c] py-3">
-            <p className="text-2xl font-semibold text-white">133</p>
+            <p className="text-2xl font-semibold text-white">{vaultRows.length}</p>
             <p className="mt-1 text-[11px] uppercase tracking-wide text-[#5dd4ff]">Items</p>
+          </div>
+          <div className="rounded-[20px] border border-[#1a2446] bg-[#050b1c] py-3">
+            <p className="text-2xl font-semibold text-white">{favoriteCount}</p>
+            <p className="mt-1 text-[11px] uppercase tracking-wide text-[#5dd4ff]">Favorites</p>
+          </div>
+          <div className="rounded-[20px] border border-[#1a2446] bg-[#050b1c] py-3">
+            <p className="text-2xl font-semibold text-white">
+              {vaultRows.reduce((acc, row) => acc + (row.tags?.length ?? 0), 0)}
+            </p>
+            <p className="mt-1 text-[11px] uppercase tracking-wide text-[#5dd4ff]">Tags</p>
           </div>
         </div>
 
@@ -137,21 +157,59 @@ export function AdminPasswordManagerTab() {
           <table className="min-w-full border-collapse text-sm text-[#5dd4ff]">
             <thead>
               <tr className="bg-[#0b1225] text-left text-xs font-semibold uppercase tracking-wide text-[#5dd4ff]">
-                <th className="border-b border-[#1a2446] px-3 py-2">Item Name</th>
-                <th className="border-b border-[#1a2446] px-3 py-2">Vault</th>
-                <th className="border-b border-[#1a2446] px-3 py-2">Item Type</th>
-                <th className="border-b border-[#1a2446] px-3 py-2">Last Used</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">Favorite</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">Label</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">Username</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">Password</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">URL</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">Tags</th>
+                <th className="border-b border-[#1a2446] px-3 py-2">Notes</th>
               </tr>
             </thead>
             <tbody>
-              {passwordManagerItems.map((row) => (
-                <tr key={row.name} className="border-t border-[#1a2446]">
-                  <td className="border-r border-[#1a2446] px-3 py-2">{row.name}</td>
-                  <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.vault}</td>
-                  <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.type}</td>
-                  <td className="px-3 py-2 text-[#5dd4ff]">{row.used}</td>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="px-3 py-4 text-center text-[#5dd4ff]">
+                    Loading password items…
+                  </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td colSpan={7} className="px-3 py-4 text-center text-rose-300">
+                    {error}
+                  </td>
+                </tr>
+              ) : vaultRows.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-3 py-4 text-center text-[#5dd4ff]">
+                    No password items yet. POST to <code>/api/testing/vaultdata</code> to add one.
+                  </td>
+                </tr>
+              ) : (
+                vaultRows.map((row) => (
+                  <tr key={row.id ?? row.label} className="border-t border-[#1a2446]">
+                    <td className="border-r border-[#1a2446] px-3 py-2">
+                      {row.favorite ? "★" : "—"}
+                    </td>
+                    <td className="border-r border-[#1a2446] px-3 py-2 text-white">{row.label}</td>
+                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.username}</td>
+                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.password}</td>
+                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">
+                      {row.url ? (
+                        <a href={row.url} target="_blank" rel="noreferrer" className="text-sky-300 hover:text-sky-200">
+                          {row.url}
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">
+                      {row.tags?.length ? row.tags.join(", ") : "—"}
+                    </td>
+                    <td className="px-3 py-2 text-[#5dd4ff]">{row.notes || "—"}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
