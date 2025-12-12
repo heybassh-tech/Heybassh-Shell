@@ -11,11 +11,11 @@ export async function createInvitationToken(
   expiresInMs: number = INVITATION_TOKEN_EXPIRY,
 ) {
   // Ensure only one active invite per email per account
-  await prisma.emailVerificationToken.deleteMany({ where: { email, account_id } })
+  await prisma.emailVerificationToken.deleteMany({ where: { email } })
   const token = tokenValue ?? uuidv4()
   const expires = new Date(Date.now() + expiresInMs)
   return prisma.emailVerificationToken.create({
-    data: { email, token, expires, account_id },
+    data: { email, token, expires },
   })
 }
 
@@ -54,8 +54,7 @@ export async function validateInvitationToken(token: string, email: string, acco
     return null
   }
   const emailMatches = record.email.toLowerCase() === email.toLowerCase()
-  const accountMatches = account_id ? record.account_id === account_id : true
-  if (!emailMatches || !accountMatches || record.expires < new Date()) {
+  if (!emailMatches || record.expires < new Date()) {
     return null
   }
   return record
