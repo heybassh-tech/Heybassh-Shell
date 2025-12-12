@@ -115,18 +115,34 @@ function UsersContent({ accountId, companyName }: { accountId: string; companyNa
     })
   }, [users, searchTerm])
 
-  const openAddPanel = () => {
-    if (!["admin", "super_admin"].includes(currentUserRole)) {
+  const [isCheckingAdmin, setIsCheckingAdmin] = useState(false)
+
+  const openAddPanel = async () => {
+    setIsCheckingAdmin(true)
+    try {
+      const res = await fetch(`/api/accounts/${accountId}/admin-check`)
+      if (!res.ok) {
+        setPermissionModalOpen(true)
+        return
+      }
+      const data = await res.json()
+      if (!data?.isAdmin) {
+        setPermissionModalOpen(true)
+        return
+      }
+      setPanelMode("add")
+      setSelectedUser(null)
+      setEmail("")
+      setName("")
+      setUserType("Employee")
+      setRole("user")
+      setPanelOpen(true)
+    } catch (err) {
+      console.error("Failed to verify admin", err)
       setPermissionModalOpen(true)
-      return
+    } finally {
+      setIsCheckingAdmin(false)
     }
-    setPanelMode("add")
-    setSelectedUser(null)
-    setEmail("")
-    setName("")
-    setUserType("Employee")
-    setRole("user")
-    setPanelOpen(true)
   }
 
   const openEditPanel = (user: User) => {
