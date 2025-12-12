@@ -180,14 +180,15 @@ export function AddTaskModal({
 
   return (
     <>
-    <PrimaryModal
-      open={open}
-      title="Add Task"
-      description="Create a new task and assign it to a team member."
-      onClose={handleClose}
-      widthClassName="max-w-2xl"
-    >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <PrimaryModal
+        open={open}
+        title="Add Task"
+        description="Create a new task and assign it to a team member."
+        onClose={handleClose}
+        widthClassName="max-w-2xl"
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="max-h-[70vh] overflow-y-auto pr-1 space-y-6">
           {/* Task Name - Inline */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-blue-200 mb-2">
@@ -224,6 +225,7 @@ export function AddTaskModal({
             <div className="relative" ref={assigneePanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Assignee</label>
               <Dropdown
+                trigger={['click']}
                 open={assigneePanelOpen}
                 onOpenChange={(open) => {
                   setAssigneePanelOpen(open);
@@ -461,63 +463,48 @@ export function AddTaskModal({
             {/* Dates - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={datePanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Dates</label>
-              <Dropdown
-                open={datePanelOpen}
-                onOpenChange={(open) => {
-                  setDatePanelOpen(open);
-                  if (open) {
-                    setAssigneePanelOpen(false);
-                    setTagPanelOpen(false);
-                    setPriorityPanelOpen(false);
-                    setStatusPanelOpen(false);
+              <button
+                type="button"
+                onClick={() => {
+                  setDatePanelOpen(true);
+                  setDatePickerOpen(true);
+                  setAssigneePanelOpen(false);
+                  setTagPanelOpen(false);
+                  setPriorityPanelOpen(false);
+                  setStatusPanelOpen(false);
+                }}
+                className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+              >
+                <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                  <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0" />
+                </div>
+                <div className="flex-1">
+                  {startDate && endDate ? (
+                    <span className="text-sm text-blue-200">{formatDateRange()}</span>
+                  ) : (
+                    <span className="text-sm text-blue-200">No date</span>
+                  )}
+                </div>
+              </button>
+              <DatePicker.RangePicker
+                open={datePickerOpen}
+                value={[startDate, endDate]}
+                onOpenChange={(open) => setDatePickerOpen(open)}
+                onChange={(dates) => {
+                  if (dates && dates[0] && dates[1]) {
+                    setStartDate(dates[0]);
+                    setEndDate(dates[1]);
+                    setDatePickerOpen(false);
+                  } else if (dates === null) {
+                    setStartDate(null);
+                    setEndDate(null);
                   }
                 }}
+                format="YYYY-MM-DD"
                 placement="topLeft"
                 getPopupContainer={() => document.body}
-                dropdownRender={() => (
-                  <div className="w-[420px] max-w-[90vw] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
-                    <DatePicker.RangePicker
-                      value={[startDate, endDate]}
-                      onChange={(dates) => {
-                        if (dates && dates[0] && dates[1]) {
-                          setStartDate(dates[0]);
-                          setEndDate(dates[1]);
-                          setDatePanelOpen(false);
-                        } else if (dates === null) {
-                          setStartDate(null);
-                          setEndDate(null);
-                        }
-                      }}
-                      format="YYYY-MM-DD"
-                      placement="topLeft"
-                      getPopupContainer={() => document.body}
-                      className="w-full"
-                      style={{
-                        width: "100%",
-                        borderRadius: "10px",
-                        borderColor: "#1a2446",
-                        backgroundColor: "#0e1629",
-                      }}
-                    />
-                  </div>
-                )}
-              >
-                <button
-                  type="button"
-                  className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
-                >
-                  <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
-                    <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0" />
-                  </div>
-                  <div className="flex-1">
-                    {startDate && endDate ? (
-                      <span className="text-sm text-blue-200">{formatDateRange()}</span>
-                    ) : (
-                      <span className="text-sm text-blue-200">No date</span>
-                    )}
-                  </div>
-                </button>
-              </Dropdown>
+                style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0 }}
+              />
             </div>
           </div>
 
@@ -526,6 +513,7 @@ export function AddTaskModal({
             <div className="relative" ref={priorityPanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Priority</label>
               <Dropdown
+                trigger={['click']}
                 open={priorityPanelOpen}
                 onOpenChange={(open) => {
                   setPriorityPanelOpen(open);
@@ -618,6 +606,7 @@ export function AddTaskModal({
             <div className="relative" ref={statusPanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Status</label>
               <Dropdown
+                trigger={['click']}
                 open={statusPanelOpen}
                 onOpenChange={(open) => {
                   setStatusPanelOpen(open);
