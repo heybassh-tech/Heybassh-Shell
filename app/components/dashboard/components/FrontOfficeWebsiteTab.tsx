@@ -69,7 +69,7 @@ export function FrontOfficeWebsiteTab() {
         </div>
       </div>
       <div className="overflow-hidden rounded-[26px] border border-[#1a2446] bg-[#0c142a]">
-        <div className="h-[640px] bg-slate-100 flex">
+        <div className="h-[640px] bg-[#0e1629] flex">
           <Palette onAddClick={handleBuilderAddFromPalette} />
           <BuilderCanvas
             state={builderState}
