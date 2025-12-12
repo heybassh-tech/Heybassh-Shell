@@ -461,215 +461,232 @@ export function AddTaskModal({
             {/* Dates - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={datePanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Dates</label>
-            <button
-              type="button"
-              onClick={() => {
-                setDatePanelOpen(!datePanelOpen);
-                setAssigneePanelOpen(false);
-                setTagPanelOpen(false);
-                setPriorityPanelOpen(false);
-                setStatusPanelOpen(false);
-              }}
-              className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
-              >
-              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
-                <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0" />
-              </div>
-              <div className="flex-1">
-                {startDate && endDate ? (
-                  <span className="text-sm text-blue-200">{formatDateRange()}</span>
-                ) : (
-                  <span className="text-sm text-blue-200">No date</span>
+              <Dropdown
+                open={datePanelOpen}
+                onOpenChange={(open) => {
+                  setDatePanelOpen(open);
+                  if (open) {
+                    setAssigneePanelOpen(false);
+                    setTagPanelOpen(false);
+                    setPriorityPanelOpen(false);
+                    setStatusPanelOpen(false);
+                  }
+                }}
+                placement="topLeft"
+                getPopupContainer={() => document.body}
+                dropdownRender={() => (
+                  <div className="w-[420px] max-w-[90vw] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
+                    <DatePicker.RangePicker
+                      value={[startDate, endDate]}
+                      onChange={(dates) => {
+                        if (dates && dates[0] && dates[1]) {
+                          setStartDate(dates[0]);
+                          setEndDate(dates[1]);
+                          setDatePanelOpen(false);
+                        } else if (dates === null) {
+                          setStartDate(null);
+                          setEndDate(null);
+                        }
+                      }}
+                      format="YYYY-MM-DD"
+                      placement="topLeft"
+                      getPopupContainer={() => document.body}
+                      className="w-full"
+                      style={{
+                        width: "100%",
+                        borderRadius: "10px",
+                        borderColor: "#1a2446",
+                        backgroundColor: "#0e1629",
+                      }}
+                    />
+                  </div>
                 )}
-              </div>
-            </button>
-
-            {/* Inline Date Panel */}
-            {datePanelOpen && (
-              <div className="absolute z-[1100] mt-2 w-[420px] max-w-[90vw] max-h-[60vh] overflow-auto rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
-                <div className="space-y-4">
-                  {/* Calendar */}
-                  <DatePicker.RangePicker
-                    value={[startDate, endDate]}
-                    onChange={(dates) => {
-                      if (dates && dates[0] && dates[1]) {
-                        setStartDate(dates[0]);
-                        setEndDate(dates[1]);
-                      } else if (dates === null) {
-                        setStartDate(null);
-                        setEndDate(null);
-                      }
-                    }}
-                    format="YYYY-MM-DD"
-                    className="w-full"
-                    style={{
-                      width: "100%",
-                      borderRadius: "10px",
-                      borderColor: "#1a2446",
-                      backgroundColor: "#0e1629",
-                    }}
-                  />                 
-                </div>
-              </div>
-            )}
+              >
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+                >
+                  <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                    <FiCalendar className="h-4 w-4 text-blue-300 flex-shrink-0" />
+                  </div>
+                  <div className="flex-1">
+                    {startDate && endDate ? (
+                      <span className="text-sm text-blue-200">{formatDateRange()}</span>
+                    ) : (
+                      <span className="text-sm text-blue-200">No date</span>
+                    )}
+                  </div>
+                </button>
+              </Dropdown>
             </div>
           </div>
 
           {/* Grid Layout: Priority and Status in second row (2 items in 3-column grid) */}
           <div className="grid grid-cols-3 gap-4">
-            {/* Priority - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={priorityPanelRef}>
-            <label className="block text-sm font-medium text-blue-200 mb-2">Priority</label>
-            <button
-              type="button"
-              onClick={() => {
-                setPriorityPanelOpen(!priorityPanelOpen);
-                setAssigneePanelOpen(false);
-                setTagPanelOpen(false);
-                setDatePanelOpen(false);
-                setStatusPanelOpen(false);
-              }}
-              className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
-            >
-              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
-                <FiFlag className="h-4 w-4 text-blue-300 flex-shrink-0" />
-              </div>
-              <div className="flex-1">
-                {task.priority ? (
-                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
-                  </span>
-                ) : (
-                  <span className="text-sm text-blue-200">No priority</span>
-                )}
-              </div>
-            </button>
-
-            {/* Inline Priority Panel */}
-            {priorityPanelOpen && (
-              <div className="absolute z-[1100] mt-2 min-w-[260px] max-w-[360px] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
-                <div className="space-y-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTask({ ...task, priority: "" as any });
-                      setPriorityPanelOpen(false);
-                    }}
-                    className={`w-full rounded-lg border px-4 py-2.5 text-left transition-colors ${
-                      !task.priority
-                        ? "border-[#18aead] bg-[#18aead]/10"
-                        : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <FiFlag className="h-4 w-4 text-blue-300" />
-                      <span className="text-sm text-blue-200">No priority</span>
-                    </div>
-                  </button>
-                  {priorityOptions.map((priority) => {
-                    const isSelected = priority === task.priority;
-                    return (
+              <label className="block text-sm font-medium text-blue-200 mb-2">Priority</label>
+              <Dropdown
+                open={priorityPanelOpen}
+                onOpenChange={(open) => {
+                  setPriorityPanelOpen(open);
+                  if (open) {
+                    setAssigneePanelOpen(false);
+                    setTagPanelOpen(false);
+                    setDatePanelOpen(false);
+                    setStatusPanelOpen(false);
+                  }
+                }}
+                placement="topLeft"
+                getPopupContainer={() => document.body}
+                dropdownRender={() => (
+                  <div className="min-w-[260px] max-w-[360px] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+                    <div className="space-y-1">
                       <button
-                        key={priority}
                         type="button"
                         onClick={() => {
-                          setTask({ ...task, priority: priority as Task["priority"] });
+                          setTask({ ...task, priority: "" as any });
                           setPriorityPanelOpen(false);
                         }}
-                        className={`w-full rounded-lg border px-4 py-2.5 text-left transition-colors ${
-                          isSelected
+                        className={`w-full rounded-full border px-4 py-2.5 text-left transition-colors ${
+                          !task.priority
                             ? "border-[#18aead] bg-[#18aead]/10"
                             : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <FiFlag className="h-4 w-4 text-blue-300" />
-                            <span className="text-sm text-blue-200">{priority}</span>
-                          </div>
-                          <span
-                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getPriorityColor(
-                              priority as Task["priority"]
-                            )}`}
-                          >
-                            {priority}
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <FiFlag className="h-4 w-4 text-blue-300" />
+                          <span className="text-sm text-blue-200">No priority</span>
                         </div>
                       </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+                      {priorityOptions.map((priority) => {
+                        const isSelected = priority === task.priority;
+                        return (
+                          <button
+                            key={priority}
+                            type="button"
+                            onClick={() => {
+                              setTask({ ...task, priority: priority as Task["priority"] });
+                              setPriorityPanelOpen(false);
+                            }}
+                            className={`w-full rounded-full border px-4 py-2.5 text-left transition-colors ${
+                              isSelected
+                                ? "border-[#18aead] bg-[#18aead]/10"
+                                : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <FiFlag className="h-4 w-4 text-blue-300" />
+                                <span className="text-sm text-blue-200">{priority}</span>
+                              </div>
+                              <span
+                                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getPriorityColor(
+                                  priority as Task["priority"]
+                                )}`}
+                              >
+                                {priority}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              >
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+                >
+                  <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                    <FiFlag className="h-4 w-4 text-blue-300 flex-shrink-0" />
+                  </div>
+                  <div className="flex-1">
+                    {task.priority ? (
+                      <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getPriorityColor(task.priority)}`}>
+                        {task.priority}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-blue-200">No priority</span>
+                    )}
+                  </div>
+                </button>
+              </Dropdown>
             </div>
 
-            {/* Status - Label + Clickable Row + Inline Panel */}
+            {/* Status - Label + Dropdown */}
             <div className="relative" ref={statusPanelRef}>
-            <label className="block text-sm font-medium text-blue-200 mb-2">Status</label>
-            <button
-              type="button"
-              onClick={() => {
-                setStatusPanelOpen(!statusPanelOpen);
-                setAssigneePanelOpen(false);
-                setTagPanelOpen(false);
-                setDatePanelOpen(false);
-                setPriorityPanelOpen(false);
-              }}
-              className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
-            >
-              <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
-                <FiCheckCircle className="h-4 w-4 text-blue-300 flex-shrink-0" />
-              </div>
-              <div className="flex-1">
-                {task.status ? (
-                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(task.status)}`}>
-                    {task.status}
-                  </span>
-                ) : (
-                  <span className="text-sm text-blue-200">No status</span>
-                )}
-              </div>
-            </button>
-
-            {/* Inline Status Panel */}
-            {statusPanelOpen && (
-              <div className="absolute z-[1100] mt-2 min-w-[260px] max-w-[360px] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
-                <div className="space-y-1">
-                  {statusOptions.map((status) => {
-                    const isSelected = status === task.status;
-                    return (
-                      <button
-                        key={status}
-                        type="button"
-                        onClick={() => {
-                          setTask({ ...task, status: status as Task["status"] });
-                          setStatusPanelOpen(false);
-                        }}
-                        className={`w-full rounded-lg border px-4 py-2.5 text-left transition-colors ${
-                          isSelected
-                            ? "border-[#18aead] bg-[#18aead]/10"
-                            : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <FiCheckCircle className="h-4 w-4 text-blue-300" />
-                            <span className="text-sm text-blue-200">{status}</span>
-                          </div>
-                          <span
-                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getStatusColor(
-                              status as Task["status"]
-                            )}`}
+              <label className="block text-sm font-medium text-blue-200 mb-2">Status</label>
+              <Dropdown
+                open={statusPanelOpen}
+                onOpenChange={(open) => {
+                  setStatusPanelOpen(open);
+                  if (open) {
+                    setAssigneePanelOpen(false);
+                    setTagPanelOpen(false);
+                    setDatePanelOpen(false);
+                    setPriorityPanelOpen(false);
+                  }
+                }}
+                placement="topLeft"
+                getPopupContainer={() => document.body}
+                dropdownRender={() => (
+                  <div className="min-w-[260px] max-w-[360px] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+                    <div className="space-y-1">
+                      {statusOptions.map((status) => {
+                        const isSelected = status === task.status;
+                        return (
+                          <button
+                            key={status}
+                            type="button"
+                            onClick={() => {
+                              setTask({ ...task, status: status as Task["status"] });
+                              setStatusPanelOpen(false);
+                            }}
+                            className={`w-full rounded-full border px-4 py-2.5 text-left transition-colors ${
+                              isSelected
+                                ? "border-[#18aead] bg-[#18aead]/10"
+                                : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
+                            }`}
                           >
-                            {status}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <FiCheckCircle className="h-4 w-4 text-blue-300" />
+                                <span className="text-sm text-blue-200">{status}</span>
+                              </div>
+                              <span
+                                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getStatusColor(
+                                  status as Task["status"]
+                                )}`}
+                              >
+                                {status}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              >
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+                >
+                  <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                    <FiCheckCircle className="h-4 w-4 text-blue-300 flex-shrink-0" />
+                  </div>
+                  <div className="flex-1">
+                    {task.status ? (
+                      <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(task.status)}`}>
+                        {task.status}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-blue-200">No status</span>
+                    )}
+                  </div>
+                </button>
+              </Dropdown>
             </div>
           </div>
 

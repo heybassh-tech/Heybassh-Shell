@@ -157,7 +157,7 @@ export function AdminPasswordManagerTab() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-3">
           <button
-            className="rounded-[24px] border border-[#1a2446] bg-[#0b1225] px-4 py-2 text-xs font-semibold text-[#5dd4ff] hover:bg-[#121c3d]"
+            className="rounded-full border border-[#1a2446] bg-[#0b1225] px-4 py-2 text-xs font-semibold text-[#5dd4ff] hover:bg-[#121c3d]"
             onClick={() => {
               resetForm()
               setModalOpen(true)
@@ -166,7 +166,7 @@ export function AdminPasswordManagerTab() {
             Add Password
           </button>
           <button
-            className="rounded-[24px] border border-[#1a2446] bg-[#0b1225] px-4 py-2 text-xs font-semibold text-[#5dd4ff] hover:bg-[#121c3d]"
+            className="rounded-full border border-[#1a2446] bg-[#0b1225] px-4 py-2 text-xs font-semibold text-[#5dd4ff] hover:bg-[#121c3d]"
             onClick={loadVault}
             disabled={isLoading}
           >
@@ -320,14 +320,14 @@ export function AdminPasswordManagerTab() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-[12px] border border-[#1a2446] px-4 py-2 text-sm font-semibold text-blue-100 hover:bg-[#0e1629]"
+                className="rounded-full border border-[#1a2446] px-4 py-2 text-sm font-semibold text-blue-100 hover:bg-[#0e1629]"
                 disabled={isLoading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="rounded-[12px] bg-[#18aead] px-4 py-2 text-sm font-semibold text-white hover:bg-[#18aead]/90"
+                className="rounded-full bg-[#18aead] px-4 py-2 text-sm font-semibold text-white hover:bg-[#18aead]/90"
                 disabled={isLoading}
               >
                 {editingId ? "Update" : "Add"} Password
@@ -357,7 +357,7 @@ export function AdminPasswordManagerTab() {
                 setDeleteId(null)
                 setDeleteLabel("")
               }}
-              className="rounded-[12px] border border-[#1a2446] px-4 py-2 text-sm font-semibold text-blue-100 hover:bg-[#0e1629]"
+              className="rounded-full border border-[#1a2446] px-4 py-2 text-sm font-semibold text-blue-100 hover:bg-[#0e1629]"
               disabled={isLoading}
             >
               Cancel
@@ -365,7 +365,7 @@ export function AdminPasswordManagerTab() {
             <button
               type="button"
               onClick={() => deleteId && handleDelete(deleteId)}
-              className="rounded-[12px] bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
+              className="rounded-full bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
               disabled={isLoading}
             >
               Delete
@@ -383,7 +383,6 @@ export function AdminPasswordManagerTab() {
                 <th className="border-b border-[#1a2446] px-3 py-2">Username</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Password</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">URL</th>
-                <th className="border-b border-[#1a2446] px-3 py-2">Tags</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Notes</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Favorite</th>
                 <th className="border-b border-[#1a2446] px-3 py-2">Actions</th>
@@ -425,21 +424,18 @@ export function AdminPasswordManagerTab() {
                         "—"
                       )}
                     </td>
-                    <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">
-                      {row.tags?.length ? row.tags.join(", ") : "—"}
-                    </td>
                     <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.notes || "—"}</td>
                     <td className="border-r border-[#1a2446] px-3 py-2 text-[#5dd4ff]">{row.favorite ? "true" : "false"}</td>
                     <td className="px-3 py-2 text-[#5dd4ff]">
                       <div className="flex gap-2">
                         <button
-                          className="rounded border border-[#1a2446] px-3 py-1 text-xs text-blue-100 hover:bg-[#0e1629]"
+                          className="rounded-full border border-[#1a2446] px-3 py-1 text-xs text-blue-100 hover:bg-[#0e1629]"
                           onClick={() => startEdit(row)}
                         >
                           Edit
                         </button>
                         <button
-                          className="rounded border border-rose-600 px-3 py-1 text-xs text-rose-200 hover:bg-rose-900/40"
+                          className="rounded-full border border-rose-600 px-3 py-1 text-xs text-rose-200 hover:bg-rose-900/40"
                           onClick={() => {
                             setDeleteId(row.id)
                             setDeleteLabel(row.label)
