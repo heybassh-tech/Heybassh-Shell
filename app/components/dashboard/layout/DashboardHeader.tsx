@@ -156,7 +156,7 @@ export function DashboardHeader({
                 }
               }}
               placeholder="Search Heybassh"
-              className="bg-transparent border-0 outline-0 text-sm text-blue-200 placeholder-blue-300/60 px-4 py-2 w-96"
+              className="bg-transparent border-0 outline-0 text-sm text-blue-200 placeholder-blue-200/80 px-4 py-2 w-96"
             />
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
