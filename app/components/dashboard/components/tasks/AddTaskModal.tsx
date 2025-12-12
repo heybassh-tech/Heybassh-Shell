@@ -51,7 +51,6 @@ export function AddTaskModal({
   const [datePanelOpen, setDatePanelOpen] = useState(false);
   const [priorityPanelOpen, setPriorityPanelOpen] = useState(false);
   const [statusPanelOpen, setStatusPanelOpen] = useState(false);
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
   const [assigneeSearch, setAssigneeSearch] = useState("");
   const [notifyAssignee, setNotifyAssignee] = useState(false);
@@ -181,14 +180,15 @@ export function AddTaskModal({
 
   return (
     <>
-    <PrimaryModal
-      open={open}
-      title="Add Task"
-      description="Create a new task and assign it to a team member."
-      onClose={handleClose}
-      widthClassName="max-w-2xl"
-    >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <PrimaryModal
+        open={open}
+        title="Add Task"
+        description="Create a new task and assign it to a team member."
+        onClose={handleClose}
+        widthClassName="max-w-2xl"
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="max-h-[70vh] overflow-y-auto pr-1 space-y-6">
           {/* Task Name - Inline */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-blue-200 mb-2">
@@ -225,6 +225,7 @@ export function AddTaskModal({
             <div className="relative" ref={assigneePanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Assignee</label>
               <Dropdown
+                trigger={['click']}
                 open={assigneePanelOpen}
                 onOpenChange={(open) => {
                   setAssigneePanelOpen(open);
@@ -512,6 +513,7 @@ export function AddTaskModal({
             <div className="relative" ref={priorityPanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Priority</label>
               <Dropdown
+                trigger={['click']}
                 open={priorityPanelOpen}
                 onOpenChange={(open) => {
                   setPriorityPanelOpen(open);
@@ -604,6 +606,7 @@ export function AddTaskModal({
             <div className="relative" ref={statusPanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Status</label>
               <Dropdown
+                trigger={['click']}
                 open={statusPanelOpen}
                 onOpenChange={(open) => {
                   setStatusPanelOpen(open);
