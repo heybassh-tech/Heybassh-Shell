@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
 import { useSession } from "next-auth/react"
 import { v4 as uuidv4 } from "uuid"
+import { PrimaryModal } from "../../PrimaryModal"
 
 type VaultEntry = {
   id: string
@@ -27,8 +28,11 @@ export function AdminPasswordManagerTab() {
   const [vaultRows, setVaultRows] = useState<VaultEntry[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
 
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleteLabel, setDeleteLabel] = useState<string>("")
   const [form, setForm] = useState<Omit<VaultEntry, "id">>({
     label: "",
     username: "",
@@ -40,6 +44,12 @@ export function AdminPasswordManagerTab() {
   })
 
   const favoriteCount = useMemo(() => vaultRows.filter((row) => row.favorite).length, [vaultRows])
+
+  useEffect(() => {
+    // Auto-load on mount
+    loadVault()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId])
 
   async function loadVault() {
     if (!accountId) {
@@ -106,11 +116,13 @@ export function AdminPasswordManagerTab() {
       tags: entry.tags ?? [],
       favorite: entry.favorite ?? false,
     })
+    setModalOpen(true)
   }
 
   function resetForm() {
     setEditingId(null)
     setForm({ label: "", username: "", password: "", url: "", notes: "", tags: [], favorite: false })
+    setModalOpen(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -129,11 +141,14 @@ export function AdminPasswordManagerTab() {
       ? vaultRows.map((r) => (r.id === editingId ? next : r))
       : [...vaultRows, next]
     await persistVault(updated)
+    setModalOpen(false)
   }
 
   async function handleDelete(id: string) {
     const updated = vaultRows.filter((r) => r.id !== id)
     await persistVault(updated)
+    setDeleteId(null)
+    setDeleteLabel("")
   }
 
   return (
@@ -141,16 +156,24 @@ export function AdminPasswordManagerTab() {
       {/* Filters */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-3">
-          <select className="rounded-[24px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs text-[#5dd4ff] shadow-sm focus:outline-none">
-            <option className="bg-[#0e1629]">All Vaults</option>
-          </select>
-          <select className="rounded-[24px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs text-[#5dd4ff] shadow-sm focus:outline-none">
-            <option className="bg-[#0e1629]">Last Month</option>
-          </select>
+          <button
+            className="rounded-[24px] border border-[#1a2446] bg-[#0b1225] px-4 py-2 text-xs font-semibold text-[#5dd4ff] hover:bg-[#121c3d]"
+            onClick={() => {
+              resetForm()
+              setModalOpen(true)
+            }}
+          >
+            Add Password
+          </button>
+          <button
+            className="rounded-[24px] border border-[#1a2446] bg-[#0b1225] px-4 py-2 text-xs font-semibold text-[#5dd4ff] hover:bg-[#121c3d]"
+            onClick={loadVault}
+            disabled={isLoading}
+          >
+            Refresh
+          </button>
         </div>
-        <button className="rounded-[24px] border border-[#1a2446] bg-[#0b1225] px-4 py-1.5 text-xs font-medium text-[#5dd4ff] hover:bg-[#121c3d]">
-          Print
-        </button>
+        <span className="text-xs text-blue-300/80">Vault items: {vaultRows.length}</span>
       </div>
 
       {/* Report card */}
@@ -229,91 +252,127 @@ export function AdminPasswordManagerTab() {
           </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="mt-8 space-y-3 rounded-[20px] border border-[#1a2446] bg-[#050b1c] p-4">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-blue-200">Label</label>
-              <input
-                className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={form.label}
-                onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
-                required
-              />
+        {/* Form Modal */}
+        <PrimaryModal
+          open={modalOpen}
+          onClose={resetForm}
+          title={editingId ? "Edit Password" : "Add Password"}
+          description="Manage a password entry for this account vault."
+        >
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-blue-200">Label</label>
+                <input
+                  className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  value={form.label}
+                  onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-blue-200">Username</label>
+                <input
+                  className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  value={form.username}
+                  onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-blue-200">Password</label>
+                <input
+                  className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-blue-200">URL</label>
+                <input
+                  className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  value={form.url}
+                  onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1 md:col-span-2">
+                <label className="text-xs font-semibold text-blue-200">Notes</label>
+                <textarea
+                  className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
+                  value={form.notes}
+                  onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                  rows={2}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={form.favorite}
+                  onChange={(e) => setForm((f) => ({ ...f, favorite: e.target.checked }))}
+                  className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
+                />
+                <span className="text-sm text-blue-100">Favorite</span>
+              </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-blue-200">Username</label>
-              <input
-                className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={form.username}
-                onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-blue-200">Password</label>
-              <input
-                className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={form.password}
-                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-blue-200">URL</label>
-              <input
-                className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={form.url}
-                onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-1 md:col-span-2">
-              <label className="text-xs font-semibold text-blue-200">Notes</label>
-              <textarea
-                className="w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] px-3 py-2 text-sm text-blue-100 focus:border-[#18aead] focus:outline-none"
-                value={form.notes}
-                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-                rows={2}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={form.favorite}
-                onChange={(e) => setForm((f) => ({ ...f, favorite: e.target.checked }))}
-                className="h-4 w-4 rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
-              />
-              <span className="text-sm text-blue-100">Favorite</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="submit"
-              className="rounded-[12px] bg-[#18aead] px-4 py-2 text-sm font-semibold text-white hover:bg-[#18aead]/90"
-              disabled={isLoading}
-            >
-              {editingId ? "Update" : "Add"} Password
-            </button>
-            {editingId && (
+            {error && <span className="text-xs text-rose-300">{error}</span>}
+            <div className="flex flex-wrap gap-2 justify-end pt-2">
               <button
                 type="button"
                 onClick={resetForm}
                 className="rounded-[12px] border border-[#1a2446] px-4 py-2 text-sm font-semibold text-blue-100 hover:bg-[#0e1629]"
+                disabled={isLoading}
               >
-                Cancel edit
+                Cancel
               </button>
-            )}
+              <button
+                type="submit"
+                className="rounded-[12px] bg-[#18aead] px-4 py-2 text-sm font-semibold text-white hover:bg-[#18aead]/90"
+                disabled={isLoading}
+              >
+                {editingId ? "Update" : "Add"} Password
+              </button>
+            </div>
+          </form>
+        </PrimaryModal>
+
+      {/* Delete confirmation */}
+      <PrimaryModal
+        open={Boolean(deleteId)}
+        onClose={() => {
+          setDeleteId(null)
+          setDeleteLabel("")
+        }}
+        title="Delete password"
+        description={`Are you sure you want to delete "${deleteLabel}"?`}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-blue-100">
+            This will remove the entry from the vault for this account.
+          </p>
+          <div className="flex justify-end gap-2">
             <button
               type="button"
-              onClick={loadVault}
+              onClick={() => {
+                setDeleteId(null)
+                setDeleteLabel("")
+              }}
               className="rounded-[12px] border border-[#1a2446] px-4 py-2 text-sm font-semibold text-blue-100 hover:bg-[#0e1629]"
               disabled={isLoading}
             >
-              Refresh
+              Cancel
             </button>
-            {error && <span className="text-xs text-rose-300">{error}</span>}
+            <button
+              type="button"
+              onClick={() => deleteId && handleDelete(deleteId)}
+              className="rounded-[12px] bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500"
+              disabled={isLoading}
+            >
+              Delete
+            </button>
           </div>
-        </form>
+        </div>
+      </PrimaryModal>
 
         {/* Table */}
         <div className="mt-8 overflow-x-auto rounded-[20px] border border-[#1a2446] bg-[#050b1c]">
@@ -345,8 +404,8 @@ export function AdminPasswordManagerTab() {
                 </tr>
               ) : vaultRows.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-3 py-4 text-center text-[#5dd4ff]">
-                    No password items yet. POST to <code>/api/testing/vaultdata</code> to add one.
+                  <td colSpan={8} className="px-3 py-4 text-center text-[#5dd4ff]">
+                    No password items yet. Click “Add Password” to create one.
                   </td>
                 </tr>
               ) : (
@@ -381,7 +440,10 @@ export function AdminPasswordManagerTab() {
                         </button>
                         <button
                           className="rounded border border-rose-600 px-3 py-1 text-xs text-rose-200 hover:bg-rose-900/40"
-                          onClick={() => handleDelete(row.id)}
+                          onClick={() => {
+                            setDeleteId(row.id)
+                            setDeleteLabel(row.label)
+                          }}
                         >
                           Delete
                         </button>
