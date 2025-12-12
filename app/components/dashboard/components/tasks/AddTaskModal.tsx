@@ -8,7 +8,7 @@ import { PrimaryInput } from "../../../PrimaryInput";
 import { FiTag, FiCalendar, FiFlag, FiCheckCircle, FiX, FiUser } from "react-icons/fi";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { getTagColor, getPriorityColor, getStatusColor } from "./taskUtils";
-import { Tag, DatePicker } from "antd";
+import { Tag, DatePicker, Dropdown } from "antd";
 import { CreateTagPopup } from "./popups/CreateTagPopup";
 import { priorityOptions, statusOptions } from "../../types";
 
@@ -180,14 +180,14 @@ export function AddTaskModal({
 
   return (
     <>
-      <PrimaryModal
-        open={open}
-        title="Add Task"
-        description="Create a new task and assign it to a team member."
-        onClose={handleClose}
-        widthClassName="max-w-2xl"
-      >
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <PrimaryModal
+      open={open}
+      title="Add Task"
+      description="Create a new task and assign it to a team member."
+      onClose={handleClose}
+      widthClassName="max-w-2xl"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
           {/* Task Name - Inline */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-blue-200 mb-2">
@@ -223,105 +223,104 @@ export function AddTaskModal({
             {/* Assignee - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={assigneePanelRef}>
               <label className="block text-sm font-medium text-blue-200 mb-2">Assignee</label>
-              <button
-                type="button"
-                onClick={() => {
-                  setAssigneePanelOpen(!assigneePanelOpen);
-                  setTagPanelOpen(false);
-                  setDatePanelOpen(false);
-                  setPriorityPanelOpen(false);
-                  setStatusPanelOpen(false);
+              <Dropdown
+                open={assigneePanelOpen}
+                onOpenChange={(open) => {
+                  setAssigneePanelOpen(open);
+                  if (open) {
+                    setTagPanelOpen(false);
+                    setDatePanelOpen(false);
+                    setPriorityPanelOpen(false);
+                    setStatusPanelOpen(false);
+                  }
                 }}
-                className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
-              >
-                <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
-                  <FiUser className="h-4 w-4 text-blue-300 flex-shrink-0" />
-                </div>
-                <div className="flex-1 text-left">
-                  {selectedAssignees.length > 0 ? (
-                    <span className="text-sm text-blue-200">
-                      {selectedAssignees.length} {selectedAssignees.length === 1 ? "person" : "people"}
-                    </span>
-                  ) : (
-                    <span className="text-sm text-blue-200">No assignee</span>
-                  )}
-                </div>
-              </button>
-
-              {/* Inline Assignee Panel */}
-              {assigneePanelOpen && (
-                <div className="absolute z-[1001] mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
-                  <div className="space-y-3">
-                    {/* Search */}
-                    <PrimaryInput
-                      type="text"
-                      placeholder="Search people"
-                      value={assigneeSearch}
-                      onChange={(e) => setAssigneeSearch(e.target.value)}
-                    />
-
-                    {/* Selected Assignees */}
-                    {selectedAssignees.length > 0 && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-blue-200">{selectedAssignees.length} selected</span>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedAssignees([])}
-                          className="text-xs text-blue-300 hover:text-blue-200"
-                        >
-                          Clear
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Assignees List */}
-                    <div className="max-h-48 space-y-1 overflow-y-auto">
-                      {filteredAssignees.length > 0 ? (
-                        filteredAssignees.map((employee) => {
-                          const isSelected = selectedAssignees.includes(employee.id);
-                          return (
-                            <button
-                              key={employee.id}
-                              type="button"
-                              onClick={() => handleAssigneeToggle(employee.id)}
-                              className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                                isSelected
-                                  ? "border-[#18aead] bg-[#18aead]/10"
-                                  : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <FiUser className="h-4 w-4 text-blue-300" />
-                                  <span className="text-sm text-blue-200">
-                                    {employee.name || employee.email}
-                                  </span>
-                                </div>
-                                {isSelected && (
-                                  <span className="text-xs text-[#18aead]">Selected</span>
-                                )}
-                              </div>
-                            </button>
-                          );
-                        })
-                      ) : (
-                        <p className="px-1 py-2 text-xs text-blue-300/70">No people found</p>
-                      )}
-                    </div>
-
-                    {/* Notify Checkbox */}
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={notifyAssignee}
-                        onChange={(e) => setNotifyAssignee(e.target.checked)}
-                        className="rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
+                placement="topLeft"
+                getPopupContainer={() => document.body}
+                dropdownRender={() => (
+                  <div className="w-[420px] max-w-[90vw] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
+                    <div className="space-y-3">
+                      <PrimaryInput
+                        type="text"
+                        placeholder="Search people"
+                        value={assigneeSearch}
+                        onChange={(e) => setAssigneeSearch(e.target.value)}
                       />
-                      <span className="text-xs text-blue-200">Notify assignees</span>
-                    </label>
+                      {selectedAssignees.length > 0 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-blue-200">{selectedAssignees.length} selected</span>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedAssignees([])}
+                            className="text-xs text-blue-300 hover:text-blue-200"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      )}
+                      <div className="max-h-48 space-y-1 overflow-y-auto">
+                        {filteredAssignees.length > 0 ? (
+                          filteredAssignees.map((employee) => {
+                            const isSelected = selectedAssignees.includes(employee.id);
+                            return (
+                              <button
+                                key={employee.id}
+                                type="button"
+                                onClick={() => handleAssigneeToggle(employee.id)}
+                                className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                                  isSelected
+                                    ? "border-[#18aead] bg-[#18aead]/10"
+                                    : "border-transparent bg-[#121c3d] hover:border-[#18aead]"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <FiUser className="h-4 w-4 text-blue-300" />
+                                    <span className="text-sm text-blue-200">
+                                      {employee.name || employee.email}
+                                    </span>
+                                  </div>
+                                  {isSelected && (
+                                    <span className="text-xs text-[#18aead]">Selected</span>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })
+                        ) : (
+                          <p className="px-1 py-2 text-xs text-blue-300/70">No people found</p>
+                        )}
+                      </div>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={notifyAssignee}
+                          onChange={(e) => setNotifyAssignee(e.target.checked)}
+                          className="rounded border-[#1a2446] bg-[#0e1629] text-[#18aead] focus:ring-[#18aead]"
+                        />
+                        <span className="text-xs text-blue-200">Notify assignees</span>
+                      </label>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              >
+                <button
+                  type="button"
+                  className="flex items-center gap-2 text-blue-300 hover:text-white/50 transition-colors"
+                >
+                  <div className="border border-[#1a2446] bg-[#0e1629] rounded-full p-2">
+                    <FiUser className="h-4 w-4 text-blue-300 flex-shrink-0" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    {selectedAssignees.length > 0 ? (
+                      <span className="text-sm text-blue-200">
+                        {selectedAssignees.length} {selectedAssignees.length === 1 ? "person" : "people"}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-blue-200">No assignee</span>
+                    )}
+                  </div>
+                </button>
+              </Dropdown>
             </div>
             {/* Tags - Label + Clickable Row + Inline Panel */}
             <div className="relative" ref={tagPanelRef}>
@@ -373,7 +372,7 @@ export function AddTaskModal({
               
               {/* Inline Tag Panel */}
               {tagPanelOpen && (
-                <div className="absolute z-[1001] mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
+                <div className="absolute z-[1100] mt-2 w-[420px] max-w-[90vw] max-h-[60vh] overflow-auto rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
                   <div className="space-y-3">
                     {/* Search */}
                     <PrimaryInput
@@ -487,7 +486,7 @@ export function AddTaskModal({
 
             {/* Inline Date Panel */}
             {datePanelOpen && (
-              <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
+              <div className="absolute z-[1100] mt-2 w-[420px] max-w-[90vw] max-h-[60vh] overflow-auto rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-4 shadow-lg">
                 <div className="space-y-4">
                   {/* Calendar */}
                   <DatePicker.RangePicker
@@ -548,7 +547,7 @@ export function AddTaskModal({
 
             {/* Inline Priority Panel */}
             {priorityPanelOpen && (
-              <div className="absolute z-[1001] mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+              <div className="absolute z-[1100] mt-2 min-w-[260px] max-w-[360px] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
                 <div className="space-y-1">
                   <button
                     type="button"
@@ -634,7 +633,7 @@ export function AddTaskModal({
 
             {/* Inline Status Panel */}
             {statusPanelOpen && (
-              <div className="absolute z-50 mt-2 w-full rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
+              <div className="absolute z-[1100] mt-2 min-w-[260px] max-w-[360px] rounded-[12px] border border-[#1a2446] bg-[#0e1629] p-2 shadow-lg">
                 <div className="space-y-1">
                   {statusOptions.map((status) => {
                     const isSelected = status === task.status;
@@ -675,21 +674,21 @@ export function AddTaskModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-white/5 pt-4">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <PrimaryButton type="submit" disabled={loading}>
+        <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-white/5 pt-4">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="rounded-[10px] border border-[#1a2446] bg-[#0e1629] px-4 py-2 text-xs font-medium text-blue-200 transition-colors hover:bg-[#121c3d] hover:text-white"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <PrimaryButton type="submit" disabled={loading}>
               {loading ? "Saving..." : "Add Task"}
-            </PrimaryButton>
-          </div>
-        </form>
-      </PrimaryModal>
+          </PrimaryButton>
+        </div>
+      </form>
+    </PrimaryModal>
 
       <CreateTagPopup
         open={createTagOpen}
