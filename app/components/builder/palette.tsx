@@ -156,12 +156,12 @@ export function Palette({
   onAddClick?: (id: PaletteComponentId) => void;
 }) {
   return (
-    <aside className="flex h-full flex-col gap-3 border-r border-slate-200 bg-slate-50/60 p-3">
+    <aside className="flex h-full flex-col gap-3 border-r border-[#1a2446] bg-[#0e1629] p-3">
       <div>
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-blue-200">
           Components
         </h2>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-blue-300/70">
           Drag a component into a column, or click Add.
         </p>
       </div>
@@ -179,13 +179,13 @@ export function Palette({
               onStartDrag?.(item.id);
             }}
             onClick={() => onAddClick?.(item.id)}
-            className="group flex flex-col items-start gap-1 rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-xs shadow-sm transition hover:border-slate-400 hover:bg-slate-50"
+            className="group flex flex-col items-start gap-1 rounded-md border border-[#1a2446] bg-[#121c3d] px-3 py-2 text-left text-xs shadow-sm transition hover:border-[#18aead] hover:bg-[#1a2446]"
           >
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-blue-200">
               {item.name}
             </span>
-            <span className="text-[11px] text-slate-500">{item.description}</span>
-            <span className="mt-1 text-[10px] font-medium text-slate-400">
+            <span className="text-[11px] text-blue-300/70">{item.description}</span>
+            <span className="mt-1 text-[10px] font-medium text-blue-300/50">
               Drag to column
             </span>
           </button>

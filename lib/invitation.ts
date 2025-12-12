@@ -29,11 +29,11 @@ export async function sendInvitationEmail(email: string, token: string, account_
 
   const mailOptions = {
     to: email,
-    subject: `You've been invited to join ${companyName} on Heybassh Shell`,
+    subject: `You've been invited to join ${companyName} on Heybassh Business Suite`,
     html: `
       <div style="font-family: Arial, sans-serif; color: #0b1124; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #0e6f69;">You've been invited!</h2>
-        <p>You've been invited to join <strong>${companyName}</strong> on Heybassh Shell.</p>
+        <p>You've been invited to join <strong>${companyName}</strong> on Heybassh Business Suite.</p>
         <p>Click the button below to create your account and get started:</p>
         <p style="margin: 24px 0;">
           <a href="${inviteUrl}" style="background: #0e6f69; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold;">Accept Invitation</a>

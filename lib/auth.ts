@@ -115,6 +115,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           account_id: authenticatedUser.account_id,
           companyName: authenticatedUser.companyName,
         }
+      } else if ((token as any)?.user?.email) {
+        // Refresh role/account on every JWT call so permission changes take effect without re-login
+        const email = (token as any).user.email as string
+        const dbUser = await prisma.user.findUnique({
+          where: { email },
+          select: { id: true, email: true, name: true, role: true, account_id: true, companyName: true },
+        })
+
+        if (dbUser) {
+          token.user = {
+            id: dbUser.id,
+            email: dbUser.email,
+            name: dbUser.name ?? dbUser.email,
+            role: dbUser.role,
+            account_id: dbUser.account_id,
+            companyName: dbUser.companyName,
+          }
+        }
       }
       return token
     },

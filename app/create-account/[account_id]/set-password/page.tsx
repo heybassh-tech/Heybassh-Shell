@@ -130,9 +130,9 @@ export default function SetPasswordPage({ params }: { params: { account_id: stri
         <h1 className="text-2xl font-semibold">{heading}</h1>
         <p className="text-sm text-blue-200">
           {setupToken
-            ? "Demo verification complete. Create the primary password so your team can log in to Heybassh Shell."
+            ? "Demo verification complete. Create the primary password so your team can log in to Heybassh Business Suite."
             : "Your verification session has expired. Request a new code to continue."}
-        </p>
+        </p> 
 
         <div className="space-y-2">
           <label className="text-sm text-blue-100">Work email</label>

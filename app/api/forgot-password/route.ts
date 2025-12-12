@@ -115,7 +115,7 @@ export async function POST(req: Request) {
       await sendEmail({
         from: fromAddress,
         to: normalizedEmail,
-        subject: "Password Reset Request - Heybassh Shell",
+        subject: "Password Reset Request - Heybassh Business Suite",
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h2 style="color: #0e6f69;">Password Reset Request</h2>

@@ -168,29 +168,29 @@ export function BuilderCanvas({
   };
 
   return (
-    <main className="flex h-full flex-1 flex-col gap-3 overflow-hidden bg-slate-100/60 p-3">
-      <header className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
+    <main className="flex h-full flex-1 flex-col gap-3 overflow-hidden bg-[#0e1629] p-3">
+      <header className="flex items-center justify-between gap-3 rounded-lg border border-[#1a2446] bg-[#121c3d] px-3 py-2">
         <div className="flex flex-col">
-          <h1 className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <h1 className="text-xs font-semibold uppercase tracking-wide text-blue-200">
             Page builder
           </h1>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-blue-300/70">
             Build pages with sections, columns, and components. Drag components from the left panel.
           </p>
         </div>
         <button
           type="button"
           onClick={addSection}
-          className="rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white shadow hover:bg-slate-800"
+          className="rounded-full bg-[#18aead] px-3 py-1.5 text-[11px] font-semibold text-white shadow hover:bg-[#18aead]/90 transition-colors"
         >
           Add section
         </button>
       </header>
 
-      <div className="relative flex-1 overflow-auto rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4">
+      <div className="relative flex-1 overflow-auto rounded-lg border border-dashed border-[#1a2446] bg-[#0e1629] p-4">
         {state.sections.length === 0 && (
-          <div className="flex h-full flex-col.items-center justify-center gap-2 text-xs text-slate-500">
-            <p className="font-medium text-slate-600">No sections yet</p>
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-xs text-blue-300/70">
+            <p className="font-medium text-blue-200">No sections yet</p>
             <p className="max-w-xs text-center">
               Use the &quot;Add section&quot; button above, then drag components into the columns.
             </p>
@@ -201,15 +201,15 @@ export function BuilderCanvas({
           {state.sections.map((section, idx) => (
             <section
               key={section.id}
-              className="space-y-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
+              className="space-y-2 rounded-lg border border-[#1a2446] bg-[#121c3d] p-3 shadow-sm"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-semibold text-white">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#18aead] text-[10px] font-semibold text-white">
                     {idx + 1}
                   </span>
                   <input
-                    className="w-40 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-800 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                    className="w-40 rounded-md border border-[#1a2446] bg-[#0e1629] px-2 py-1 text-[11px] font-medium text-blue-200 focus:border-[#18aead] focus:outline-none focus:ring-1 focus:ring-[#18aead]"
                     value={section.label}
                     onChange={(e) => {
                       const nextSections = state.sections.map((s) =>
@@ -223,14 +223,14 @@ export function BuilderCanvas({
                   <button
                     type="button"
                     onClick={() => addColumn(section.id)}
-                    className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-medium text-slate-700 hover:bg-slate-100"
+                    className="rounded-full border border-[#1a2446] bg-[#0e1629] px-2.5 py-1 text-[10px] font-medium text-blue-200 hover:bg-[#121c3d] hover:border-[#18aead] transition-colors"
                   >
                     Add column
                   </button>
                   <button
                     type="button"
                     onClick={() => removeSection(section.id)}
-                    className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-medium text-slate-500 hover:bg-slate-100"
+                    className="rounded-full border border-[#1a2446] px-2.5 py-1 text-[10px] font-medium text-blue-300/70 hover:bg-[#121c3d] hover:text-blue-200 transition-colors"
                   >
                     Remove
                   </button>
@@ -241,7 +241,7 @@ export function BuilderCanvas({
                 {section.columns.map((col) => (
                   <div
                     key={col.id}
-                    className="min-h-[120px] rounded-md border border-dashed border-slate-300 bg-slate-50/80 p-2"
+                    className="min-h-[120px] rounded-md border border-dashed border-[#1a2446] bg-[#0e1629]/50 p-2"
                     style={{
                       gridColumn: `span ${Math.max(
                         3,
@@ -254,12 +254,12 @@ export function BuilderCanvas({
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => handleDropOnColumn(e, section.id, col.id)}
                   >
-                    <div className="mb-1 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+                    <div className="mb-1 flex items-center justify-between gap-2 text-[10px] text-blue-300/70">
                       <span>Column</span>
                       <button
                         type="button"
                         onClick={() => removeColumn(section.id, col.id)}
-                        className="rounded-full px-2 py-0.5 hover:bg-slate-100"
+                        className="rounded-full px-2 py-0.5 hover:bg-[#121c3d] text-blue-300/70 hover:text-blue-200 transition-colors"
                       >
                         Remove
                       </button>
@@ -271,14 +271,14 @@ export function BuilderCanvas({
                           onClick={() =>
                             onSelectComponent(selectedComponentId === cmp.id ? null : cmp)
                           }
-                          className={`group flex flex-col items-stretch gap-1 rounded-md border bg-white px-2 py-1 text-left text-[11px] shadow-sm transition cursor-pointer ${
+                          className={`group flex flex-col items-stretch gap-1 rounded-md border bg-[#121c3d] px-2 py-1 text-left text-[11px] shadow-sm transition cursor-pointer ${
                             selectedComponentId === cmp.id
-                              ? "border-slate-900 ring-1 ring-slate-900/60"
-                              : "border-slate-200 hover:border-slate-400"
+                              ? "border-[#18aead] ring-1 ring-[#18aead]/60 bg-[#18aead]/10"
+                              : "border-[#1a2446] hover:border-[#18aead]"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium text-slate-700">
+                            <span className="font-medium text-blue-200">
                               {cmp.name || "Component"}
                             </span>
                             <button
@@ -287,18 +287,18 @@ export function BuilderCanvas({
                                 e.stopPropagation();
                                 handleRemoveComponent(section.id, col.id, cmp.id);
                               }}
-                              className="rounded-full px-2 py-0.5 text-[10px] text-slate-500 hover:bg-slate-100"
+                              className="rounded-full px-2 py-0.5 text-[10px] text-blue-300/70 hover:bg-[#1a2446] hover:text-blue-200 transition-colors"
                             >
                               Remove
                             </button>
                           </div>
-                          <p className="line-clamp-2 text-[10px] text-slate-500">
+                          <p className="line-clamp-2 text-[10px] text-blue-300/60">
                             {cmp.html.replace(/\s+/g, " ").slice(0, 120)}
                           </p>
                         </div>
                       ))}
                       {col.components.length === 0 && (
-                        <p className="mt-4 text-center text-[10px] text-slate-400">
+                        <p className="mt-4 text-center text-[10px] text-blue-300/50">
                           Drag a component here
                         </p>
                       )}
